@@ -3,7 +3,7 @@ Welcome to Aquaholic Home page🎉 <br>
 {% load socialaccount %}
 {% load i18n %}
     {% if user.is_authenticated %}
-        <h1>Welcome, {{ user.username }} !</h1>
+        <h1>Welcome, {{ user.first_name }} !</h1>
     {% endif %}
 <br>
     <form action="{% provider_login_url 'line' %}" method="post">
@@ -11,7 +11,11 @@ Welcome to Aquaholic Home page🎉 <br>
       <button type="submit">Login with Line</button>
     </form>
 
+
     <form method="post" action="{% url 'account_logout' %}">
       {% csrf_token %}
+      {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+      {% endif %}
       <button class="STYLE_ME" type="submit">Logout</button>
     </form>

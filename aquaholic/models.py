@@ -1,3 +1,4 @@
+"""Models for Aquaholic"""
 from django.db import models
 
 

@@ -139,10 +139,11 @@ SOCIALACCOUNT_PROVIDERS = {
     'line': {
               'APP': {
                   'client_id': '1657561314',
-                  'secret': '16a2b4ff60f411ee937a7ee268acb7e7'
+                  'secret': 'e10c8555ec6cf7d549bd83677e75ac26'
               },
               "SCOPE": ['profile', 'openid', 'email']
           }
 }
 
 ACCOUNT_LOGOUT_ON_GET = True
+

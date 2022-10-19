@@ -1,0 +1,16 @@
+{% load socialaccount %}
+<html>
+  <head>
+    <title>Login page</title>
+  </head>
+  <body>
+    {% if user.is_authenticated %}
+        <h1>Welcome, {{ user.first_name }} !</h1>
+    {% else %}
+        <h1>Login Page</h1>
+        <button onclick="document.location='{% provider_login_url 'line' %}'">
+            Login with Line
+        </button>
+    {% endif %}
+  </body>
+</html>

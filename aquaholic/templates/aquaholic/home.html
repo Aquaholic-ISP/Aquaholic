@@ -1,10 +1,17 @@
 Welcome to Aquaholic Home page🎉 <br>
 
 {% load socialaccount %}
+{% load i18n %}
     {% if user.is_authenticated %}
         <h1>Welcome, {{ user.username }} !</h1>
-    {% else %}
-        <a href="{% provider_login_url 'line' %}">Login with Line</a>
     {% endif %}
 <br>
-    <a href="{% provider_login_url 'line' %}">Logout</a>
+    <form action="{% provider_login_url 'line' %}" method="post">
+      {% csrf_token %}
+      <button type="submit">Login with Line</button>
+    </form>
+
+    <form method="post" action="{% url 'account_logout' %}">
+      {% csrf_token %}
+      <button class="STYLE_ME" type="submit">Logout</button>
+    </form>

@@ -40,6 +40,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.sites',
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.line",
 ]
 
 MIDDLEWARE = [
@@ -118,3 +123,23 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTHENTICATION_BACKENDS = (
+ 'django.contrib.auth.backends.ModelBackend',
+ 'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+
+SITE_ID = 2
+LOGIN_REDIRECT_URL = '/aquaholic/'
+LOGOUT_REDIRECT_URL = '/accounts/line/login/'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'line': {
+              'APP': {
+                  'client_id': '1657561314',
+                  'secret': '16a2b4ff60f411ee937a7ee268acb7e7'
+              },
+              "SCOPE": ['profile', 'openid', 'email']
+          }
+}

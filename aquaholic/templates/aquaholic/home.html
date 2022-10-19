@@ -1,1 +1,10 @@
-Welcome to Aquaholic Home page🎉
+Welcome to Aquaholic Home page🎉 <br>
+
+{% load socialaccount %}
+    {% if user.is_authenticated %}
+        <h1>Welcome, {{ user.username }} !</h1>
+    {% else %}
+        <a href="{% provider_login_url 'line' %}">Login with Line</a>
+    {% endif %}
+<br>
+    <a href="{% provider_login_url 'line' %}">Logout</a>

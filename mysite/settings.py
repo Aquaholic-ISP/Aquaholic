@@ -62,7 +62,8 @@ ROOT_URLCONF = "mysite.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'templates')],
+        "DIRS": [os.path.join(BASE_DIR, 'templates'),
+                 os.path.join(BASE_DIR, 'templates', 'allauth', 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -132,7 +133,7 @@ AUTHENTICATION_BACKENDS = (
 
 SITE_ID = 2
 LOGIN_REDIRECT_URL = '/aquaholic/'
-LOGOUT_REDIRECT_URL = '/accounts/line/login/'
+LOGOUT_REDIRECT_URL = '/aquaholic/'
 
 SOCIALACCOUNT_PROVIDERS = {
     'line': {
@@ -143,3 +144,5 @@ SOCIALACCOUNT_PROVIDERS = {
               "SCOPE": ['profile', 'openid', 'email']
           }
 }
+
+

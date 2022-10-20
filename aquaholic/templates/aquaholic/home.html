@@ -1,10 +1,39 @@
-Welcome to Aquaholic Home page🎉 <br>
+{% load static %}
 
-{% load socialaccount %}
-    {% if user.is_authenticated %}
-        <h1>Welcome, {{ user.username }} !</h1>
-    {% else %}
-        <a href="{% provider_login_url 'line' %}">Login with Line</a>
-    {% endif %}
-<br>
-    <a href="{% provider_login_url 'line' %}">Logout</a>
+<html>
+<head>
+    <title>Home page of Aquaholic</title>
+    <link rel="stylesheet" href="{% static 'aquaholic/style.css' %}">
+</head>
+<body>
+    <div class="banner">
+        <div class="content1">
+            <h1>Aquaholic</h1>
+            <p>Improve your drinking water habits now.</p>
+        </div>
+        <div class="content2">
+            <h1>Calculate your water intake</h1>
+            <h3 style="position: absolute; padding-left: 716px; padding-top:30px">
+                Enter your weight</h3>
+            <input type="number" placeholder="weight" name="" style="position: absolute; left: 1050px; top:215px">
+            <br>
+            <h3 style="position: absolute; left: 520px; top: 300px">
+                Enter the duration of your exercise</h3>
+            <input type="number" placeholder="exercise duration" name="" style="position: absolute; left: 1050px; top:300px">
+            <div>
+                <button type="button" style="position: absolute; top:400px"><span></span>CALCULATE</button>
+            </div>
+        </div>
+        <div class="result">
+            <p >The amount of water you should drink in a day is {result} ml</p>
+        </div>
+        <div class="linklog">
+            <ul>
+                <li style="position: absolute; top:650px; left: 580px"><a href="#">Login</a></li>
+            </ul>
+            <h3 style="position: absolute; top:650px; left: 660px">to plan your schedule.</h3>
+        </div>
+    </div>
+</body>
+</html>
+

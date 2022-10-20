@@ -2,7 +2,6 @@ from django.views import generic
 from .models import UserInfo, Schedule, Intake
 from django.shortcuts import render
 from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
-from django.contrib import messages
 
 
 class HomePage(generic.ListView):
@@ -25,8 +24,9 @@ class Calculate(generic.ListView):
             return render(request, 'aquaholic/calculate.html',
                           {'result': f"{water_amount_per_day:.2f}"})
         except ValueError:
-            messages.error(request, "Please, enter a positive number in both fields.")
-            return render(request, 'aquaholic/calculate.html',)
+            message = "Please, enter a positive number in both fields."
+            return render(request, 'aquaholic/calculate.html',
+                          {'message': message})
 
 
 class SetUp(generic.DetailView):

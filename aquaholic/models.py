@@ -43,8 +43,11 @@ class Schedule(models.Model):
     expected_amount = models.DecimalField(max_digits=10, decimal_places=10, default=0)
     notification_status = models.BooleanField(default=True)
 
-    def set_notification_status(self):
-        pass
+    def change_notification_status(self):
+        if self.notification_status is True:
+            self.notification_status = False
+        else:
+            self.notification_status = True
 
 
 class Intake(models.Model):

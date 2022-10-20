@@ -1,39 +1,51 @@
 {% load static %}
+{% load socialaccount %}
+{% load i18n %}
+
 
 <html>
 <head>
     <title>Home page of Aquaholic</title>
     <link rel="stylesheet" href="{% static 'aquaholic/style.css' %}">
 </head>
-<body>
-    <div class="banner">
-        <div class="content1">
-            <h1>Aquaholic</h1>
-            <p>Improve your drinking water habits now.</p>
+<div class="entrance">
+    {% if user.is_authenticated %}
+    <div class="getin">
+        <p>Aquaholic</p>
+        <h1>Welcome Back, {{ user.first_name }}</h1>
+        <div class="buttonenter">
+            <form action="progress.html" method="post">
+                <button type="submit">Set Your Progress</button>
+            </form>
+            <form action="" method="post">
+                <button type="submit">See History</button>
+            </form>
         </div>
-        <div class="content2">
-            <h1>Calculate your water intake</h1>
-            <h3 style="position: absolute; padding-left: 716px; padding-top:30px">
-                Enter your weight</h3>
-            <input type="number" placeholder="weight" name="" style="position: absolute; left: 1050px; top:215px">
-            <br>
-            <h3 style="position: absolute; left: 520px; top: 300px">
-                Enter the duration of your exercise</h3>
-            <input type="number" placeholder="exercise duration" name="" style="position: absolute; left: 1050px; top:300px">
-            <div>
-                <button type="button" style="position: absolute; top:400px"><span></span>CALCULATE</button>
-            </div>
-        </div>
-        <div class="result">
-            <p >The amount of water you should drink in a day is {result} ml</p>
-        </div>
-        <div class="linklog">
-            <ul>
-                <li style="position: absolute; top:650px; left: 580px"><a href="#">Login</a></li>
-            </ul>
-            <h3 style="position: absolute; top:650px; left: 660px">to plan your schedule.</h3>
+        <div class="logout">
+            <form method="post" action="{% url 'account_logout' %}">
+      {% csrf_token %}
+      {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+      {% endif %}
+      <button class="STYLE_ME" type="submit">Logout</button>
+    </form>
         </div>
     </div>
-</body>
-</html>
+    {% endif %}
 
+
+    {% if not user.is_authenticated %}
+    <h1>Aquaholic</h1>
+    <p>Improve your drinking habits now.</p>
+    <div class="buttonlogin">
+        <form action="{% provider_login_url 'line' %}" method="post">
+      {% csrf_token %}
+      <button type="submit"><span></span>Login with Line</button>
+        </form>
+        <form action="calculate.html" method="post">
+            <button type="submit"><span></span>Calculate</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+</html>

@@ -8,6 +8,12 @@ class HomePage(generic.ListView):
     template_name = 'aquaholic/home.html'
 
 
+class Calculate(generic.ListView):
+    """A class that represents the home page view."""
+    model = UserInfo
+    template_name = 'aquaholic/calculate.html'
+
+
 class SetUp(generic.DetailView):
     """A class that represents the set up page view."""
     model = UserInfo

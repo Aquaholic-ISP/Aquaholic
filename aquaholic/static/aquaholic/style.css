@@ -72,3 +72,16 @@ button{
     position: relative;
     top: 10px;
 }
+
+.calmain {
+    width: 100%;
+    position: absolute;
+    top: 10%;
+    transform: translateY(-50%);
+    text-align: center;
+}
+
+.calmain h1{
+    font-size: 40px;
+    margin-top: 20px;
+}

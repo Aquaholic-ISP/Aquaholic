@@ -42,7 +42,7 @@
       {% csrf_token %}
       <button type="submit"><span></span>Login with Line</button>
         </form>
-        <form action="calculate.html" method="post">
+        <form action="{% url 'aquaholic:calculate' %}" method="GET">
             <button type="submit"><span></span>Calculate</button>
         </form>
     </div>

@@ -12,8 +12,6 @@ class HomePage(generic.ListView):
 
 class Calculate(generic.ListView):
     """A class that represents the calculation page view."""
-    model = UserInfo
-    template_name = 'aquaholic/calculate.html'
 
     def get(self, request, *args, **kwargs):
         return render(request, 'aquaholic/calculate.html')

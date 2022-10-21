@@ -70,4 +70,11 @@ class CalculateView(TestCase):
         self.assertContains(response, "Please, enter a positive number in both fields.", html=True)
 
 
+class TemplateUsed(TestCase):
+    def test_template_used(self):
+        """template used correctly"""
+        response = self.client.get(reverse('aquaholic:calculate'))
+        self.assertTemplateUsed(response, 'aquaholic/calculate.html')
+        response = self.client.get(reverse('aquaholic:home'))
+        self.assertTemplateUsed(response, 'aquaholic/home.html')
 

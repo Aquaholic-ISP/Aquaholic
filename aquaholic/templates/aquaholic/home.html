@@ -39,11 +39,12 @@
     <p>Improve your drinking habits now.</p>
     <div class="buttonlogin">
         <form action="{% provider_login_url 'line' %}" method="post">
-      {% csrf_token %}
-      <button type="submit"><span></span>Login with Line</button>
+          {% csrf_token %}
+          <button type="submit"><span></span>Login with Line</button>
         </form>
         <form action="{% url 'aquaholic:calculate' %}" method="GET">
-            <button type="submit"><span></span>Calculate</button>
+          {% csrf_token %}
+          <button type="submit"><span></span>Calculate</button>
         </form>
     </div>
     {% endif %}

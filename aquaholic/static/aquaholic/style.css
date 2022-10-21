@@ -3,7 +3,7 @@
     padding: 0;
     text-align: center;
     background-color: #4682B4;
-    color: white;
+    color: #0E1646;
 
 }
 
@@ -33,7 +33,7 @@ button{
     text-align: center;
     border-radius: 25px;
     font-weight: bold;
-    border: 2px solid white;
+    border: 2px solid #0E1646;
     background: transparent;
     cursor: pointer;
     position: relative;
@@ -76,12 +76,46 @@ button{
 .calmain {
     width: 100%;
     position: absolute;
-    top: 10%;
+    top: 40%;
     transform: translateY(-50%);
     text-align: center;
+    line-height: 1.6;
 }
 
 .calmain h1{
-    font-size: 40px;
-    margin-top: 20px;
+    font-size: 80px;
+    margin-top: 10px;
 }
+
+.calpart button{
+    width: 250px;
+    padding: 10px auto;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: 1;
+}
+
+.calpart input{
+    width: 115px;
+    height: 30px;
+    line-height: 1.65;
+    border: 1px solid #0E1646;
+}
+
+img {
+    position: absolute;
+    top: 200px;
+    margin-left: 360px;
+    transform: rotate(335deg);
+}
+

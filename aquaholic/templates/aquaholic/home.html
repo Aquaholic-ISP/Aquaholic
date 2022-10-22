@@ -11,8 +11,16 @@
 <div class="entrance">
     {% if user.is_authenticated %}
     <div class="getin">
-        <p>Aquaholic</p>
-        <h1>Welcome Back, {{ user.first_name }}</h1>
+
+        <div class="water">
+            <h2 style="font-size: 40px;">Aquaholic</h2>
+            <h2 style="font-size: 40px;">Aquaholic</h2>
+            <h2 style="font-size: 40px;">Aquaholic</h2>
+            <h2 style="font-size: 40px;">Aquaholic</h2>
+        </div>
+
+        <h1 style="font-size: 120px; ">Welcome Back, {{ user.first_name }}</h1>
+
         <div class="buttonenter">
             <form action="progress.html" method="post">
                 <button type="submit">Set Your Progress</button>
@@ -21,32 +29,41 @@
                 <button type="submit">See History</button>
             </form>
         </div>
+
         <div class="logout">
             <form method="post" action="{% url 'account_logout' %}">
-      {% csrf_token %}
-      {% if redirect_field_value %}
-        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-      {% endif %}
-      <button class="STYLE_ME" type="submit">Logout</button>
-    </form>
+                {% csrf_token %}
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                {% endif %}
+                <button class="STYLE_ME" type="submit">Logout</button>
+            </form>
         </div>
     </div>
     {% endif %}
 
 
     {% if not user.is_authenticated %}
-    <h1>Aquaholic</h1>
-    <p>Improve your drinking habits now.</p>
-    <div class="buttonlogin">
-        <form action="{% provider_login_url 'line' %}" method="post">
-          {% csrf_token %}
-          <button type="submit"><span></span>Login with Line</button>
-        </form>
-        <form action="{% url 'aquaholic:calculate' %}" method="GET">
-          {% csrf_token %}
-          <button type="submit"><span></span>Calculate</button>
-        </form>
-    </div>
+        <div class="water">
+            <h2>Aquaholic</h2>
+            <h2>Aquaholic</h2>
+            <h2>Aquaholic</h2>
+            <h2>Aquaholic</h2>
+        </div>
+
+        <p>Improve your drinking habits now.</p>
+
+        <div class="buttonlogin">
+            <form action="{% provider_login_url 'line' %}" method="post">
+            {% csrf_token %}
+            <button type="submit"><span></span>Login with Line</button>
+            </form>
+            <form action="{% url 'aquaholic:calculate' %}" method="GET">
+            {% csrf_token %}
+            <button type="submit"><span></span>Calculate</button>
+            </form>
+        </div>
+
     {% endif %}
 </div>
 </html>

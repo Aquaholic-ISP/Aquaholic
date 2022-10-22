@@ -27,10 +27,69 @@
     line-weight: 25px;
 }
 
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+
+
+.water {
+    position: relative;
+    width: 100%;
+    height: 28vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    font-family: "Poppins", sans-serif;
+}
+
+.water h2{
+    position: absolute;
+    font-size: 14vw;
+    background: transparent;
+}
+
+.water h2:nth-child(1){
+    color: #fff;
+    text-shadow: -2px 2px 0px #183954,
+    -4px 4px 0px #183954,
+    -6px 6px 0px #183954,
+    -8px 8px 0px #183954,
+    -18px 18px 20px rgba(0,0,0,0.5);
+    -18px 18px 50px rgba(0,0,0,0.5);
+}
+
+.water h2:nth-child(2){
+    color: #2196f3;
+    opacity: 0.5;
+    animation: animate 3s ease-in-out infinite;
+}
+
+.water h2:nth-child(3){
+    color: #2196f3;
+    opacity: 0.5;
+    animation: animate 6s ease-in-out infinite;
+}
+
+.water h2:nth-child(4){
+    color: #2196f3;
+    animation: animate 4s ease-in-out infinite;
+}
+
+@keyframes animate{
+    0%, 100%
+    {
+        clip-path: polygon(0% 46%, 16% 45%, 34% 52%, 50% 61%, 68% 65%, 85% 61%, 100% 53%, 100% 100%, 0% 100%);
+    }
+    50%
+    {
+        clip-path: polygon(0 59%, 18% 67%, 36% 70%, 51% 66%, 66% 56%, 82% 49%, 100% 45%, 100% 100%, 0% 100%);
+    }
+}
+
 button{
     width: 150px;
     padding: 10px 0;
     text-align: center;
+    font-size: 15px;
     border-radius: 25px;
     font-weight: bold;
     border: 2px solid #0E1646;
@@ -50,6 +109,7 @@ button{
     top: 40%;
     transform: translateY(-50%);
     text-align: center;
+    font-family: "Poppins", sans-serif;
 }
 
 .getin p{
@@ -57,11 +117,15 @@ button{
     margin: 0;
     position: relative;
     top: 80px;
+    text-shadow:
+    -10px 10px 10px rgba(0,0,0,0.5);
 }
 
 .getin h1{
     font-size: 80px;
-    margin-top: 80px;
+    margin-top: -120px;
+    text-shadow:
+    -10px 10px 10px rgba(0,0,0,0.5);
 }
 
 .buttonenter form{
@@ -73,49 +137,7 @@ button{
     top: 10px;
 }
 
-.calmain {
-    width: 100%;
-    position: absolute;
-    top: 40%;
-    transform: translateY(-50%);
-    text-align: center;
-    line-height: 1.6;
-}
 
-.calmain h1{
-    font-size: 80px;
-    margin-top: 10px;
-}
 
-.calpart button{
-    width: 250px;
-    padding: 10px auto;
-    text-align: center;
-    font-size: 18px;
-    border-radius: 25px;
-    font-weight: bold;
-    border: 2px solid #0E1646;
-    background: transparent;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
 
-input[type=number]::-webkit-inner-spin-button {
-  -webkit-appearance: 1;
-}
-
-.calpart input{
-    width: 115px;
-    height: 30px;
-    line-height: 1.65;
-    border: 1px solid #0E1646;
-}
-
-img {
-    position: absolute;
-    top: 200px;
-    margin-left: 360px;
-    transform: rotate(335deg);
-}
 

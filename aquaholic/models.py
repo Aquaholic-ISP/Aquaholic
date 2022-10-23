@@ -13,7 +13,7 @@ class UserInfo(models.Model):
     """
     UserInfo class for collect user information.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     weight = models.DecimalField(max_digits=10, decimal_places=10, default=0)
     exercise_time = models.DecimalField(max_digits=10, decimal_places=10, default=0)
     water_amount_per_day = models.DecimalField(max_digits=10, decimal_places=10, default=0)

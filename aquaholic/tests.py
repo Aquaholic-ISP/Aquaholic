@@ -52,6 +52,7 @@ class HomePageView(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_to_home_page(self):
+        """client redirect to home page"""
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         cal_url = reverse('aquaholic:home')

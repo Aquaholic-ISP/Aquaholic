@@ -51,7 +51,7 @@ class HomePageView(TestCase):
         response = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(response.status_code, 200)
 
-    def test_redirect_to_calculate_page(self):
+    def test_redirect_to_home_page(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         cal_url = reverse('aquaholic:home')

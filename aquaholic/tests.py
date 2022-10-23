@@ -94,13 +94,16 @@ class TemplateUsed(TestCase):
         self.assertTemplateUsed(response, 'aquaholic/calculate.html')
         response = self.client.get(reverse('aquaholic:home'))
         self.assertTemplateUsed(response, 'aquaholic/home.html')
+        self.client.login()
+        cal_url = self.client.get(reverse('aquaholic:home'))
+        self.assertTemplateUsed(cal_url, 'aquaholic/home.html')
 
 
 class LoginWithLine(TestCase):
     def test_authenticated_using_line(self):
         """After login redirect to calculation page"""
         self.client.login()
-        cal_url = reverse('aquaholic:calculate')
+        cal_url = reverse('aquaholic:home')
         response = self.client.get(cal_url)
         self.assertEqual(response.status_code, 200)
 

@@ -19,10 +19,10 @@
     <div class="calpart" style="line-height: 250%">
     <form action="{% url 'aquaholic:calculate' %}" method="POST">
         {% csrf_token%}
-        <label style="font-size: 30px;">Enter your weight</label>
-        <input style="margin-left: 90px; font-size: 18px;" type="number" name="weight" min="0">
+        <label style="font-size: 30px; position: relative;">Enter your weight (kg)</label>
+        <input style="margin-left: 114px; font-size: 18px;" type="number" name="weight" min="0">
         <br>
-        <label style="font-size: 30px;">Enter your exercise time</label>
+        <label style="font-size: 30px;">Enter your exercise time (min)</label>
         <input style="margin-left: 65px; font-size: 18px;" type="number" name="exercise_time" min="0">
         <br>
         {% if message %}

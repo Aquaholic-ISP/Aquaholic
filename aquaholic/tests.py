@@ -2,26 +2,10 @@ from django.test import TestCase
 
 # Create your tests here.
 import datetime
-from django.test import TestCase
-from django.utils import timezone
 from aquaholic.models import UserInfo
 from django.urls import reverse
-from django.contrib.auth.models import User
 from http import HTTPStatus
-from allauth.account import app_settings as account_settings
-from allauth.account.models import EmailAddress
-from allauth.account.utils import user_email
-from allauth.socialaccount.helpers import complete_social_login
-from allauth.socialaccount.models import SocialApp, SocialAccount, SocialLogin
-from allauth.utils import get_user_model
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth.models import User
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
-from django.test.client import Client
-from django.test.client import RequestFactory
-from django.test.utils import override_settings
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
@@ -67,7 +51,8 @@ class HomePageView(TestCase):
         response = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(response.status_code, 200)
 
-    def test_redirect_to_calculate_page(self):
+    def test_redirect_to_home_page(self):
+        """client redirect to home page"""
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         cal_url = reverse('aquaholic:home')
@@ -94,13 +79,16 @@ class TemplateUsed(TestCase):
         self.assertTemplateUsed(response, 'aquaholic/calculate.html')
         response = self.client.get(reverse('aquaholic:home'))
         self.assertTemplateUsed(response, 'aquaholic/home.html')
+        self.client.login()
+        cal_url = self.client.get(reverse('aquaholic:home'))
+        self.assertTemplateUsed(cal_url, 'aquaholic/home.html')
 
 
 class LoginWithLine(TestCase):
     def test_authenticated_using_line(self):
         """After login redirect to calculation page"""
         self.client.login()
-        cal_url = reverse('aquaholic:calculate')
+        cal_url = reverse('aquaholic:home')
         response = self.client.get(cal_url)
         self.assertEqual(response.status_code, 200)
 

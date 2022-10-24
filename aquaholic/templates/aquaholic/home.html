@@ -22,10 +22,12 @@
         <h1 style="font-size: 120px; ">Welcome Back, {{ user.first_name }}</h1>
 
         <div class="buttonenter">
-            <form action="progress.html" method="post">
+            <form action="{% url 'aquaholic:set_up' user.id %}" method="get">
+                {% csrf_token %}
                 <button type="submit">Set Your Progress</button>
             </form>
-            <form action="" method="post">
+            <form action="{% url 'aquaholic:history' user.id %}" method="get">
+                {% csrf_token %}
                 <button type="submit">See History</button>
             </form>
         </div>

@@ -40,18 +40,26 @@ class SetUp(generic.DetailView):
     template_name = 'aquaholic/set_up.html'
 
     def get(self, request, *args, **kwargs):
+        # TODO receive first notification time and last notification time from user and save to database
+
         try:
-            token = UserInfo.objects.get(user=request.user).token
+            # user who have already generate token doesn't have to generate token
+            token = UserInfo.objects.get(user_id=request.user.id).notify_token
             return render(request, self.template_name,
-                          {'token_exist': True})
+                          {'token_exist': True,
+                           'user': request.user})
         except:
-            return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
+            # user already generate token
+            return render(request, self.template_name,
+                          {'token_exist': False,
+                           'user': request.user})
 
 
 class NotificationCallback(generic.DetailView):
     """A class that represents the progress page view."""
 
     def get(self, request, *args, **kwargs):
+        """Send welcome message to new user."""
         token = get_access_token(request.GET['code'])
         send_notification("Welcome to aquaholic", token)
         UserInfo.objects.create(user=request.user, notify_token=token)
@@ -79,3 +87,12 @@ class History(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
+
+
+class CalculateAuth(generic.DetailView):
+    """A class that represents the calculation page view for authenticate user."""
+    template_name = 'aquaholic/calculation_auth.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+

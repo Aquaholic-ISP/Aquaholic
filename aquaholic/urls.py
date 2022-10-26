@@ -2,12 +2,12 @@ from django.urls import path
 from django.views.generic import RedirectView
 
 from . import views
-import allauth.socialaccount.providers.oauth2.views as CallbackView
 
 app_name = "aquaholic"
 
 urlpatterns = [
-    path('noti/callback/', views.NotificationCallback.as_view(), name="callback"), #TODO change the url
+    path('noti/callback/', views.NotificationCallback.as_view(), name="callback"),
+    path('aquaholic/<int:pk>/calculate', views.CalculateAuth.as_view(), name='calculate_auth'),
     path('aquaholic/<int:pk>/set_up', views.SetUp.as_view(), name='set_up'),
     path('aquaholic/<int:pk>/schedule', views.ScheduleView.as_view(), name='schedule'),
 

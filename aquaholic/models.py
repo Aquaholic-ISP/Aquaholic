@@ -21,6 +21,7 @@ class UserInfo(models.Model):
     last_notification_time = models.TimeField('last notification time', null=True)
     total_hours = models.DecimalField(max_digits=10, decimal_places=10, null=True)
     water_amount_per_hour = models.DecimalField(max_digits=10, decimal_places=10, null=True)
+    notify_token = models.CharField(max_length=200, null=True)
 
     def get_water_amount_per_day(self):
         """Calculate amount of water per day."""

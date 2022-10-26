@@ -1,7 +1,9 @@
 from django.views import generic
 from .models import UserInfo, Schedule, Intake
-from django.shortcuts import render
+from django.shortcuts import render, reverse, redirect
 from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
+from .notification import get_access_token, send_notification
+from django.http import HttpResponseRedirect
 
 
 class HomePage(generic.ListView):
@@ -38,13 +40,30 @@ class SetUp(generic.DetailView):
     template_name = 'aquaholic/set_up.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        try:
+            token = UserInfo.objects.get(user=request.user).token
+            return render(request, self.template_name,
+                          {'token_exist': True})
+        except:
+            return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
 
 
-class Progress(generic.DetailView):
+class NotificationCallback(generic.DetailView):
     """A class that represents the progress page view."""
+
+    def get(self, request, *args, **kwargs):
+        token = get_access_token(request.GET['code'])
+        send_notification("Welcome to aquaholic", token)
+        UserInfo.objects.create(user=request.user, notify_token=token)
+        return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
+
+
+class ScheduleView(generic.DetailView):
     model = Schedule
-    template_name = 'aquaholic/progress.html'
+    template_name = 'aquaholic/schedule.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
 
 
 class Input(generic.DetailView):

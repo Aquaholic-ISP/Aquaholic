@@ -1,1 +1,31 @@
-A set up page starter.
+{% load static %}
+{% load socialaccount %}
+{% load i18n %}
+
+<html>
+<head>
+    <title>Set your new schedule</title>
+    <link rel="stylesheet" href="{% static 'aquaholic/style4.css' %}">
+</head>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+    </div>
+
+    <h1>Set your new schedule</h1>
+    <div class="setup">
+<!--        <form action="{% url 'aquaholic:calculate' %}" method="get">-->
+<!--              {% csrf_token %}-->
+            <br>
+        <label style="font-size: 30px; position: relative;">Enter your first notification time</label>
+        <input style="margin-left: 114px; font-size: 18px;" type="time" name="first_notification">
+        <br>
+        <label style="font-size: 30px; position: relative;">Enter your last notification time</label>
+        <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification">
+        <br>
+        <button type="submit" style="margin-top: 40px;">Generate schedule</button>
+    </form>
+    </div>
+</html>

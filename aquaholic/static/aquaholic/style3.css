@@ -1,0 +1,142 @@
+*{
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-color: #4682B4;
+    color: #0E1646;
+
+}
+
+.entrance{
+    width: 100%;
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    text-align: center;
+}
+
+.entrance h1{
+    font-size: 120px;
+    margin-top: 80px;
+}
+
+.entrance p{
+    font-size: 30px;
+    margin: 10 auto;
+    font-weight: 100;
+    line-weight: 25px;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+
+
+.water {
+    position: relative;
+    width: 100%;
+    height: 28vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    font-family: "Poppins", sans-serif;
+}
+
+.water h2{
+    position: absolute;
+    font-size: 14vw;
+    background: transparent;
+}
+
+.water h2:nth-child(1){
+    color: #fff;
+    text-shadow: -2px 2px 0px #183954,
+    -4px 4px 0px #183954,
+    -6px 6px 0px #183954,
+    -8px 8px 0px #183954,
+    -18px 18px 20px rgba(0,0,0,0.5);
+    -18px 18px 50px rgba(0,0,0,0.5);
+}
+
+.water h2:nth-child(2){
+    color: #2196f3;
+    opacity: 0.5;
+    animation: animate 3s ease-in-out infinite;
+}
+
+.water h2:nth-child(3){
+    color: #2196f3;
+    opacity: 0.5;
+    animation: animate 6s ease-in-out infinite;
+}
+
+.water h2:nth-child(4){
+    color: #2196f3;
+    animation: animate 4s ease-in-out infinite;
+}
+
+@keyframes animate{
+    0%, 100%
+    {
+        clip-path: polygon(0% 46%, 16% 45%, 34% 52%, 50% 61%, 68% 65%, 85% 61%, 100% 53%, 100% 100%, 0% 100%);
+    }
+    50%
+    {
+        clip-path: polygon(0 59%, 18% 67%, 36% 70%, 51% 66%, 66% 56%, 82% 49%, 100% 45%, 100% 100%, 0% 100%);
+    }
+}
+
+button{
+    width: 150px;
+    padding: 10px 0;
+    margin: 20px;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    position: relative;
+    right: 400px;
+
+}
+
+.buttonlogin form {
+    display: inline-block
+}
+
+.getin{
+    width: 100%;
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    text-align: center;
+    font-family: "Poppins", sans-serif;
+}
+
+.getin p{
+    font-size: 30px;
+    margin: 0;
+    position: relative;
+    top: 50px;
+    text-shadow:
+    -10px 10px 10px rgba(0,0,0,0.5);
+}
+
+.getin h1{
+    font-size: 80px;
+
+}
+.getin h2{
+    font-size: 80px;
+
+}
+
+.buttonenter form{
+    display: inline-block;
+}
+
+.logout form{
+    position: relative;
+    top: 10px;
+
+}

@@ -1,9 +1,12 @@
+import datetime
+
 from django.views import generic
 from .models import UserInfo, Schedule, Intake
 from django.shortcuts import render, reverse, redirect
 from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
+import datetime
 
 
 class HomePage(generic.ListView):
@@ -40,8 +43,6 @@ class SetUp(generic.DetailView):
     template_name = 'aquaholic/set_up.html'
 
     def get(self, request, *args, **kwargs):
-        # TODO receive first notification time and last notification time from user and save to database
-
         try:
             # user who have already generate token doesn't have to generate token
             token = UserInfo.objects.get(user_id=request.user.id).notify_token
@@ -53,6 +54,22 @@ class SetUp(generic.DetailView):
             return render(request, self.template_name,
                           {'token_exist': False,
                            'user': request.user})
+
+    def post(self, request):
+        try:
+            first = request.POST("first_notification")
+            first_notify_time = datetime.time.strftime(first, "%H:%M")
+            last = request.POST("last_notification")
+            last_notify_time = datetime.time.strftime(last, "%H:%M")
+            user = UserInfo.objects.get(user_id=request.user.id)
+            user.first_notification_time = first_notify_time
+            user.last_notification_time = last_notify_time
+            user.save()
+            return render(request, self.template_name,)
+        except ValueError:
+            message = "Please, enter time in both fields."
+            return render(request, self.template_name,
+                          {'message': message})
 
 
 class NotificationCallback(generic.DetailView):
@@ -95,4 +112,3 @@ class CalculateAuth(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
-

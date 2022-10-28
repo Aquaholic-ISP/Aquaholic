@@ -14,9 +14,8 @@
     background: transparent;
     position: relative;
     float: right;
-    top: -200px;
-    right: 50px;
-}
+    top: 0px auto;
+    right: 60px;}
 
 .navbar ul li{
     list-style: none;
@@ -46,10 +45,9 @@
 .navbar ul li:hover::after{
     width: 100%;
 }
-
 h1{
     font-size: 30px;
-    margin: 230px;
+    margin: 0px auto;
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
 }

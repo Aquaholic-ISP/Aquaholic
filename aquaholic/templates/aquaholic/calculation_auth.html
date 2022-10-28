@@ -1,1 +1,41 @@
-A calculation page for authenticate user.
+{% load static %}
+{% load socialaccount %}
+{% load i18n %}
+
+<html>
+<head>
+    <title>Calculate Water Intake</title>
+    <link rel="stylesheet" href="{% static 'aquaholic/style2.css' %}">
+</head>
+
+    <h1>Calculate Your Water Intake</h1>
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+    </div>
+
+<div class="calmain">
+    <div class="calpart" style="line-height: 250%">
+    <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="POST">
+        {% csrf_token%}
+        <label style="font-size: 30px; position: relative;">Enter your weight (kg)</label>
+        <input style="margin-left: 114px; font-size: 18px;" type="number" name="weight" min="0">
+        <br>
+        <label style="font-size: 30px;">Enter your exercise time (min)</label>
+        <input style="margin-left: 65px; font-size: 18px;" type="number" name="exercise_time" min="0">
+        <br>
+        {% if message %}
+            <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
+        {% endif %}
+        <button type="submit" style="margin-top: 40px;">Calculate</button>
+    </form>
+    </div>
+        {% if result %}
+    <p style="line-height: 300%; font-size: 30px;">The amount of water that you should drink is <b>{{result}}</b> ml.</p>
+        {% endif %}
+    <img src="https://i.pinimg.com/originals/3f/ce/50/3fce500cf135060b549eb758a743db87.gif"
+         alt="water bottle"  width="250" />
+</div>
+
+</html>

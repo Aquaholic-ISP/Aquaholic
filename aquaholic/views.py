@@ -51,21 +51,23 @@ class CalculateAuth(generic.DetailView):
         return render(request, self.template_name, {'user': request.user})
 
     def post(self, request, *args, **kwargs):
-
-        w = request.POST["weight"]
-        t = request.POST["exercise_time"]
-        weight = Decimal(request.POST["weight"]).quantize(Decimal('1.00'))
-        exercise_time = Decimal(request.POST["exercise_time"]).quantize(Decimal('1.00'))
-        water_amount_per_day = ((float(w) * KILOGRAM_TO_POUND * 0.5)
+        try:
+            w = request.POST["weight"]
+            t = request.POST["exercise_time"]
+            water_amount_per_day = ((float(w) * KILOGRAM_TO_POUND * 0.5)
                                 + (float(t) / 30) * 12) * OUNCES_TO_MILLILITER
-        wp = Decimal(water_amount_per_day).quantize(Decimal('1.00'))
-        user = UserInfo.objects.get(user_id=request.user.id)
-        user.weight = weight
-        user.exercise_time = exercise_time
-        user.water_amount_per_day = wp
-        user.save()
-        return render(request, self.template_name,
+            wp = Decimal(water_amount_per_day).quantize(Decimal('1.00'))
+            user = UserInfo.objects.get(user_id=request.user.id)
+            user.weight = float(w)
+            user.exercise_time = float(t)
+            user.water_amount_per_day = wp
+            user.save()
+            return render(request, self.template_name,
                       {'result': f"{wp:.2f}"})
+        except ValueError:
+            message = "Please, enter a positive number in both fields."
+            return render(request, self.template_name,
+                          {'message': message})
 
 
 class SetUp(generic.DetailView):

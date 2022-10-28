@@ -93,12 +93,10 @@ class NotificationCallback(generic.DetailView):
         """Send welcome message to new user."""
         token = get_access_token(request.GET['code'])
         send_notification("Welcome to aquaholic", token)
-
-
-        w = decimal.Decimal(50.32)
-        t = decimal.Decimal(60.32)
-        UserInfo.objects.create(weight=decimal.Decimal(50.32),
-                               exercise_time=decimal.Decimal(60.32),
+        w = Decimal(50.32)
+        t = Decimal(60.32)
+        UserInfo.objects.create(weight=Decimal(50.32),
+                               exercise_time=Decimal(60.32),
                                first_notification_time=datetime.time(8, 0, 0),
                                last_notification_time=datetime.time(22, 0, 0)
                                 )

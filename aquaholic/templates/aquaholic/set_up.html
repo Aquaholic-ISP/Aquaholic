@@ -8,32 +8,29 @@
     <link rel="stylesheet" href="{% static 'aquaholic/style4.css' %}">
 </head>
 
-    <div class="navbar">
-        <ul>
-            <li><a href="/">Home</a></li>
-        </ul>
-    </div>
+<div class="navbar">
+    <ul>
+        <li><a href="/">Home</a></li>
+    </ul>
+</div>
 
-    <h1>Set your new schedule</h1>
-    <div class="setup">
-        <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
-              {% csrf_token %}
-            <br>
+<h1>Set your new schedule</h1>
+<div class="setup">
+    <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
+        {% csrf_token %}
+        <br>
         <label style="font-size: 30px; position: relative;">Enter your first notification time</label>
         <input style="margin-left: 114px; font-size: 18px;" type="time" name="first_notification">
         <br>
         <label style="font-size: 30px; position: relative;">Enter your last notification time</label>
         <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification">
-        <br>
-        <button type="submit" style="margin-top: 40px;">Generate schedule</button>
     </form>
-    </div>
-
     <br>
     {% if not token_exist %}
-        <a href="https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=fVKMI2Q1k3MY5D3w2g0Hwt&redirect_uri=http://127.0.0.1:8000/noti/callback/&scope=notify&state=testing123">Generate schedule</a>
+    <a href="https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=fVKMI2Q1k3MY5D3w2g0Hwt&redirect_uri=http://127.0.0.1:8000/noti/callback/&scope=notify&state=testing123">
+        <Button style="margin-top: 40px;">Generate schedule</button></a>
     {% else %}
-        <a href="{% url 'aquaholic:schedule' user.id %}">Generate schedule </a>
+    <a href="{% url 'aquaholic:schedule' user.id %}"><Button style="margin-top: 40px;">Generate schedule</button></a>
     {% endif %}
-
+</div>
 </html>

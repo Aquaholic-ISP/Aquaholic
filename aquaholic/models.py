@@ -5,6 +5,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+
 KILOGRAM_TO_POUND = 2.20462262185
 OUNCES_TO_MILLILITER = 29.5735296
 
@@ -16,11 +17,11 @@ class UserInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     weight = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     exercise_time = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    water_amount_per_day = models.DecimalField(max_digits=10, decimal_places=10, default=0)
+    water_amount_per_day = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     first_notification_time = models.TimeField('first notification time', null=True)
     last_notification_time = models.TimeField('last notification time', null=True)
     total_hours = models.DecimalField(max_digits=10, decimal_places=10, null=True)
-    water_amount_per_hour = models.DecimalField(max_digits=10, decimal_places=10, null=True)
+    water_amount_per_hour = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     notify_token = models.CharField(max_length=200, null=True)
 
     def get_water_amount_per_day(self):
@@ -39,6 +40,9 @@ class UserInfo(models.Model):
     def get_water_amount_per_hour(self):
         """Calculate amount of water per hour."""
         self.water_amount_per_hour = self.water_amount_per_day / self.total_hours
+
+    def send_notification(self):
+        pass
 
 
 class Schedule(models.Model):

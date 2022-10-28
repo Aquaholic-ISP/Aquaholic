@@ -4,9 +4,11 @@
 <html>
 <head>
     <title>Home page of Aquaholic</title>
-    <link rel="stylesheet" href="{% static 'aquaholic/style3.css' %}">
+    <link rel="stylesheet" href="{% static 'aquaholic/style.css' %}">
 </head>
 <div class="entrance">
+        <link rel="stylesheet" href="{% static 'aquaholic/style3.css' %}">
+
     {% if user.is_authenticated %}
     <div class="getin">
             <h1 style="font-size: 40px;">Aquaholic</h1>
@@ -19,6 +21,12 @@
                 {% csrf_token %}
                 <button type="submit">Notification schedule</button>
             </form>
+
+            <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit">Calculate</button>
+            </form>
+
             <form action="{% url 'aquaholic:history' user.id %}" method="get">
                 {% csrf_token %}
                 <button type="submit">History</button>
@@ -36,10 +44,11 @@
     <div class="progress">
         <div class="progress-bar"></div>
     </div>
-    </div>
+
     </div>
         </div>
     </div>
+
 
     {% endif %}
     {% if not user.is_authenticated %}

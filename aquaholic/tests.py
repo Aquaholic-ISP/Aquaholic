@@ -29,7 +29,8 @@ class UserInfoModelTests(TestCase):
 
     def test_get_total_hour(self):
         """calculate the total hour from user input notification time."""
-        user = create_userinfo(50, 60, first_notification_time=datetime.time(8, 0, 0), last_notification_time=datetime.time(22, 0, 0))
+        user = create_userinfo(50, 60, first_notification_time=datetime.time(8, 0, 0),
+                               last_notification_time=datetime.time(22, 0, 0))
         user.get_total_hours()
         total = 14
         self.assertEqual(total, user.total_hours)
@@ -93,3 +94,10 @@ class LoginWithLine(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class SetUpView(TestCase):
+    def test_setup_page(self):
+        page = self.client.get(reverse('aquaholic:set_up'))
+        self.assertEqual(page.status_code, 200)
+
+    def test_get_notification_time(self):
+        pass

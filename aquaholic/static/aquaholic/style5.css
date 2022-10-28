@@ -24,3 +24,32 @@
     text-align: center;
     font-size: 25px;
 }
+
+.navbar ul li a{
+    text-decoration: none;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.navbar ul li::after{
+    content: '';
+    height: 3px;
+    width: 0%;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    transition: 0.5s;
+}
+
+.navbar ul li:hover::after{
+    width: 100%;
+}
+
+h1{
+    font-size: 30px;
+    margin: 230px;
+    text-shadow:
+    -12px 12px 20px rgba(0,0,0,0.5);
+}

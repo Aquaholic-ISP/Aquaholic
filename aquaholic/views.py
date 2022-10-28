@@ -73,17 +73,15 @@ class SetUp(generic.DetailView):
     template_name = 'aquaholic/set_up.html'
 
     def get(self, request, *args, **kwargs):
-        try:
-            # user who have already generate token doesn't have to generate token
-            token = UserInfo.objects.get(user_id=request.user.id).notify_token
-            return render(request, self.template_name,
-                          {'token_exist': True,
-                           'user': request.user})
-        except:
-            # user already generate token
-            return render(request, self.template_name,
-                          {'token_exist': False,
-                           'user': request.user})
+        # user who have already generate token doesn't have to generate token
+        token_exist = False
+        token = UserInfo.objects.get(user_id=request.user.id).notify_token
+        if token is not None:
+            print(token_exist)
+            token_exist = True
+        return render(request, self.template_name,
+                      {'token_exist': token_exist,
+                       'user': request.user})
 
     def post(self, request):
         try:
@@ -109,13 +107,9 @@ class NotificationCallback(generic.DetailView):
         """Send welcome message to new user."""
         token = get_access_token(request.GET['code'])
         send_notification("Welcome to aquaholic", token)
-        w = Decimal(50.32)
-        t = Decimal(60.32)
-        UserInfo.objects.create(weight=Decimal(50.32),
-                               exercise_time=Decimal(60.32),
-                               first_notification_time=datetime.time(8, 0, 0),
-                               last_notification_time=datetime.time(22, 0, 0)
-                                )
+        user = UserInfo.objects.get(user_id=request.user.id)
+        user.notify_token = token
+        user.save()
         return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
 
 
@@ -137,14 +131,6 @@ class History(generic.DetailView):
     """A class that represents the history page view."""
     model = Intake
     template_name = 'aquaholic/history.html'
-
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
-
-
-class CalculateAuth(generic.DetailView):
-    """A class that represents the calculation page view for authenticate user."""
-    template_name = 'aquaholic/calculation_auth.html'
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)

@@ -7,6 +7,14 @@ from django.http import HttpResponseRedirect
 import datetime
 
 
+def get_total_hours(first_notification_time, last_notification_time):
+    """Calculate total hours from first and last notification time."""
+    date = datetime.date(1, 1, 1)
+    first_time = datetime.datetime.combine(date, first_notification_time)
+    last_time = datetime.datetime.combine(date, last_notification_time)
+    time = last_time - first_time
+    return round(time.seconds / 3600)
+
 
 class HomePage(generic.ListView):
     """A class that represents the home page view."""
@@ -82,6 +90,10 @@ class SetUp(generic.DetailView):
             last = request.POST["last_notification"]
             first_notify_time = datetime.datetime.strptime(first, "%H:%M").time()
             last_notify_time = datetime.datetime.strptime(last, "%H:%M").time()
+            if first == last or get_total_hours(first_notify_time, last_notify_time) == 0:
+                message = "Please, enter different time or time difference is more than 1 hour."
+                return render(request, self.template_name,
+                              {'message': message})
             user = UserInfo.objects.get(user_id=request.user.id)
             user.first_notification_time = first_notify_time
             user.last_notification_time = last_notify_time
@@ -117,8 +129,9 @@ class ScheduleView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         user = request.user
         userinfo = UserInfo.objects.get(user_id=user.id)
-        userinfo.get_total_hours()
+        userinfo.total_hours = get_total_hours(userinfo.first_notification_time, userinfo.last_notification_time)
         userinfo.get_water_amount_per_hour()
+        userinfo.save()
 
         total_hours = int(userinfo.total_hours)
         first_notify_time = userinfo.first_notification_time
@@ -133,6 +146,7 @@ class ScheduleView(generic.DetailView):
                                     notification_status=False
                                     )
             first_notification_time = first_notification_time + datetime.timedelta(hours=1)
+
 
         # print(len(Schedule.objects.all()))
         # for schedule in Schedule.objects.all():

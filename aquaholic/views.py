@@ -129,16 +129,24 @@ class ScheduleView(generic.DetailView):
     def get(self, request, *args, **kwargs):
         user = request.user
         userinfo = UserInfo.objects.get(user_id=user.id)
+        # calculate and save total hours and water amount per hour to database
         userinfo.total_hours = get_total_hours(userinfo.first_notification_time, userinfo.last_notification_time)
         userinfo.get_water_amount_per_hour()
         userinfo.save()
 
+        # get total hours, first notification time and expected amount (water amount to dink per hour)
         total_hours = int(userinfo.total_hours)
         first_notify_time = userinfo.first_notification_time
         expected_amount = userinfo.water_amount_per_hour
 
         first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
 
+        # user already have schedule yet
+        if Schedule.objects.filter(user_info_id=userinfo.id).exists():
+            found_schedule = Schedule.objects.filter(user_info_id=userinfo.id)
+            for one_schedule in found_schedule:
+                one_schedule.delete()
+        # create schedule
         for i in range(total_hours):
             Schedule.objects.create(user_info_id=userinfo.id,
                                     notification_time=first_notification_time,
@@ -146,12 +154,6 @@ class ScheduleView(generic.DetailView):
                                     notification_status=False
                                     )
             first_notification_time = first_notification_time + datetime.timedelta(hours=1)
-
-
-        # print(len(Schedule.objects.all()))
-        # for schedule in Schedule.objects.all():
-        #     print(schedule.user_info.user.id, schedule.notification_time, schedule.expected_amount, schedule.notification_status)
-
         return render(request, self.template_name)
 
 

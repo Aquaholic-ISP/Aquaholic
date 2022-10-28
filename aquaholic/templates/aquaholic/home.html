@@ -19,6 +19,10 @@
             </form>
             <form action="{% url 'aquaholic:set_up' user.id %}" method="get">
                 {% csrf_token %}
+                <button type="submit">Set Notification schedule</button>
+            </form>
+            <form action="{% url 'aquaholic:schedule' user.id %}" method="get">
+                {% csrf_token %}
                 <button type="submit">Notification schedule</button>
             </form>
             <form action="{% url 'aquaholic:history' user.id %}" method="get">

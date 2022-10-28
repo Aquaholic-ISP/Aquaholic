@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 import datetime
 from decimal import Decimal
 
+
 class HomePage(generic.ListView):
     """A class that represents the home page view."""
     template_name = 'aquaholic/home.html'
@@ -52,7 +53,7 @@ class CalculateAuth(generic.DetailView):
             w = request.POST["weight"]
             t = request.POST["exercise_time"]
             water_amount_per_day = ((float(w) * KILOGRAM_TO_POUND * 0.5)
-                                + (float(t) / 30) * 12) * OUNCES_TO_MILLILITER
+                                   + (float(t) / 30) * 12) * OUNCES_TO_MILLILITER
             wp = Decimal(water_amount_per_day).quantize(Decimal('1.00'))
             user = UserInfo.objects.get(user_id=request.user.id)
             user.weight = float(w)
@@ -118,7 +119,29 @@ class ScheduleView(generic.DetailView):
     template_name = 'aquaholic/schedule.html'
 
     def get(self, request, *args, **kwargs):
-        total_hours = datetime.time()
+        user = request.user
+        userinfo = UserInfo.objects.get(user_id=user.id)
+        userinfo.get_total_hours()
+        userinfo.get_water_amount_per_hour()
+
+        total_hours = int(userinfo.total_hours)
+        first_notify_time = userinfo.first_notification_time
+        expected_amount = userinfo.water_amount_per_hour
+
+        first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
+
+        for i in range(total_hours):
+            Schedule.objects.create(user_info_id=userinfo.id,
+                                    notification_time=first_notification_time,
+                                    expected_amount=expected_amount,
+                                    notification_status=False
+                                    )
+            first_notification_time = first_notification_time + datetime.timedelta(hours=1)
+
+        # print(len(Schedule.objects.all()))
+        # for schedule in Schedule.objects.all():
+        #     print(schedule.user_info.user.id, schedule.notification_time, schedule.expected_amount, schedule.notification_status)
+
         return render(request, self.template_name)
 
 

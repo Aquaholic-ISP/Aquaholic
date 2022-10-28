@@ -1,5 +1,3 @@
-import datetime
-
 from django.views import generic
 from .models import UserInfo, Schedule, Intake
 from django.shortcuts import render, reverse, redirect
@@ -7,7 +5,6 @@ from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
 import datetime
-from decimal import Decimal
 
 
 class HomePage(generic.ListView):
@@ -50,23 +47,6 @@ class CalculateAuth(generic.DetailView):
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {'user': request.user})
 
-    def post(self, request, *args, **kwargs):
-
-        w = request.POST["weight"]
-        t = request.POST["exercise_time"]
-        weight = Decimal(request.POST["weight"]).quantize(Decimal('1.00'))
-        exercise_time = Decimal(request.POST["exercise_time"]).quantize(Decimal('1.00'))
-        water_amount_per_day = ((float(w) * KILOGRAM_TO_POUND * 0.5)
-                                + (float(t) / 30) * 12) * OUNCES_TO_MILLILITER
-        wp = Decimal(water_amount_per_day).quantize(Decimal('1.00'))
-        user = UserInfo.objects.get(user_id=request.user.id)
-        user.weight = weight
-        user.exercise_time = exercise_time
-        user.water_amount_per_day = wp
-        user.save()
-        return render(request, self.template_name,
-                      {'result': f"{wp:.2f}"})
-
 
 class SetUp(generic.DetailView):
     """A class that represents the set up page view."""
@@ -74,27 +54,28 @@ class SetUp(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         # user who have already generate token doesn't have to generate token
+        return render(request, self.template_name, {'user': request.user})
+
+    def post(self, request, *args, **kwargs):
         token_exist = False
         token = UserInfo.objects.get(user_id=request.user.id).notify_token
         if token is not None:
-            print(token_exist)
             token_exist = True
-        return render(request, self.template_name,
-                      {'token_exist': token_exist,
-                       'user': request.user})
-
-    def post(self, request):
         try:
-            first = request.POST("first_notification")
-            first_notify_time = datetime.time.strftime(first, "%H:%M")
-            last = request.POST("last_notification")
-            last_notify_time = datetime.time.strftime(last, "%H:%M")
+            first = request.POST["first_notification"]
+            last = request.POST["last_notification"]
+            first_notify_time = datetime.datetime.strptime(first, "%H:%M").time()
+            last_notify_time = datetime.datetime.strptime(last, "%H:%M").time()
             user = UserInfo.objects.get(user_id=request.user.id)
             user.first_notification_time = first_notify_time
             user.last_notification_time = last_notify_time
             user.save()
-            return render(request, self.template_name,)
-        except ValueError:
+            if token_exist:
+                return HttpResponseRedirect(reverse('aquaholic:schedule', args=(user.id,)))
+            else:
+                url = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=fVKMI2Q1k3MY5D3w2g0Hwt&redirect_uri=http://127.0.0.1:8000/noti/callback/&scope=notify&state=testing123"
+                return HttpResponseRedirect(url)
+        except:
             message = "Please, enter time in both fields."
             return render(request, self.template_name,
                           {'message': message})
@@ -118,6 +99,7 @@ class ScheduleView(generic.DetailView):
     template_name = 'aquaholic/schedule.html'
 
     def get(self, request, *args, **kwargs):
+        total_hours = datetime.time()
         return render(request, self.template_name)
 
 

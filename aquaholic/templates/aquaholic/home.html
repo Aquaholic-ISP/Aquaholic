@@ -4,13 +4,11 @@
 <html>
 <head>
         <link rel="stylesheet" href="{% static 'aquaholic/style.css' %}">
-
     <title>Home page of Aquaholic</title>
 </head>
 <div class="entrance">
     {% if user.is_authenticated %}
             <link rel="stylesheet" href="{% static 'aquaholic/style3.css' %}">
-
     <div class="getin">
             <h1 style="font-size: 40px;">Aquaholic</h1>
         <h2 style="font-size: 40px; ">Welcome Back, {{ user.first_name }}</h2>
@@ -27,9 +25,9 @@
                 <button type="submit">History</button>
             </form>
  <div class="container">
-    <div class="progress">
-        <div class="progress-bar"></div>
+        <div class="skill html">0%</div>
     </div>
+
 
         <div class="logout">
             <form method="post" action="{% url 'account_logout' %}">
@@ -42,7 +40,6 @@
 
 
     </div>
-        </div>
     </div>
 
 
@@ -53,7 +50,6 @@
             <h2>Aquaholic</h2>
             <h2>Aquaholic</h2>
             <h2>Aquaholic</h2>
-
         </div>
         <p>Improve your drinking habits now.</p>
         <div class="buttonlogin">

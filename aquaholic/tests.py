@@ -100,4 +100,10 @@ class SetUpView(TestCase):
         self.assertEqual(page.status_code, 200)
 
     def test_get_notification_time(self):
-        pass
+        first_notify_time = datetime.time.strftime(datetime.time(10, 0, 0), "%H:%M")
+        last_notify_time = datetime.time.strftime(datetime.time(22, 0, 0), "%H:%M")
+
+        self.client.login()
+        user = create_userinfo(80, 0, first_notify_time, last_notify_time)
+        self.assertEqual(user.first_notification_time, "10:00")
+        self.assertEqual(user.last_notification_time, "22:00")

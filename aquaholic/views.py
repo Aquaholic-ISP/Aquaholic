@@ -5,7 +5,7 @@ from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
 import datetime
-
+from decimal import Decimal
 
 class HomePage(generic.ListView):
     """A class that represents the home page view."""
@@ -46,6 +46,25 @@ class CalculateAuth(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {'user': request.user})
+
+    def post(self, request, *args, **kwargs):
+        try:
+            w = request.POST["weight"]
+            t = request.POST["exercise_time"]
+            water_amount_per_day = ((float(w) * KILOGRAM_TO_POUND * 0.5)
+                                + (float(t) / 30) * 12) * OUNCES_TO_MILLILITER
+            wp = Decimal(water_amount_per_day).quantize(Decimal('1.00'))
+            user = UserInfo.objects.get(user_id=request.user.id)
+            user.weight = float(w)
+            user.exercise_time = float(t)
+            user.water_amount_per_day = wp
+            user.save()
+            return render(request, self.template_name,
+                      {'result': f"{wp:.2f}"})
+        except ValueError:
+            message = "Please, enter a positive number in both fields."
+            return render(request, self.template_name,
+                          {'message': message})
 
 
 class SetUp(generic.DetailView):

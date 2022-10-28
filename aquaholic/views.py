@@ -154,7 +154,8 @@ class ScheduleView(generic.DetailView):
                                     notification_status=False
                                     )
             first_notification_time = first_notification_time + datetime.timedelta(hours=1)
-        return render(request, self.template_name)
+        return render(request, self.template_name,
+                      {'schedule': Schedule.objects.filter(user_info_id=userinfo.id)})
 
 
 class Input(generic.DetailView):

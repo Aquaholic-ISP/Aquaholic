@@ -10,3 +10,11 @@
 
         </ul>
 </div>
+
+{% for data in schedule %}
+    {% if data.notification_status %}
+        {{data.notification_time}} {{data.expected_amount}} on <br>
+    {% else %}
+        {{data.notification_time}} {{data.expected_amount}} off <br>
+    {% endif %}
+{% endfor %}

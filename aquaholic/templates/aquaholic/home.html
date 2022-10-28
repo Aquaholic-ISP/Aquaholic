@@ -21,6 +21,12 @@
                 {% csrf_token %}
                 <button type="submit">Notification schedule</button>
             </form>
+
+            <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit">Calculate</button>
+            </form>
+
             <form action="{% url 'aquaholic:history' user.id %}" method="get">
                 {% csrf_token %}
                 <button type="submit">History</button>

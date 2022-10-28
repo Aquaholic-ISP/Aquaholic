@@ -8,8 +8,9 @@
 </head>
 <div class="entrance">
     {% if user.is_authenticated %}
-            <link rel="stylesheet" href="{% static 'aquaholic/style3.css' %}">
     <div class="getin">
+                    <link rel="stylesheet" href="{% static 'aquaholic/style3.css' %}">
+
             <h1 style="font-size: 40px;">Aquaholic</h1>
         <h2 style="font-size: 40px; ">Welcome Back, {{ user.first_name }}</h2>
         <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
@@ -25,11 +26,12 @@
                 <button type="submit">History</button>
             </form>
  <div class="container">
-        <div class="skill html">0%</div>
+        <div class="progress intake">0%</div>
     </div>
 
-
         <div class="logout">
+                        <link rel="stylesheet" href="{% static 'aquaholic/style3.css' %}">
+
             <form method="post" action="{% url 'account_logout' %}">
                 {% csrf_token %}
                 {% if redirect_field_value %}

@@ -1,30 +1,25 @@
 {% load static %}
 {% load socialaccount %}
 {% load i18n %}
-
-
 <html>
 <head>
     <title>Home page of Aquaholic</title>
     <link rel="stylesheet" href="{% static 'aquaholic/style.css' %}">
 </head>
 <div class="entrance">
+        <link rel="stylesheet" href="{% static 'aquaholic/style3.css' %}">
+
     {% if user.is_authenticated %}
     <div class="getin">
-
-        <div class="water">
-            <h2 style="font-size: 40px;">Aquaholic</h2>
-            <h2 style="font-size: 40px;">Aquaholic</h2>
-            <h2 style="font-size: 40px;">Aquaholic</h2>
-            <h2 style="font-size: 40px;">Aquaholic</h2>
-        </div>
-
-        <h1 style="font-size: 120px; ">Welcome Back, {{ user.first_name }}</h1>
-
-        <div class="buttonenter">
+            <h1 style="font-size: 40px;">Aquaholic</h1>
+        <h2 style="font-size: 40px; ">Welcome Back, {{ user.first_name }}</h2>
+        <form action="{% url 'aquaholic:calculate' %}" method="get">
+                {% csrf_token %}
+                <button type="submit">calculate your goal</button>
+            </form>
             <form action="{% url 'aquaholic:set_up' user.id %}" method="get">
                 {% csrf_token %}
-                <button type="submit">Set Your Progress</button>
+                <button type="submit">Notification schedule</button>
             </form>
 
             <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
@@ -34,9 +29,8 @@
 
             <form action="{% url 'aquaholic:history' user.id %}" method="get">
                 {% csrf_token %}
-                <button type="submit">See History</button>
+                <button type="submit">History</button>
             </form>
-        </div>
 
         <div class="logout">
             <form method="post" action="{% url 'account_logout' %}">
@@ -46,11 +40,17 @@
                 {% endif %}
                 <button class="STYLE_ME" type="submit">Logout</button>
             </form>
+            <div class="container">
+    <div class="progress">
+        <div class="progress-bar"></div>
+    </div>
+
+    </div>
         </div>
     </div>
+
+
     {% endif %}
-
-
     {% if not user.is_authenticated %}
         <div class="water">
             <h2>Aquaholic</h2>
@@ -75,6 +75,3 @@
     {% endif %}
 </div>
 </html>
-<script>
-document.referrer;
-</script>

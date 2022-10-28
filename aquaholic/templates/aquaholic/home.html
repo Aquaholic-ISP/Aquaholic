@@ -26,6 +26,12 @@
                 {% csrf_token %}
                 <button type="submit">Set Your Progress</button>
             </form>
+
+            <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit">Calculate</button>
+            </form>
+
             <form action="{% url 'aquaholic:history' user.id %}" method="get">
                 {% csrf_token %}
                 <button type="submit">See History</button>

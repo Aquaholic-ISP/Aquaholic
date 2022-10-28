@@ -1,5 +1,14 @@
-A schedule page starter.
 {% load static %}
-{% for schedule in Schedule.objects.all %}
-        {{schedule.user_info.user.id}} {{schedule.notification_time}} {{schedule.expected_amount}} {{schedule.notification_status}}
-{% endfor %}
+{% load socialaccount %}
+{% load i18n %}
+<html>
+<head>
+        <link rel="stylesheet" href="{% static 'aquaholic/style5.css' %}">
+    <title>Your notification schedule</title>
+</head>
+<div class="navbar">
+    <ul>
+        <li><a href="/">Home</a></li>
+    </ul>
+</div>
+<h1>Your notification schedule</h1>

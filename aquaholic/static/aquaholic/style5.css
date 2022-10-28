@@ -1,0 +1,26 @@
+*{
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-color: #4682B4;
+    color: #0E1646;
+    font-family: "Poppins", sans-serif;
+}
+
+.navbar{
+    display: flex;
+    margin: auto;
+    align-items: flex-start;
+    background: transparent;
+    position: relative;
+    float: right;
+    top: -200px;
+    right: 50px;
+}
+
+.navbar ul li{
+    list-style: none;
+    position: relative;
+    text-align: center;
+    font-size: 25px;
+}

@@ -12,7 +12,7 @@
     <div class="getin">
             <h1 style="font-size: 40px;">Aquaholic</h1>
         <h2 style="font-size: 40px; ">Welcome Back, {{ user.first_name }}</h2>
-        <form action="{% url 'aquaholic:calculate' %}" method="get">
+        <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
                 {% csrf_token %}
                 <button type="submit">calculate your goal</button>
             </form>

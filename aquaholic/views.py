@@ -55,15 +55,14 @@ class CalculateAuth(generic.DetailView):
             w = request.POST["weight"]
             t = request.POST["exercise_time"]
             water_amount_per_day = ((float(w) * KILOGRAM_TO_POUND * 0.5)
-                                + (float(t) / 30) * 12) * OUNCES_TO_MILLILITER
-            wp = Decimal(water_amount_per_day).quantize(Decimal('1.00'))
+                                    + (float(t) / 30) * 12) * OUNCES_TO_MILLILITER
             user = UserInfo.objects.get(user_id=request.user.id)
             user.weight = float(w)
             user.exercise_time = float(t)
-            user.water_amount_per_day = wp
+            user.water_amount_per_day = water_amount_per_day
             user.save()
             return render(request, self.template_name,
-                      {'result': f"{wp:.2f}"})
+                          {'result': f"{water_amount_per_day:.2f}"})
         except ValueError:
             message = "Please, enter a positive number in both fields."
             return render(request, self.template_name,
@@ -95,7 +94,7 @@ class SetUp(generic.DetailView):
             user.first_notification_time = first_notify_time
             user.last_notification_time = last_notify_time
             user.save()
-            return render(request, self.template_name,)
+            return render(request, self.template_name, )
         except ValueError:
             message = "Please, enter time in both fields."
             return render(request, self.template_name,

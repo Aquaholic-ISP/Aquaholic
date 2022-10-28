@@ -2,7 +2,8 @@
     margin: 0;
     padding: 0;
     text-align: center;
-    background:  #4682B4;
+    background-color: #4682B4;
+    color: #0E1646;
 
 }
 
@@ -46,43 +47,10 @@
     background: transparent;
 }
 
-.water h2:nth-child(1){
-    color: #fff;
-    text-shadow: -2px 2px 0px #183954,
-    -4px 4px 0px #183954,
-    -6px 6px 0px #183954,
-    -8px 8px 0px #183954,
-    -18px 18px 20px rgba(0,0,0,0.5);
-    -18px 18px 50px rgba(0,0,0,0.5);
-}
 
-.water h2:nth-child(2){
-    color: #2196f3;
-    opacity: 0.5;
-    animation: animate 3s ease-in-out infinite;
-}
 
-.water h2:nth-child(3){
-    color: #2196f3;
-    opacity: 0.5;
-    animation: animate 6s ease-in-out infinite;
-}
 
-.water h2:nth-child(4){
-    color: #2196f3;
-    animation: animate 4s ease-in-out infinite;
-}
 
-@keyframes animate{
-    0%, 100%
-    {
-        clip-path: polygon(0% 46%, 16% 45%, 34% 52%, 50% 61%, 68% 65%, 85% 61%, 100% 53%, 100% 100%, 0% 100%);
-    }
-    50%
-    {
-        clip-path: polygon(0 59%, 18% 67%, 36% 70%, 51% 66%, 66% 56%, 82% 49%, 100% 45%, 100% 100%, 0% 100%);
-    }
-}
 
 button{
     width: 150px;
@@ -142,7 +110,7 @@ button{
 
 .container {
     margin: 10px auto;
-    margin-top: 90px;
+    margin-top: -90px;
     width: 400px;
     text-align: center;
 }

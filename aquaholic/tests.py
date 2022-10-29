@@ -6,6 +6,9 @@ from aquaholic.models import UserInfo
 from django.urls import reverse
 from http import HTTPStatus
 from django.test import TestCase
+from aquaholic.views import *
+from django.contrib.auth.models import User
+from urllib import request
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
@@ -14,7 +17,7 @@ def create_userinfo(weight, exercise_time, first_notification_time, last_notific
     given number of `days` offset to now (negative for questions published
     in the past, positive for questions that have yet to be published).
     """
-    return UserInfo(weight=weight, exercise_time=exercise_time, first_notification_time=first_notification_time,
+    return UserInfo.objects.create(weight=weight, exercise_time=exercise_time, first_notification_time=first_notification_time,
                     last_notification_time=last_notification_time)
 
 
@@ -31,7 +34,7 @@ class UserInfoModelTests(TestCase):
         """calculate the total hour from user input notification time."""
         user = create_userinfo(50, 60, first_notification_time=datetime.time(8, 0, 0),
                                last_notification_time=datetime.time(22, 0, 0))
-        user.get_total_hours()
+        user.total_hours = get_total_hours(user.first_notification_time, user.last_notification_time)
         total = 14
         self.assertEqual(total, user.total_hours)
 
@@ -41,7 +44,7 @@ class UserInfoModelTests(TestCase):
                                last_notification_time=datetime.time(22, 0, 0))
         per_hour = 167.1233227
         user.get_water_amount_per_day()
-        user.get_total_hours()
+        user.total_hours = get_total_hours(user.first_notification_time, user.last_notification_time)
         user.get_water_amount_per_hour()
         self.assertAlmostEqual(per_hour, user.water_amount_per_hour, 5)
 
@@ -83,6 +86,14 @@ class TemplateUsed(TestCase):
         self.client.login()
         cal_url = self.client.get(reverse('aquaholic:home'))
         self.assertTemplateUsed(cal_url, 'aquaholic/home.html')
+        first_notify_time = datetime.time(10, 0, 0)
+        last_notify_time = datetime.time(22, 0, 0)
+        user = create_userinfo(80, 0, first_notify_time, last_notify_time)
+        userinfo = User.objects.filter(id=user.id)
+        setup_url = self.client.get(reverse('aquaholic:set_up', args=(userinfo,)))
+        self.assertTemplateUsed(setup_url, 'aquaholic/set_up.html')
+        # schedule_url = self.client.get(reverse('aquaholic:schedule'))
+        # self.assertTemplateUsed(schedule_url, 'aquaholic/schedule.html')
 
 
 class LoginWithLine(TestCase):
@@ -95,9 +106,9 @@ class LoginWithLine(TestCase):
 
 
 class SetUpView(TestCase):
-    def test_setup_page(self):
-        page = self.client.get(reverse('aquaholic:set_up'))
-        self.assertEqual(page.status_code, 200)
+    # def test_setup_page(self):
+    #     page = self.client.get(reverse('aquaholic:set_up'))
+    #     self.assertEqual(page.status_code, 200)
 
     def test_get_notification_time(self):
         first_notify_time = datetime.time.strftime(datetime.time(10, 0, 0), "%H:%M")
@@ -107,3 +118,24 @@ class SetUpView(TestCase):
         user = create_userinfo(80, 0, first_notify_time, last_notify_time)
         self.assertEqual(user.first_notification_time, "10:00")
         self.assertEqual(user.last_notification_time, "22:00")
+
+
+class ScheduleView(TestCase):
+    # def test_schedule_page(self):
+    #     self.client.login()
+    #     response = self.client.get(reverse('aquaholic:schedule'))
+    #     self.assertEqual(response.status_code, 200)
+
+    def test_set_schedule(self):
+        self.client.login()
+        first_notify_time = datetime.time(10, 0, 0)
+        last_notify_time = datetime.time(22, 0, 0)
+        user = create_userinfo(80, 0, first_notify_time, last_notify_time)
+        user.total_hours = get_total_hours(first_notify_time, last_notify_time)
+        self.assertEqual(user.total_hours, 12)
+        # self.assertEqual()
+        first_notify_time = datetime.time(11, 0, 0)
+        user.objects.create(user_info_id=user,
+                                    notification_time=first_notify_time,
+                                    expected_amount=user.get_water_amount_per_hour(),
+                                    notification_status=False)

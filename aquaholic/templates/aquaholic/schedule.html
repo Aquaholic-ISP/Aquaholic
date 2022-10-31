@@ -10,12 +10,38 @@
 
         </ul>
 </div>
-
+<div class="schedule">
+        <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
+<table border="1" cellpadding=10>
+    <th style="text-align:center">Time</th>
+    <th style="text-align:center">Amount</th>
 {% for data in schedule %}
-    {% if not data.notification_status %}
-        {{data.notification_time}} {{data.expected_amount}} off <br>
+    <tr>
+    {% if data.notification_status %}
+        <td>{{data.notification_time.time}}</td>
+        <td style="text-align:center">{{data.expected_amount}}</td>
+        <td>
+            <label class="switch">
+            <input type="checkbox">
+            <span class="slider round"></span>
+            </label>
+        </td>
     {% else %}
-        {{data.notification_time}} {{data.expected_amount}} on <br>
+        <td> {{data.notification_time.time}}</td>
+        <td style="text-align:center">{{data.expected_amount}}</td>
+<!--             <td><label class="switch">-->
+<!--    <input type="checkbox" onclick="data.change_notification_status()">-->
+<!--                 <p id="text" style="display:none">Checkbox is checked</p>-->
+<!--                 check-->
+
+<!--    <span class="slider round"></span>-->
+<!--            </label></td>-->
     {% endif %}
+    </tr>
+
+<!--                {{ data.notification_status }}-->
 {% endfor %}
 
+</table><br>
+        </form>
+</div>

@@ -144,6 +144,7 @@ class ScheduleView(TestCase):
         # response = self.client.get(reverse('aquaholic:schedule'))
         # self.assertEqual(response.status_code, 200)
 
+
     def test_set_schedule(self):
         user = User.objects.create(username='testuser')
         user.set_password('12345')

@@ -12,9 +12,10 @@
 </div>
 
 {% for data in schedule %}
-    {% if data.notification_status %}
-        {{data.notification_time}} {{data.expected_amount}} on <br>
-    {% else %}
+    {% if not data.notification_status %}
         {{data.notification_time}} {{data.expected_amount}} off <br>
+    {% else %}
+        {{data.notification_time}} {{data.expected_amount}} on <br>
     {% endif %}
 {% endfor %}
+

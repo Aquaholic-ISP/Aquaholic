@@ -3,14 +3,7 @@ import datetime
 from .models import Schedule
 from .notification import send_notification
 
-import logging
-logger = logging.getLogger(__name__)
-
-
 def update_notification():
-    logger = logging.getLogger(__name__)
-    logger.debug("Cron job works")
-
     all_to_send = Schedule.objects.filter(notification_time__lte=datetime.datetime.now(),
                                           notification_status=False)
     for one_to_send in all_to_send:

@@ -5,8 +5,9 @@ import datetime
 from aquaholic.models import UserInfo
 from django.urls import reverse
 from http import HTTPStatus
-from django.test import TestCase
+from django.test import TestCase, Client
 from aquaholic.views import *
+from django.http import HttpResponse, HttpRequest
 from django.contrib.auth.models import User
 from urllib import request
 
@@ -88,10 +89,13 @@ class TemplateUsed(TestCase):
         self.assertTemplateUsed(cal_url, 'aquaholic/home.html')
         first_notify_time = datetime.time(10, 0, 0)
         last_notify_time = datetime.time(22, 0, 0)
-        user = create_userinfo(80, 0, first_notify_time, last_notify_time)
-        userinfo = User.objects.filter(id=user.id)
-        setup_url = self.client.get(reverse('aquaholic:set_up', args=(userinfo,)))
-        self.assertTemplateUsed(setup_url, 'aquaholic/set_up.html')
+        # user = create_userinfo(80, 0, first_notify_time, last_notify_time)
+        # user = UserInfo.objects.create(weight=80, exercise_time=0,first_notification_time=datetime.time(8, 0, 0),
+        #                        last_notification_time=datetime.time(22, 0, 0))
+        # # UserInfo.objects.get(user_id=user.id)
+        # found_schedule = Schedule.objects.filter(user_info_id=user.id)
+        # setup_url = self.client.get(reverse('aquaholic:set_up', args=(found_schedule,)))
+        # self.assertTemplateUsed(setup_url, 'aquaholic/set_up.html')
         # schedule_url = self.client.get(reverse('aquaholic:schedule'))
         # self.assertTemplateUsed(schedule_url, 'aquaholic/schedule.html')
 
@@ -106,9 +110,14 @@ class LoginWithLine(TestCase):
 
 
 class SetUpView(TestCase):
-    # def test_setup_page(self):
-    #     page = self.client.get(reverse('aquaholic:set_up'))
-    #     self.assertEqual(page.status_code, 200)
+    def test_setup_page(self):
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
+        page = client.get(reverse('aquaholic:set_up', args=(user.id,)))
+        self.assertEqual(page.status_code, 200)
 
     def test_get_notification_time(self):
         first_notify_time = datetime.time.strftime(datetime.time(10, 0, 0), "%H:%M")
@@ -121,21 +130,51 @@ class SetUpView(TestCase):
 
 
 class ScheduleView(TestCase):
-    # def test_schedule_page(self):
-    #     self.client.login()
-    #     response = self.client.get(reverse('aquaholic:schedule'))
-    #     self.assertEqual(response.status_code, 200)
+    def test_schedule_page(self):
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
+        # response = client.get("/aquaholic/schedule", follow=True)
+        # response = client.get('aquaholic:schedule', args=(user.id,))
+        response = client.get({'schedule': Schedule.objects.filter(user_info_id=user.id)})
+        self.assertEqual(response.status_code, 200)
+        # self.client.login()
+        # response = self.client.get(reverse('aquaholic:schedule'))
+        # self.assertEqual(response.status_code, 200)
 
     def test_set_schedule(self):
-        self.client.login()
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
         first_notify_time = datetime.time(10, 0, 0)
         last_notify_time = datetime.time(22, 0, 0)
         user = create_userinfo(80, 0, first_notify_time, last_notify_time)
         user.total_hours = get_total_hours(first_notify_time, last_notify_time)
         self.assertEqual(user.total_hours, 12)
         # self.assertEqual()
-        first_notify_time = datetime.time(11, 0, 0)
-        user.objects.create(user_info_id=user,
-                                    notification_time=first_notify_time,
-                                    expected_amount=user.get_water_amount_per_hour(),
-                                    notification_status=False)
+        # user = HttpRequest.user
+        # userinfo = UserInfo.objects.get(user_id=user.id)
+        # user.objects.create(user_info_id=user,
+        #                             notification_time=first_notify_time,
+        #                             expected_amount=user.get_water_amount_per_hour(),
+        #                             notification_status=False)
+        # user = UserInfo.objects.create(weight=80, exercise_time=0, first_notification_time=datetime.time(8, 0, 0),
+        #                                last_notification_time=datetime.time(22, 0, 0))
+        # # UserInfo.objects.get(user_id=user.id)
+        # found_schedule = Schedule.objects.filter(user_info_id=user.id)
+        # # setup_url = self.client.get(reverse('aquaholic:set_up', args=(found_schedule,)))
+        # # self.assertEqual(found_schedule, Schedule.)
+        # expected_amount = userinfo.water_amount_per_hour
+        # for i in range(user.total_hours):
+        #     Schedule.objects.create(user_info_id=userinfo.id,
+        #                             notification_time=first_notify_time,
+        #                             expected_amount=expected_amount,
+        #                             notification_status=False
+        #                             )
+        #     first_notify_time = first_notify_time + datetime.timedelta(hours=1)
+        #     self.assertEqual(first_notify_time, datetime.time(11, 0, 0))
+

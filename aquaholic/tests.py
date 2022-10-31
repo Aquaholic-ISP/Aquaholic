@@ -89,15 +89,13 @@ class TemplateUsed(TestCase):
         self.assertTemplateUsed(cal_url, 'aquaholic/home.html')
         first_notify_time = datetime.time(10, 0, 0)
         last_notify_time = datetime.time(22, 0, 0)
-        # user = create_userinfo(80, 0, first_notify_time, last_notify_time)
-        # user = UserInfo.objects.create(weight=80, exercise_time=0,first_notification_time=datetime.time(8, 0, 0),
-        #                        last_notification_time=datetime.time(22, 0, 0))
-        # # UserInfo.objects.get(user_id=user.id)
-        # found_schedule = Schedule.objects.filter(user_info_id=user.id)
-        # setup_url = self.client.get(reverse('aquaholic:set_up', args=(found_schedule,)))
-        # self.assertTemplateUsed(setup_url, 'aquaholic/set_up.html')
-        # schedule_url = self.client.get(reverse('aquaholic:schedule'))
-        # self.assertTemplateUsed(schedule_url, 'aquaholic/schedule.html')
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
+        page = client.get(reverse('aquaholic:set_up', args=(user.id,)))
+        self.assertTemplateUsed(page, 'aquaholic/set_up.html')
 
 
 class LoginWithLine(TestCase):
@@ -130,7 +128,7 @@ class SetUpView(TestCase):
 
 
 class ScheduleView(TestCase):
-    def test_schedule_page(self):
+    def test_new_user_schedule_page_not_found(self):
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save()
@@ -139,11 +137,10 @@ class ScheduleView(TestCase):
         # response = client.get("/aquaholic/schedule", follow=True)
         # response = client.get('aquaholic:schedule', args=(user.id,))
         response = client.get({'schedule': Schedule.objects.filter(user_info_id=user.id)})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
         # self.client.login()
         # response = self.client.get(reverse('aquaholic:schedule'))
         # self.assertEqual(response.status_code, 200)
-
 
     def test_set_schedule(self):
         user = User.objects.create(username='testuser')

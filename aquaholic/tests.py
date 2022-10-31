@@ -87,8 +87,6 @@ class TemplateUsed(TestCase):
         self.client.login()
         cal_url = self.client.get(reverse('aquaholic:home'))
         self.assertTemplateUsed(cal_url, 'aquaholic/home.html')
-        first_notify_time = datetime.time(10, 0, 0)
-        last_notify_time = datetime.time(22, 0, 0)
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save()
@@ -120,7 +118,6 @@ class SetUpView(TestCase):
     def test_get_notification_time(self):
         first_notify_time = datetime.time.strftime(datetime.time(10, 0, 0), "%H:%M")
         last_notify_time = datetime.time.strftime(datetime.time(22, 0, 0), "%H:%M")
-
         self.client.login()
         user = create_userinfo(80, 0, first_notify_time, last_notify_time)
         self.assertEqual(user.first_notification_time, "10:00")
@@ -131,16 +128,10 @@ class ScheduleView(TestCase):
     def test_new_user_schedule_page_not_found(self):
         user = User.objects.create(username='testuser')
         user.set_password('12345')
-        user.save()
         client = Client()
         client.login(username='testuser', password='12345')
-        # response = client.get("/aquaholic/schedule", follow=True)
-        # response = client.get('aquaholic:schedule', args=(user.id,))
-        response = client.get({'schedule': Schedule.objects.filter(user_info_id=user.id)})
+        response = client.get('aquaholic:set_up', args=Schedule.objects.filter(user_info_id=user.id),)
         self.assertEqual(response.status_code, 404)
-        # self.client.login()
-        # response = self.client.get(reverse('aquaholic:schedule'))
-        # self.assertEqual(response.status_code, 200)
 
     def test_set_schedule(self):
         user = User.objects.create(username='testuser')

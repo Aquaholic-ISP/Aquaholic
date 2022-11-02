@@ -5,7 +5,11 @@ import datetime
 from aquaholic.models import UserInfo
 from django.urls import reverse
 from http import HTTPStatus
-from django.test import TestCase
+from django.test import TestCase, Client
+from aquaholic.views import *
+from django.http import HttpResponse, HttpRequest
+from django.contrib.auth.models import User
+from urllib import request
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
@@ -14,7 +18,7 @@ def create_userinfo(weight, exercise_time, first_notification_time, last_notific
     given number of `days` offset to now (negative for questions published
     in the past, positive for questions that have yet to be published).
     """
-    return UserInfo(weight=weight, exercise_time=exercise_time, first_notification_time=first_notification_time,
+    return UserInfo.objects.create(weight=weight, exercise_time=exercise_time, first_notification_time=first_notification_time,
                     last_notification_time=last_notification_time)
 
 
@@ -29,8 +33,9 @@ class UserInfoModelTests(TestCase):
 
     def test_get_total_hour(self):
         """calculate the total hour from user input notification time."""
-        user = create_userinfo(50, 60, first_notification_time=datetime.time(8, 0, 0), last_notification_time=datetime.time(22, 0, 0))
-        user.get_total_hours()
+        user = create_userinfo(50, 60, first_notification_time=datetime.time(8, 0, 0),
+                               last_notification_time=datetime.time(22, 0, 0))
+        user.total_hours = get_total_hours(user.first_notification_time, user.last_notification_time)
         total = 14
         self.assertEqual(total, user.total_hours)
 
@@ -40,7 +45,7 @@ class UserInfoModelTests(TestCase):
                                last_notification_time=datetime.time(22, 0, 0))
         per_hour = 167.1233227
         user.get_water_amount_per_day()
-        user.get_total_hours()
+        user.total_hours = get_total_hours(user.first_notification_time, user.last_notification_time)
         user.get_water_amount_per_hour()
         self.assertAlmostEqual(per_hour, user.water_amount_per_hour, 5)
 
@@ -82,6 +87,13 @@ class TemplateUsed(TestCase):
         self.client.login()
         cal_url = self.client.get(reverse('aquaholic:home'))
         self.assertTemplateUsed(cal_url, 'aquaholic/home.html')
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
+        page = client.get(reverse('aquaholic:set_up', args=(user.id,)))
+        self.assertTemplateUsed(page, 'aquaholic/set_up.html')
 
 
 class LoginWithLine(TestCase):
@@ -92,4 +104,44 @@ class LoginWithLine(TestCase):
         response = self.client.get(cal_url)
         self.assertEqual(response.status_code, 200)
 
+
+class SetUpView(TestCase):
+    def test_setup_page(self):
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
+        page = client.get(reverse('aquaholic:set_up', args=(user.id,)))
+        self.assertEqual(page.status_code, 200)
+
+    def test_get_notification_time(self):
+        first_notify_time = datetime.time.strftime(datetime.time(10, 0, 0), "%H:%M")
+        last_notify_time = datetime.time.strftime(datetime.time(22, 0, 0), "%H:%M")
+        self.client.login()
+        user = create_userinfo(80, 0, first_notify_time, last_notify_time)
+        self.assertEqual(user.first_notification_time, "10:00")
+        self.assertEqual(user.last_notification_time, "22:00")
+
+
+class ScheduleView(TestCase):
+    def test_new_user_schedule_page_not_found(self):
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        client = Client()
+        client.login(username='testuser', password='12345')
+        response = client.get('aquaholic:set_up', args=Schedule.objects.filter(user_info_id=user.id),)
+        self.assertEqual(response.status_code, 404)
+
+    def test_set_schedule(self):
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
+        first_notify_time = datetime.time(10, 0, 0)
+        last_notify_time = datetime.time(22, 0, 0)
+        user = create_userinfo(80, 0, first_notify_time, last_notify_time)
+        user.total_hours = get_total_hours(first_notify_time, last_notify_time)
+        self.assertEqual(user.total_hours, 12)
 

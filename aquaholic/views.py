@@ -58,14 +58,20 @@ class CalculateAuth(generic.DetailView):
 
     def post(self, request, *args, **kwargs):
         try:
-            user = UserInfo.objects.get(user_id=request.user.id)
-            user.weight = float(request.POST["weight"])
-            user.exercise_time = float(request.POST["exercise_time"])
-            user.water_amount_per_day = ((user.weight * KILOGRAM_TO_POUND * 0.5)
-                                         + (user.exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
-            user.save()
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            user_info.weight = float(request.POST["weight"])
+            user_info.exercise_time = float(request.POST["exercise_time"])
+            user_info.water_amount_per_day = ((user_info.weight * KILOGRAM_TO_POUND * 0.5)
+                                         + (user_info.exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
+            user_info.get_water_amount_per_hour()
+            user_info.save()
+
+            all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
+            for one_schedule in all_schedules:
+                one_schedule.expected_amount = user_info.water_amount_per_hour
+                one_schedule.save()
             return render(request, self.template_name,
-                          {'result': f"{user.water_amount_per_day:.2f}"})
+                          {'result': f"{user_info.water_amount_per_day:.2f}"})
         except ValueError:
             message = "Please, enter a positive number in both fields."
             return render(request, self.template_name,

@@ -68,7 +68,7 @@ class CalculateAuth(generic.DetailView):
 
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
-                one_schedule.expected_amount = user_info.water_amount_per_hour
+                one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
                 one_schedule.save()
             return render(request, self.template_name,
                           {'result': f"{user_info.water_amount_per_day:.2f}"})
@@ -128,8 +128,8 @@ class SetUp(generic.DetailView):
             # create schedule
             for i in range(total_hours):
                 Schedule.objects.create(user_info_id=userinfo.id,
-                                        notification_time=first_notification_time,
-                                        expected_amount=expected_amount,
+                                        notification_time=first_notification_time.time(),
+                                        expected_amount=round(expected_amount, 2),
                                         notification_status=False
                                         )
                 first_notification_time = first_notification_time + datetime.timedelta(hours=1)

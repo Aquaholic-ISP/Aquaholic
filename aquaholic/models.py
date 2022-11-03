@@ -41,7 +41,6 @@ class UserInfo(models.Model):
         """Calculate amount of water per hour."""
         if self.total_hours is not None:
             self.water_amount_per_hour = self.water_amount_per_day / self.total_hours
-            print(self.water_amount_per_hour)
 
     def send_notification(self):
         pass
@@ -50,7 +49,7 @@ class UserInfo(models.Model):
 class Schedule(models.Model):
     """Schedule class for create notification time."""
     user_info = models.ForeignKey(UserInfo, on_delete=models.CASCADE, null=True)
-    notification_time = models.DateTimeField('notification time', null=True)
+    notification_time = models.TimeField('notification time', null=True)
     expected_amount = models.FloatField(default=0)
     notification_status = models.BooleanField(default=True)
 

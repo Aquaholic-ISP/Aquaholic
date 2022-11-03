@@ -1,1 +1,6 @@
-A history page starter.
+{% load static %}
+{% load socialaccount %}
+{% load i18n %}
+{% if all_intake %}
+    <p style="line-height: 300%; font-size: 30px;">The amount of water that you should drink is <b>{{all_intake}}</b> ml.</p>
+        {% endif %}

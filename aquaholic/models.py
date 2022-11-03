@@ -27,7 +27,7 @@ class UserInfo(models.Model):
     def get_water_amount_per_day(self):
         """Calculate amount of water per day."""
         self.water_amount_per_day = ((self.weight * KILOGRAM_TO_POUND * 0.5) + (self.exercise_time / 30) * 12) \
-                                    * OUNCES_TO_MILLILITER
+                                     * OUNCES_TO_MILLILITER
 
     # def get_total_hours(self):
     #     """Calculate total hours from first and last notification time."""
@@ -39,7 +39,8 @@ class UserInfo(models.Model):
 
     def get_water_amount_per_hour(self):
         """Calculate amount of water per hour."""
-        self.water_amount_per_hour = self.water_amount_per_day / self.total_hours
+        if self.total_hours is not None:
+            self.water_amount_per_hour = self.water_amount_per_day / self.total_hours
 
     def send_notification(self):
         pass
@@ -51,13 +52,14 @@ class Schedule(models.Model):
     notification_time = models.DateTimeField('notification time', null=True)
     expected_amount = models.FloatField(default=0)
     notification_status = models.BooleanField(default=True)
+    is_last = models.BooleanField(default=False)
 
-    def change_notification_status(self):
-        """Change notification status."""
-        if self.notification_status is True:
-            self.notification_status = False
-        else:
-            self.notification_status = True
+    # def change_notification_status(self):
+    #     """Change notification status."""
+    #     if self.notification_status is True:
+    #         self.notification_status = False
+    #     else:
+    #         self.notification_status = True
 
 
 class Intake(models.Model):

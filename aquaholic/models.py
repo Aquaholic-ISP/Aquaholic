@@ -27,7 +27,7 @@ class UserInfo(models.Model):
     def get_water_amount_per_day(self):
         """Calculate amount of water per day."""
         self.water_amount_per_day = ((self.weight * KILOGRAM_TO_POUND * 0.5) + (self.exercise_time / 30) * 12) \
-                                    * OUNCES_TO_MILLILITER
+                                     * OUNCES_TO_MILLILITER
 
     # def get_total_hours(self):
     #     """Calculate total hours from first and last notification time."""
@@ -49,16 +49,18 @@ class UserInfo(models.Model):
 class Schedule(models.Model):
     """Schedule class for create notification time."""
     user_info = models.ForeignKey(UserInfo, on_delete=models.CASCADE, null=True)
-    notification_time = models.TimeField('notification time', null=True)
+    notification_time = models.DateTimeField('notification time', null=True)
     expected_amount = models.FloatField(default=0)
     notification_status = models.BooleanField(default=True)
+    is_last = models.BooleanField(default=False)
+    is_first = models.BooleanField(default=False)
 
-    def change_notification_status(self):
-        """Change notification status."""
-        if self.notification_status is True:
-            self.notification_status = False
-        else:
-            self.notification_status = True
+    # def change_notification_status(self):
+    #     """Change notification status."""
+    #     if self.notification_status is True:
+    #         self.notification_status = False
+    #     else:
+    #         self.notification_status = True
 
 
 class Intake(models.Model):

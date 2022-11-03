@@ -62,7 +62,7 @@ class CalculateAuth(generic.DetailView):
             user_info.weight = float(request.POST["weight"])
             user_info.exercise_time = float(request.POST["exercise_time"])
             user_info.water_amount_per_day = ((user_info.weight * KILOGRAM_TO_POUND * 0.5)
-                                         + (user_info.exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
+                                              + (user_info.exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
             user_info.get_water_amount_per_hour()
             user_info.save()
 
@@ -119,6 +119,7 @@ class SetUp(generic.DetailView):
             expected_amount = userinfo.water_amount_per_hour
 
             first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
+            last_notification_time = first_notification_time + datetime.timedelta(hours=total_hours)
 
             # user already have schedule
             if Schedule.objects.filter(user_info_id=userinfo.id).exists():
@@ -126,13 +127,17 @@ class SetUp(generic.DetailView):
                 for one_schedule in found_schedule:
                     one_schedule.delete()
             # create schedule
-            for i in range(total_hours):
+            if last_notification_time < datetime.datetime.now():
+                first_notification_time += datetime.timedelta(hours=24)
+            for i in range(total_hours+1):
                 Schedule.objects.create(user_info_id=userinfo.id,
-                                        notification_time=first_notification_time.time(),
+                                        notification_time=first_notification_time,
                                         expected_amount=round(expected_amount, 2),
-                                        notification_status=False
+                                        notification_status=(first_notification_time < datetime.datetime.now()),
+                                        is_first=(i == 0),
+                                        is_last=(i == total_hours)
                                         )
-                first_notification_time = first_notification_time + datetime.timedelta(hours=1)
+                first_notification_time += datetime.timedelta(hours=1)
             if token_exist:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(user.id,)))
             else:

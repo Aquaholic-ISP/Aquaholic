@@ -5,6 +5,8 @@ from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
 import datetime
+from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -185,4 +187,14 @@ class History(generic.DetailView):
     template_name = 'aquaholic/history.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        user = request.user
+        userinfo = UserInfo.objects.get(user_id=user.id)
+        if Intake.objects.filter(user_info_id=userinfo.id).exists():
+            all_intake = Intake.objects.get(user_info_id=userinfo.id)
+            if all_intake:
+                return render(request, self.template_name, {"all_intake": f"{all_intake.user_drinks_amount}"})
+        else:
+            return HttpResponseRedirect(reverse('aquaholic:home'))
+
+
+

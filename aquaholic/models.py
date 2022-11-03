@@ -39,7 +39,9 @@ class UserInfo(models.Model):
 
     def get_water_amount_per_hour(self):
         """Calculate amount of water per hour."""
-        self.water_amount_per_hour = self.water_amount_per_day / self.total_hours
+        if self.total_hours is not None:
+            self.water_amount_per_hour = self.water_amount_per_day / self.total_hours
+            print(self.water_amount_per_hour)
 
     def send_notification(self):
         pass

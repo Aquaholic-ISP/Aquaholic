@@ -128,7 +128,7 @@ button{
     width: 60%;
     background: transparent;
     position: absolute;
-    margin-top: auto;
+    margin-top: 3%;
 }
 
 .allbtn form{
@@ -149,7 +149,7 @@ button{
     width: 50%;
     background: transparent;
     position: absolute;
-    margin-top: 14%;
+    margin-top: 10%;
     margin-left: 35%;
 }
 
@@ -158,7 +158,7 @@ button{
     position: relative;
     justify-content: center;
     margin-left: 93%;
-    margin-top: 2%;
+    margin-top: 0%;
     background: transparent;
 }
 
@@ -169,7 +169,7 @@ button{
     margin-right:0px;
     background-color: rgb(192, 192, 192);
     width: 100%;
-    height: 40px;
+    height: 70px;
     border-radius: 15px;
 }
 
@@ -178,7 +178,7 @@ button{
     color: white;
     padding: 5px;
     text-align: right;
-    font-size: 20px;
+    font-size: 40px;
     border-radius: 15px;
     -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);

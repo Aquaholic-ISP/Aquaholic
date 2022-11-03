@@ -29,6 +29,10 @@
                 {% csrf_token %}
                 <button type="submit">History</button>
             </form>
+            <form action="{% url 'aquaholic:input' user.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit">Input</button>
+            </form>
  <div class="container">
         <div class="progress intake">0%</div>
     </div>

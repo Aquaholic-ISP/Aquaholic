@@ -1,1 +1,26 @@
 An input page starter.
+
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+    </div>
+
+<div class="input" style="line-height: 250%">
+    <form action="{% url 'aquaholic:input' user.id %}" method="POST">
+        {% csrf_token%}
+        <label style="font-size: 30px; position: relative;">Enter date</label>
+        <input style="margin-left: 114px; font-size: 18px;" type="date" name="date">
+        <br>
+        <label style="font-size: 30px;">Enter amount</label>
+        <input style="margin-left: 65px; font-size: 18px;" type="number" name="amount" min="0">
+        <br>
+        {% if message %}
+            <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
+        {% endif %}
+        <button type="submit" style="margin-top: 40px;">Save</button>
+    </form>
+    </div>
+{% if save %}
+    <p style="line-height: 300%; font-size: 30px;">Save <b>{{result}}</b> ml.</p>
+        {% endif %}

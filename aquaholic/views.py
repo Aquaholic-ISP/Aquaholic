@@ -134,7 +134,6 @@ class SetUp(generic.DetailView):
                                         notification_time=first_notification_time,
                                         expected_amount=round(expected_amount, 2),
                                         notification_status=(first_notification_time < datetime.datetime.now()),
-                                        is_first=(i == 0),
                                         is_last=(i == total_hours)
                                         )
                 first_notification_time += datetime.timedelta(hours=1)

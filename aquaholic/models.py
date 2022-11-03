@@ -53,7 +53,6 @@ class Schedule(models.Model):
     expected_amount = models.FloatField(default=0)
     notification_status = models.BooleanField(default=True)
     is_last = models.BooleanField(default=False)
-    is_first = models.BooleanField(default=False)
 
     # def change_notification_status(self):
     #     """Change notification status."""

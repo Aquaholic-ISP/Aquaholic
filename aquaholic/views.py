@@ -168,6 +168,9 @@ class Input(generic.DetailView):
     model = Intake
     template_name = 'aquaholic/input.html'
 
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
 
 class History(generic.DetailView):
     """A class that represents the history page view."""

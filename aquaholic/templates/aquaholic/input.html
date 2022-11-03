@@ -1,1 +1,65 @@
-An input page starter.
+{% load static %}
+{% load socialaccount %}
+{% load i18n %}
+
+<html>
+<head>
+        <link rel="stylesheet" href="{% static 'aquaholic/style6.css' %}">
+    <title>Input of water intake</title>
+</head>
+
+<div class="navbar">
+    <ul>
+        <li><a href="/">Home</a></li>
+    </ul>
+</div>
+
+<div class="head">
+    <h1>How much have you drink ?</h1>
+</div>
+
+<div class="wrapbutton">
+    <form action="{% url 'aquaholic:input' user.id %}" method="get">
+        {% csrf_token %}
+        <button type="submit" id="small" name="small" value="150" onclick=""><img src="https://i.imgur.com/Bz4bGyZ.png" width="185" height="170"></button>
+        <button type="submit" id="glass" name="glass" value="200" onclick=""><img src="https://i.imgur.com/NlANHha.png" width="185" height="170"></button>
+        <button type="submit" id="medium" name="medium" value="480" onclick=""><img src="https://i.imgur.com/yxXe2Hl.png" width="185" height="170"></button>
+        <button type="submit" id="bottle" name="bottle" value="600" onclick=""><img src="https://i.imgur.com/OKWOlYq.png" width="185" height="170"></button>
+    </form>
+</div>
+
+<div class="wrapinfo">
+    <form action="{% url 'aquaholic:input' user.id %}" method="get">
+        {% csrf_token %}
+
+        <div class="date">
+            <label>Date: </label> 
+            <input id="date" type="date" /> 
+
+            <script>
+            var date = new Date();
+            var currentDate = date.toISOString().slice(0,10);
+            var currentTime = date.getHours() + ':' + date.getMinutes();
+
+            document.getElementById('date').value = currentDate;
+            </script>
+        </div>
+
+        <div class="amount">
+            <label>Enter the amount: </label>
+            <input type="number" name="amount" min="0" value="<?php echo $yy ?>">
+            <script>
+                function fillAmount(amount) {
+                    document.getElementsByName("small").value = amount
+                   }
+            </script>
+        </div>
+
+        <div class="save">
+            <button type="submit">Save</button>
+        </div>
+
+    </form>
+</div>
+
+</html>

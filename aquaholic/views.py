@@ -231,22 +231,19 @@ class History(generic.DetailView):
         for day in range(1, num_days+1):
             days[datetime.date(this_year, this_month, day).strftime("%d %b %Y")] = 0
 
-        if all_intake:
-            for intake in sorted_intakes:
-                intake_date = intake.intake_date
-                intake_date_month = intake_date.month
-                intake_date_year = intake_date.year
-                if (this_month == intake_date_month) and (this_year == intake_date_year):
-                    days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
-            return render(request, self.template_name, {"all_intake": all_intake,
-                                                        "goal": userinfo.water_amount_per_day,
-                                                        "date": list(days.keys()),
-                                                        "amount": list(days.values()),
-                                                        "recent_year": get_five_recent_years(),
-                                                        "selected_month_int": this_month,
-                                                        "selected_month_str": today.strftime("%b")})
-        else:
-            return render(request, self.template_name, {"message": "You didn't have a history yet."})
+        for intake in sorted_intakes:
+            intake_date = intake.intake_date
+            intake_date_month = intake_date.month
+            intake_date_year = intake_date.year
+            if (this_month == intake_date_month) and (this_year == intake_date_year):
+                days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
+        return render(request, self.template_name, {"all_intake": all_intake,
+                                                    "goal": userinfo.water_amount_per_day,
+                                                    "date": list(days.keys()),
+                                                    "amount": list(days.values()),
+                                                    "recent_year": get_five_recent_years(),
+                                                    "selected_month_int": this_month,
+                                                    "selected_month_str": today.strftime("%b")})
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -262,19 +259,16 @@ class History(generic.DetailView):
         for day in range(1, num_days + 1):
             days[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = 0
 
-        if all_intake:
-            for intake in sorted_intakes:
-                intake_date = intake.intake_date
-                intake_date_month = intake_date.month
-                intake_date_year = intake_date.year
-                if (selected_month == intake_date_month) and (selected_year == intake_date_year):
-                    days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
-            return render(request, self.template_name, {"all_intake": all_intake,
-                                                        "goal": userinfo.water_amount_per_day,
-                                                        "date": list(days.keys()),
-                                                        "amount": list(days.values()),
-                                                        "recent_year": get_five_recent_years(),
-                                                        "selected_month_int": selected_month,
-                                                        "selected_month_str": datetime.date(2022, selected_month, 1).strftime('%b')})
-        else:
-            return render(request, self.template_name, {"message": "You didn't have a history yet."})
+        for intake in sorted_intakes:
+            intake_date = intake.intake_date
+            intake_date_month = intake_date.month
+            intake_date_year = intake_date.year
+            if (selected_month == intake_date_month) and (selected_year == intake_date_year):
+                days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
+        return render(request, self.template_name, {"all_intake": all_intake,
+                                                    "goal": userinfo.water_amount_per_day,
+                                                    "date": list(days.keys()),
+                                                    "amount": list(days.values()),
+                                                    "recent_year": get_five_recent_years(),
+                                                    "selected_month_int": selected_month,
+                                                    "selected_month_str": datetime.date(2022, selected_month, 1).strftime('%b')})

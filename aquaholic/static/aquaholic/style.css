@@ -84,7 +84,7 @@
     }
 }
 
-button{
+.allbtn button{
     width: 150px;
     padding: 10px 0;
     text-align: center;
@@ -99,7 +99,25 @@ button{
 }
 
 .buttonlogin form {
-    display: inline-block
+    display: inline-block;
+    position: relative;
+    margin: auto;
+    width: 150px;
+    height: 30px;
+}
+
+.buttonlogin button{
+    width: 150px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
 .getin{
@@ -153,12 +171,26 @@ button{
     margin-left: 35%;
 }
 
+.wrap-contain button{
+    width: 150px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
 .wrap-contain form{
     margin: auto;
     position: relative;
     justify-content: center;
-    margin-left: 93%;
-    margin-top: 0%;
+    margin-left: 0%;
+    margin-top: 2%;
     background: transparent;
 }
 

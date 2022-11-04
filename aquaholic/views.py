@@ -4,6 +4,7 @@ from django.shortcuts import render, reverse, redirect
 from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
+from django.utils.timezone import make_aware
 import datetime
 
 

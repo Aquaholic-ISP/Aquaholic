@@ -29,12 +29,12 @@
 </div>
 
 <div class="wrapinfo">
-    <form action="{% url 'aquaholic:input' user.id %}" method="get">
+    <form action="{% url 'aquaholic:input' user.id %}" method="post">
         {% csrf_token %}
 
         <div class="date">
             <label>Date: </label> 
-            <input id="date" type="date" /> 
+            <input id="date" type="date" name="date"/> 
 
             <script>
             var date = new Date();

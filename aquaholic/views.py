@@ -169,7 +169,28 @@ class Input(generic.DetailView):
     template_name = 'aquaholic/input.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        return render(request, self.template_name, {'user': request.user})
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            amount = request.POST["amount"]
+            date = request.POST["date"]
+            intake_dated = datetime.datetime.strptime(date, '%Y-%m-%d')
+            aware_date = make_aware(intake_dated)
+            userinfo = UserInfo.objects.get(user_id=request.user.id)
+            if Intake.objects.filter(user_info_id=userinfo.id, intake_date=aware_date).exists():
+                intake = Intake.objects.get(user_info_id=userinfo.id, intake_date=aware_date)
+                intake.user_drinks_amount += float(amount)
+                intake.save()
+            else:
+                Intake.objects.create(user_info_id=userinfo.id,
+                                      intake_date=date,
+                                      user_drinks_amount=amount)
+            return HttpResponseRedirect(reverse('aquaholic:home'))
+        except:
+            message = "Please, input in the field."
+            return render(request, self.template_name,
+                          {'message': message})
 
 
 class History(generic.DetailView):

@@ -20,5 +20,3 @@ def update_notification():
             schedule.notification_time += datetime.timedelta(hours=24)
             schedule.notification_status = False
             schedule.save()
-
-

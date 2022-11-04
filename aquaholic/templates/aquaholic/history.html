@@ -1,6 +1,80 @@
+<!DOCTYPE html>
 {% load static %}
-{% load socialaccount %}
-{% load i18n %}
-{% if all_intake %}
-    <p style="line-height: 300%; font-size: 30px;">The amount of water that you should drink is <b>{{all_intake}}</b> ml.</p>
-        {% endif %}
+
+<html>
+
+<head>
+      <link rel="stylesheet" href="{% static 'aquaholic/style7.css' %}">
+</head>
+
+
+<body>
+
+<div class="navbar">
+  <ul>
+    <li><a href="/">Home</a></li>
+  </ul>
+</div>
+<h1>Your intake history</h1>
+<div class="search">
+  <form action="{% url 'aquaholic:history' user.id %}" method="post">
+    {% csrf_token %}
+    <label for="month">Choose month and year:</label>
+    <select id="month" name="month">
+      <option value={{selected_month_int}}>{{selected_month_str}}</option>
+      <option value=1>Jan</option>
+      <option value=2>Feb</option>
+      <option value=3>Mar</option>
+      <option value=4>Apr</option>
+      <option value=5>May</option>
+      <option value=6>Jun</option>
+      <option value=7>Jul</option>
+      <option value=8>Aug</option>
+      <option value=9>Sep</option>
+      <option value=10>Oct</option>
+      <option value=11>Nov</option>
+      <option value=12>Dec</option>
+    </select>
+    <select id="year" name="year">
+      {% for year in recent_year %}
+         <option value={{year}}>{{year}}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" >Go</button>
+  </form>
+</div>
+<div>
+  <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const labels = {{date|safe}};
+
+  const data = {
+    labels: labels,
+    datasets: [{
+      label: 'The amount of water that you drink each day (ml)',
+      backgroundColor: '#d4f1f9',
+      borderColor: '#d4f1f9',
+      data: {{amount|safe}},
+    }]
+  };
+
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {}
+  };
+</script>
+
+<script>
+  const myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+  );
+</script>
+
+</body>
+</html>

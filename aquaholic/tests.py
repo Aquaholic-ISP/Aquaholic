@@ -158,24 +158,20 @@ class ScheduleView(TestCase):
         user.save()
         client = Client()
         client.login(username='testuser', password='12345')
-        page = client.get(reverse('aquaholic:set_up', args=(user.id,)))
-        self.assertTemplateUsed(page, 'aquaholic/set_up.html')
-
-        userinfo = UserInfo.objects.create(weight=50, exercise_time=30, first_notification_time=datetime.time(8, 0, 0),
+        userinfo = UserInfo.objects.create(weight=50, exercise_time=30, first_notification_time=datetime.time(11, 0, 0),
                                            last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
-        first_notify_time = userinfo.first_notification_time
-        first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
         userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
                                                userinfo.last_notification_time)
         userinfo.get_water_amount_per_hour()
         userinfo.save()
+        first_notify_time = userinfo.first_notification_time
         expected_amount = userinfo.water_amount_per_hour
-        Schedule.objects.create(user_info_id=user.id,
-                                notification_time=first_notification_time,
-                                expected_amount=expected_amount,
-                                notification_status=False
-                                )
-        userinfo.save()
+        first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
+        Schedule.objects.create(user_info_id=userinfo.id,
+                                    notification_time=first_notification_time,
+                                    expected_amount=expected_amount,
+                                    notification_status=False
+                                    )
         page = client.get(reverse('aquaholic:schedule', args=(user.id,),))
         self.assertEqual(page.status_code, 200)
 

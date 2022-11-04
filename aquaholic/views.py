@@ -189,8 +189,8 @@ class Input(generic.DetailView):
         try:
             amount = request.POST["amount"]
             date = request.POST["date"]
-            intake_dated = datetime.datetime.strptime(date, '%Y-%m-%d')
-            aware_date = make_aware(intake_dated)
+            intake_date = datetime.datetime.strptime(date, '%Y-%m-%d') + datetime.timedelta(hours=10)
+            aware_date = make_aware(intake_date)
             userinfo = UserInfo.objects.get(user_id=request.user.id)
             if Intake.objects.filter(user_info_id=userinfo.id, intake_date=aware_date).exists():
                 intake = Intake.objects.get(user_info_id=userinfo.id, intake_date=aware_date)
@@ -198,7 +198,7 @@ class Input(generic.DetailView):
                 intake.save()
             else:
                 Intake.objects.create(user_info_id=userinfo.id,
-                                      intake_date=date,
+                                      intake_date=intake_date,
                                       user_drinks_amount=amount)
             return HttpResponseRedirect(reverse('aquaholic:home'))
         except:

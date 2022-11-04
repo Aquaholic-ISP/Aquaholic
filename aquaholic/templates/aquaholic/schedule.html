@@ -15,27 +15,31 @@
 <table border="1" cellpadding=10>
     <th style="text-align:center">Time</th>
     <th style="text-align:center">Amount</th>
+    <th style="text-align:center">status</th>
 {% for data in schedule %}
     <tr>
     {% if data.notification_status %}
         <td>{{data.notification_time}}</td>
         <td style="text-align:center">{{data.expected_amount}}</td>
+<!--                <td style="text-align:center">{{data.is_last}}</td>-->
+<td><label class="switch">
+    <input type="checkbox" >
+
+    <span class="slider round"></span>
+            </label></td>
         <td>
-            <label class="switch">
-            <input type="checkbox">
-            <span class="slider round"></span>
-            </label>
         </td>
     {% else %}
         <td> {{data.notification_time}}</td>
         <td style="text-align:center">{{data.expected_amount}}</td>
-<!--             <td><label class="switch">-->
-<!--    <input type="checkbox" onclick="data.change_notification_status()">-->
-<!--                 <p id="text" style="display:none">Checkbox is checked</p>-->
-<!--                 check-->
+<!--                        <td style="text-align:center">{{data.is_last}}</td>-->
 
-<!--    <span class="slider round"></span>-->
-<!--            </label></td>-->
+             <td><label class="switch">
+    <input type="checkbox"  checked="checked">
+<!--                 <p  style="display:none">Checkbox is checked</p>-->
+
+    <span class="slider round"></span>
+            </label></td>
     {% endif %}
     </tr>
 

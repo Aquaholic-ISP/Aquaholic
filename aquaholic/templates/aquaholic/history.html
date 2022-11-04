@@ -1,6 +1,56 @@
+<!DOCTYPE html>
 {% load static %}
-{% load socialaccount %}
-{% load i18n %}
-{% if all_intake %}
-    <p style="line-height: 300%; font-size: 30px;">The amount of water that you should drink is <b>{{all_intake}}</b> ml.</p>
-        {% endif %}
+
+<html>
+
+<body>
+
+<div class="navbar">
+  <ul>
+    <li><a href="/">Home</a></li>
+  </ul>
+</div>
+<h1>Your intake history</h1>
+
+<div>
+  <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const labels = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+  ];
+
+  const data = {
+    labels: labels,
+    datasets: [{
+      label: 'My First dataset',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: [0, 10, 5, 2, 20, 30, 45],
+    }]
+  };
+
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {}
+  };
+</script>
+
+<script>
+  const myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+  );
+</script>
+
+</body>
+</html>

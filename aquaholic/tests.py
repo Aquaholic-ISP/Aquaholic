@@ -145,3 +145,29 @@ class ScheduleView(TestCase):
         user.total_hours = get_total_hours(first_notify_time, last_notify_time)
         self.assertEqual(user.total_hours, 12)
 
+
+class HistoryViewTest(TestCase):
+    def test_history_page(self):
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
+        first_notify_time = datetime.time(8, 0, 0)
+        last_notify_time = datetime.time(23, 0, 0)
+        userinfo = UserInfo.objects.create(weight=50,
+                                           exercise_time=60,
+                                           first_notification_time=first_notify_time,
+                                           last_notification_time=last_notify_time,
+                                           user_id=user.id)
+        response = client.get(reverse('aquaholic:home'))
+        self.assertEqual(response.status_code, 200)
+        intake = Intake.objects.create(user_info_id=userinfo.id,
+                                       intake_date=datetime.datetime.today(),
+                                       user_drinks_amount=500)
+        response = client.get(reverse('aquaholic:history', args=(user.id,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'aquaholic/history.html')
+
+
+

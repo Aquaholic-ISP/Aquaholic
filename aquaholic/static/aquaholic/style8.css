@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+
+
+*{
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    color: #0E1646;
+    font-family: "Poppins", sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.section1 {
+    border: #0e164600 solid;
+    background: linear-gradient(27.5deg, #1d5c96 50%, #7db0de 58%);
+    width: 99.6%;
+    height: 100%;
+}
+
+.header {
+    width: 50%;
+    background: transparent;
+    margin-top: 25%;
+    margin-left: 4%;
+}
+
+.header h1{
+    text-align: left;
+}
+
+.describtion p{
+    text-align: left;
+}
+
+.describtion ul li{
+    list-style: none;
+    position: relative;
+    text-align: left;
+    font-size: 16px;
+}
+
+.section2 {
+    border: #0e164600 solid;
+    width: 99.6%;
+    height: 100%;
+}
+
+.section2 h1 {
+    font-size: 50px;
+    margin-top: 6%;
+}
+
+.creator {
+    margin-top: 4%;
+    width: auto;
+    display: flex;
+}
+
+.picture1 {
+    width: 17.4%;
+    margin-left: 6%;
+}
+
+.picture1 img{
+    width: 300px;
+    height: 300px;
+}
+
+.picture2 {
+    width: 17.4%;
+    margin-left: 6%;
+}
+
+.picture2 img{
+    width: 300px;
+    height: 300px;
+}
+
+.picture3 {
+    width: 17.4%;
+    margin-left: 6%;
+}
+
+.picture3 img{
+    width: 300px;
+    height: 300px;
+}
+
+.picture4 {
+    width: 17.4%;
+    margin-left: 6%;
+}
+
+.picture4 img{
+    width: 300px;
+    height: 300px;
+}

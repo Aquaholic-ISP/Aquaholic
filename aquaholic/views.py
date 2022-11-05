@@ -34,10 +34,11 @@ class HomePage(generic.ListView):
                 print(goal)
                 amount = int(all_intake.user_drinks_amount/goal *100)
                 print(amount)
-                if all_intake:
+                if all_intake and amount<=100:
                     return render(request, self.template_name, {"all_intake": f"{amount}"})
-            else:
-                return HttpResponseRedirect(reverse('aquaholic:home'))
+                elif all_intake and amount>100:
+                    amount=100
+                    return render(request, self.template_name, {"all_intake": f"{amount}"})
         return render(request, self.template_name)
 
 

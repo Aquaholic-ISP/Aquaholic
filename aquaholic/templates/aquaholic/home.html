@@ -53,7 +53,7 @@
 
         <div class="wrap-contain">
             <div class="container">
-                <div class="progress intake" style="width:{{ all_intake }}%">{{ all_intake }}%</div>
+                <div class="progress intake" style="width:{{ all_intake }}%">{{all_intake}}%</div>
             </div>
             <form action="{% url 'aquaholic:input' user.id %}" method="get">
                     {% csrf_token %}
@@ -66,7 +66,6 @@
     {% endif %}
 
     {% if not user.is_authenticated %}
-
 
         <div class="water">
             <h2>Aquaholic</h2>

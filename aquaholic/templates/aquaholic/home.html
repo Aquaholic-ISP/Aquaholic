@@ -20,7 +20,7 @@
         </div>
 
         <div class="allbtn">
-            
+
             <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
                 {% csrf_token %}
                 <button type="submit" style="width: 220px;">calculate your goal</button>
@@ -50,16 +50,16 @@
             </form>
 
         </div>
-           
+
         <div class="wrap-contain">
             <div class="container">
-                <div class="progress intake">0%</div>
+                <div class="progress intake" style="width:{{ all_intake }}%">{{ all_intake }}%</div>
             </div>
             <form action="{% url 'aquaholic:input' user.id %}" method="get">
                     {% csrf_token %}
                     <button type="submit">Input your intake</button>
                 </form>
-        </div>    
+        </div>
 
     </div>
 

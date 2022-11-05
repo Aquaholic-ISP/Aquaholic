@@ -40,6 +40,7 @@ class HomePage(generic.ListView):
                 return HttpResponseRedirect(reverse('aquaholic:home'))
         return render(request, self.template_name)
 
+
 class Calculate(generic.ListView):
     """A class that represents the calculation page view."""
     template_name = 'aquaholic/calculate.html'

@@ -27,8 +27,18 @@ class HomePage(generic.ListView):
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.is_authenticated:
-            if not UserInfo.objects.filter(user_id=user.id).exists():
-                UserInfo.objects.create(user_id=user.id)
+            userinfo = UserInfo.objects.get(user_id=user.id)
+            if Intake.objects.filter(user_info_id=userinfo.id).exists():
+                all_intake = Intake.objects.get(user_info_id=userinfo.id)
+                goal = userinfo.water_amount_per_day
+                print(goal)
+                amount = int(all_intake.user_drinks_amount/goal *100)
+                print(amount)
+                if all_intake and amount<=100:
+                    return render(request, self.template_name, {"all_intake": f"{amount}"})
+                elif all_intake and amount>100:
+                    amount=100
+                    return render(request, self.template_name, {"all_intake": f"{amount}"})
         return render(request, self.template_name)
 
 

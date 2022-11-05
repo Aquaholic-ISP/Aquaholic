@@ -32,6 +32,14 @@ class HomePage(generic.ListView):
         return render(request, self.template_name)
 
 
+class AboutUs(generic.ListView):
+    """A class that represents the about us page view."""
+    template_name = 'aquaholic/about_us.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
 class Calculate(generic.ListView):
     """A class that represents the calculation page view."""
     template_name = 'aquaholic/calculate.html'

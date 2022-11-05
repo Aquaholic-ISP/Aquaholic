@@ -31,15 +31,14 @@ class HomePage(generic.ListView):
             userinfo = UserInfo.objects.get(user_id=user.id)
             if Intake.objects.filter(user_info_id=userinfo.id).exists():
                 all_intake = Intake.objects.get(user_info_id=userinfo.id, intake_date=date)
-                goal = userinfo.water_amount_per_day
-                print(goal)
-                amount = int(all_intake.user_drinks_amount/goal *100)
-                print(amount)
-                if all_intake and amount<=100:
-                    return render(request, self.template_name, {"all_intake": f"{amount}"})
-                elif all_intake and amount>100:
-                    amount=100
-                    return render(request, self.template_name, {"all_intake": f"{amount}"})
+                if all_intake:
+                    goal = userinfo.water_amount_per_day
+                    amount = int(all_intake.user_drinks_amount / goal * 100)
+                    if amount <= 100:
+                        return render(request, self.template_name, {"all_intake": f"{amount}"})
+                    elif amount > 100:
+                        amount = 100
+                        return render(request, self.template_name, {"all_intake": f"{amount}"})
         return render(request, self.template_name)
 
 

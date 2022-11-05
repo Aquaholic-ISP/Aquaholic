@@ -2,7 +2,7 @@ from django.test import TestCase
 
 # Create your tests here.
 import datetime
-from aquaholic.models import UserInfo
+from aquaholic.models import UserInfo, Intake
 from django.urls import reverse
 from http import HTTPStatus
 from django.test import TestCase, Client
@@ -200,4 +200,49 @@ class HistoryViewTest(TestCase):
         self.assertTemplateUsed(response, 'aquaholic/history.html')
 
 
+class InputViewTest(TestCase):
+    """Test cases for input view."""
 
+    def test_input(self):
+        """Intakes are stored in the database correctly.
+
+        When user input an amount of water and save,
+        the amount of water that the user input on
+        the selected day topped up from the already
+        existing amount in the database of that day.
+        """
+        # user logins and to home page where user info is created
+        user1 = User.objects.create(username='testuser1')
+        user1.set_password('12345')
+        user1.save()
+        client = Client()
+        client.login(username='testuser1', password='12345')
+        response = client.get(reverse('aquaholic:home'))
+        self.assertEqual(response.status_code, 200)
+
+        # user input the amount of water and save
+        input_url = reverse('aquaholic:input', args=(user1.id,))
+        form_data = {"amount": "200",
+                     "date": "2022-11-05"}
+        response = client.post(input_url, form_data)
+        self.assertEqual(response.status_code, 302)
+
+        # get userInfo object from database
+        user_info = UserInfo.objects.get(user_id=user1.id)
+
+        # datetime in database = actual time + 10 hours
+        db_time = datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10)
+        intake1 = Intake.objects.get(user_info_id=user_info.id, intake_date=db_time)
+        self.assertEqual(200, intake1.user_drinks_amount)
+
+        # user save the amount of water and save again
+        input_url = reverse('aquaholic:input', args=(user1.id,))
+        form_data = {"amount": "500",
+                     "date": "2022-11-05"}
+        response = client.post(input_url, form_data)
+        self.assertEqual(response.status_code, 302)
+
+        # the amount of water topped up from the already existing amount
+        db_time = datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10)
+        intake1 = Intake.objects.get(user_info_id=user_info.id, intake_date=db_time)
+        self.assertEqual(700, intake1.user_drinks_amount)

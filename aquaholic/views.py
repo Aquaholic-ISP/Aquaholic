@@ -26,10 +26,11 @@ class HomePage(generic.ListView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
+        date = datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0)
         if user.is_authenticated:
             userinfo = UserInfo.objects.get(user_id=user.id)
             if Intake.objects.filter(user_info_id=userinfo.id).exists():
-                all_intake = Intake.objects.get(user_info_id=userinfo.id)
+                all_intake = Intake.objects.get(user_info_id=userinfo.id, intake_date=date)
                 goal = userinfo.water_amount_per_day
                 print(goal)
                 amount = int(all_intake.user_drinks_amount/goal *100)

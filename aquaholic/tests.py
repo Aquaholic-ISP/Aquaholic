@@ -177,6 +177,7 @@ class ScheduleView(TestCase):
 
 
 class HistoryViewTest(TestCase):
+    """Test cases for history page."""
     def test_history_page(self):
         user = User.objects.create(username='testuser')
         user.set_password('12345')
@@ -192,10 +193,19 @@ class HistoryViewTest(TestCase):
                                            user_id=user.id)
         response = client.get(reverse('aquaholic:home'))
         self.assertEqual(response.status_code, 200)
-        intake = Intake.objects.create(user_info_id=userinfo.id,
-                                       intake_date=datetime.datetime.today(),
-                                       user_drinks_amount=500)
+
+        # user input amount of water and go to history page
+        Intake.objects.create(user_info_id=userinfo.id,
+                              intake_date=datetime.datetime.today(),
+                              user_drinks_amount=500)
         response = client.get(reverse('aquaholic:history', args=(user.id,)))
+        self.assertEqual(response.status_code, 200)
+        history_url = reverse('aquaholic:history', args=(user.id,))
+
+        # user change mouth and year of history page
+        form_data = {"month": "12",
+                     "year": "2021"}
+        response = client.post(history_url, form_data)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'aquaholic/history.html')
 

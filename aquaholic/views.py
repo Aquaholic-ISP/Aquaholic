@@ -1,13 +1,11 @@
 from django.views import generic
-from .models import UserInfo, Schedule, Intake
-from django.shortcuts import render, reverse, redirect
+from .models import Schedule, Intake
+from django.shortcuts import reverse
 from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
 from django.utils.timezone import make_aware
-from django.shortcuts import render, get_object_or_404
-from django.contrib import messages
-import datetime
+from django.shortcuts import render
 import datetime, calendar
 
 

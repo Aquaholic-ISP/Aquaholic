@@ -1,15 +1,10 @@
-from django.test import TestCase
-
-# Create your tests here.
 import datetime
 from aquaholic.models import UserInfo, Intake
 from django.urls import reverse
 from http import HTTPStatus
 from django.test import TestCase, Client
 from aquaholic.views import *
-from django.http import HttpResponse, HttpRequest
 from django.contrib.auth.models import User
-from urllib import request
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):

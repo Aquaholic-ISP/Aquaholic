@@ -1,15 +1,10 @@
-from django.test import TestCase
-
-# Create your tests here.
 import datetime
 from aquaholic.models import UserInfo, Intake
 from django.urls import reverse
 from http import HTTPStatus
 from django.test import TestCase, Client
 from aquaholic.views import *
-from django.http import HttpResponse, HttpRequest
 from django.contrib.auth.models import User
-from urllib import request
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
@@ -147,7 +142,7 @@ class SetUpView(TestCase):
 
 class ScheduleView(TestCase):
     def test_new_user_schedule_page_not_found(self):
-        """Authenticated user can redirect to sche dule page. But no time and amount in schedule page
+        """Authenticated user can redirect to schedule page. But no time and amount in schedule page
         if users are not create schedule."""
         user = User.objects.create(username='testuser')
         user.set_password('12345')
@@ -191,6 +186,12 @@ class ScheduleView(TestCase):
 class HistoryViewTest(TestCase):
     """Test cases for history page."""
     def test_history_page(self):
+        """History view work correctly.
+
+        When user go to history page,
+        it showed water intake of user
+        base on month and year that user selected.
+        """
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save()

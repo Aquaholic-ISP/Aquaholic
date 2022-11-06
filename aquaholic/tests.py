@@ -121,6 +121,7 @@ class LoginWithLine(TestCase):
 
 class SetUpView(TestCase):
     def test_setup_page(self):
+        """ authenticated user can redirect to set up page"""
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save()
@@ -130,6 +131,7 @@ class SetUpView(TestCase):
         self.assertEqual(page.status_code, 200)
 
     def test_get_notification_time(self):
+        """User can set notification time in set up page."""
         first_notify_time = datetime.time.strftime(datetime.time(10, 0, 0), "%H:%M")
         last_notify_time = datetime.time.strftime(datetime.time(22, 0, 0), "%H:%M")
         self.client.login()
@@ -140,14 +142,24 @@ class SetUpView(TestCase):
 
 class ScheduleView(TestCase):
     def test_new_user_schedule_page_not_found(self):
+        """Authenticated user can redirect to schedule page. But no time and amount in schedule page
+        if users are not create schedule."""
         user = User.objects.create(username='testuser')
         user.set_password('12345')
+        user.save()
         client = Client()
         client.login(username='testuser', password='12345')
-        response = client.get('aquaholic:schedule', args=Schedule.objects.filter(user_info_id=user.id),)
-        self.assertEqual(response.status_code, 404)
+        userinfo = UserInfo.objects.create(weight=50, exercise_time=30, first_notification_time=datetime.time(11, 0, 0),
+                                           last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
+        userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
+                                               userinfo.last_notification_time)
+        userinfo.get_water_amount_per_hour()
+        userinfo.save()
+        page = client.get(reverse('aquaholic:schedule', args=(user.id,), ))
+        self.assertEqual(page.status_code, 200)
 
     def test_set_schedule(self):
+        """schedule show time nad amount after generate schedule."""
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save()

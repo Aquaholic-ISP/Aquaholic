@@ -1,11 +1,14 @@
 from django.views import generic
-from .models import UserInfo, Schedule, Intake, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
+from .models import UserInfo, Schedule, Intake
+from django.shortcuts import render, reverse, redirect
+from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
 from django.utils.timezone import make_aware
-from django.shortcuts import render, reverse
+from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
 import datetime
-import calendar
+import datetime, calendar
 
 
 def get_total_hours(first_notification_time, last_notification_time):

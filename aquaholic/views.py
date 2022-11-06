@@ -161,7 +161,8 @@ class SetUp(generic.DetailView):
             if token_exist:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(user.id,)))
             else:
-                url = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=fVKMI2Q1k3MY5D3w2g0Hwt&redirect_uri=http://127.0.0.1:8000/noti/callback/&scope=notify&state=testing123"
+                url = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=fVKMI2Q1k3MY5D3w2g0Hwt" \
+                      "&redirect_uri=http://127.0.0.1:8000/noti/callback/&scope=notify&state=testing123 "
                 return HttpResponseRedirect(url)
         except:
             message = "Please, enter time in both fields."

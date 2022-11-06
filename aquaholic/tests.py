@@ -174,6 +174,12 @@ class ScheduleView(TestCase):
 class HistoryViewTest(TestCase):
     """Test cases for history page."""
     def test_history_page(self):
+        """History view work correctly.
+
+        When user go to history page,
+        it showed water intake of user
+        base on month and year that user selected.
+        """
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save()

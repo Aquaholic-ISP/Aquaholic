@@ -31,7 +31,7 @@ class HomePage(generic.ListView):
             if not UserInfo.objects.filter(user_id=user.id).exists():
                 UserInfo.objects.create(user_id=user.id)
             userinfo = UserInfo.objects.get(user_id=user.id)
-            if Intake.objects.filter(user_info_id=userinfo.id).exists():
+            if Intake.objects.filter(user_info_id=userinfo.id, intake_date=date).exists():
                 all_intake = Intake.objects.get(user_info_id=userinfo.id, intake_date=date)
                 if all_intake:
                     goal = userinfo.water_amount_per_day

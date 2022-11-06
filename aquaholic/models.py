@@ -29,14 +29,6 @@ class UserInfo(models.Model):
         self.water_amount_per_day = ((self.weight * KILOGRAM_TO_POUND * 0.5) + (self.exercise_time / 30) * 12) \
                                      * OUNCES_TO_MILLILITER
 
-    # def get_total_hours(self):
-    #     """Calculate total hours from first and last notification time."""
-    #     date = datetime.date(1, 1, 1)
-    #     first_time = datetime.datetime.combine(date, self.first_notification_time)
-    #     last_time = datetime.datetime.combine(date, self.last_notification_time)
-    #     time = last_time - first_time
-    #     self.total_hours = round(time.seconds / 3600)
-
     def get_water_amount_per_hour(self):
         """Calculate amount of water per hour."""
         if self.total_hours is not None:

@@ -5,7 +5,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-
 KILOGRAM_TO_POUND = 2.20462262185
 OUNCES_TO_MILLILITER = 29.5735296
 
@@ -27,7 +26,7 @@ class UserInfo(models.Model):
     def get_water_amount_per_day(self):
         """Calculate amount of water per day."""
         self.water_amount_per_day = ((self.weight * KILOGRAM_TO_POUND * 0.5) + (self.exercise_time / 30) * 12) \
-                                     * OUNCES_TO_MILLILITER
+                                    * OUNCES_TO_MILLILITER
 
     def get_water_amount_per_hour(self):
         """Calculate amount of water per hour."""
@@ -45,13 +44,6 @@ class Schedule(models.Model):
     expected_amount = models.FloatField(default=0)
     notification_status = models.BooleanField(default=True)
     is_last = models.BooleanField(default=False)
-
-    # def change_notification_status(self):
-    #     """Change notification status."""
-    #     if self.notification_status is True:
-    #         self.notification_status = False
-    #     else:
-    #         self.notification_status = True
 
 
 class Intake(models.Model):

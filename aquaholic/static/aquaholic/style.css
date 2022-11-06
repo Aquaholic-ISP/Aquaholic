@@ -1,34 +1,72 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+
 *{
     margin: 0;
     padding: 0;
     text-align: center;
     background-color: #4682B4;
     color: #0E1646;
-
+    font-family: "Poppins", sans-serif;
 }
 
 .entrance{
     width: 100%;
     position: absolute;
-    top: 40%;
+    top: 50%;
     transform: translateY(-50%);
     text-align: center;
 }
 
 .entrance h1{
     font-size: 120px;
-    margin-top: 80px;
+    margin-top: 77px;
 }
 
 .entrance p{
     font-size: 30px;
     margin: 10 auto;
     font-weight: 100;
-    line-weight: 25px;
+    margin-top: 2%;
 }
 
-@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+.navbar{
+    display: flex;
+    align-items: flex-start;
+    background: transparent;
+    position: relative;
+    float: right;
+    right: 50px;
+    margin-top: 0%;
+}
 
+.navbar ul li{
+    list-style: none;
+    position: relative;
+    text-align: center;
+    font-size: 25px;
+}
+
+.navbar ul li a{
+    text-decoration: none;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.navbar ul li::after{
+    content: '';
+    height: 3px;
+    width: 0%;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    transition: 0.5s;
+}
+
+.navbar ul li:hover::after{
+    width: 100%;
+}
 
 .water {
     position: relative;
@@ -53,7 +91,7 @@
     -4px 4px 0px #183954,
     -6px 6px 0px #183954,
     -8px 8px 0px #183954,
-    -18px 18px 20px rgba(0,0,0,0.5);
+    -18px 18px 20px rgba(0,0,0,0.5),
     -18px 18px 50px rgba(0,0,0,0.5);
 }
 
@@ -85,7 +123,7 @@
     }
 }
 
-button{
+.allbtn button{
     width: 150px;
     padding: 10px 0;
     text-align: center;
@@ -100,44 +138,142 @@ button{
 }
 
 .buttonlogin form {
-    display: inline-block
+    display: inline-block;
+    position: relative;
+    margin: auto;
+    width: 150px;
+    height: 30px;
+}
+
+.buttonlogin button{
+    width: 150px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
 .getin{
     width: 100%;
     position: absolute;
-    top: 40%;
-    transform: translateY(-50%);
+    top: 30%;
+    transform: translateY(-100%);
     text-align: center;
     font-family: "Poppins", sans-serif;
 }
 
-.getin p{
-    font-size: 30px;
+.head-auth h3{
     margin: 0;
+    font-size: 35px;
+    margin-bottom: -3%;
+    color: rgb(165, 233, 254);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.head-auth h1{
+    margin: 0;
+    margin-top: -2%;
+}
+
+.allbtn {
+    width: 60%;
+    background: transparent;
+    position: absolute;
+    margin-top: 3%;
+}
+
+.allbtn form{
+    margin: auto;
     position: relative;
-    top: 50px;
-    text-shadow:
-    -10px 10px 10px rgba(0,0,0,0.5);
+    justify-content: center;
+    margin-left: 50%;
+    margin-top: -3%;
+    background: transparent;
 }
 
-.getin h1{
-    font-size: 80px;
-    margin-top: -70px;
-    text-shadow:
-    -10px 10px 10px rgba(0,0,0,0.5);
+.buttonlogin {
+    position: relative;
+    text-align: center;
 }
 
-.buttonenter form{
-    display: inline-block;
+.wrap-contain {
+    width: 50%;
+    background: transparent;
+    position: absolute;
+    margin-top: 10%;
+    margin-left: 35%;
+}
+
+.wrap-contain button{
+    width: 150px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.wrap-contain form{
+    margin: auto;
+    position: relative;
+    justify-content: center;
+    margin-left: 0%;
+    margin-top: 2%;
+    background: transparent;
+}
+
+
+.container {
+    border: #0E1646 solid;
+    margin: 0px auto;
+    margin-right:0px;
+    background-color: rgb(192, 192, 192);
+    width: 100%;
+    height: 70px;
+    border-radius: 15px;
+}
+
+.progress {
+    background-color:#0E1646;
+    color: white;
+    padding: 5px;
+    text-align: right;
+    font-size: 40px;
+    border-radius: 15px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+    -webkit-transition: 0.4s linear;
+    -moz-transition: 0.4s linear;
+    -o-transition: 0.4s linear;
+    transition: 0.4s linear;
+    -webkit-transition-property: width;
+    -moz-transition-property: width;
+    -o-transition-property: width;
+    transition-property: width;
+    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.intake {
+    width: 0%;
+}
+
+.container form {
+    background: transparent;
 }
 
 .logout form{
     position: relative;
-    top: 10px;
+    top: 20px;
 }
-
-
-
-
-

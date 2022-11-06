@@ -5,7 +5,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-
 KILOGRAM_TO_POUND = 2.20462262185
 OUNCES_TO_MILLILITER = 29.5735296
 
@@ -29,17 +28,10 @@ class UserInfo(models.Model):
         self.water_amount_per_day = ((self.weight * KILOGRAM_TO_POUND * 0.5) + (self.exercise_time / 30) * 12) \
                                     * OUNCES_TO_MILLILITER
 
-    # def get_total_hours(self):
-    #     """Calculate total hours from first and last notification time."""
-    #     date = datetime.date(1, 1, 1)
-    #     first_time = datetime.datetime.combine(date, self.first_notification_time)
-    #     last_time = datetime.datetime.combine(date, self.last_notification_time)
-    #     time = last_time - first_time
-    #     self.total_hours = round(time.seconds / 3600)
-
     def get_water_amount_per_hour(self):
         """Calculate amount of water per hour."""
-        self.water_amount_per_hour = self.water_amount_per_day / self.total_hours
+        if self.total_hours is not None:
+            self.water_amount_per_hour = self.water_amount_per_day / self.total_hours
 
     def send_notification(self):
         pass
@@ -51,13 +43,7 @@ class Schedule(models.Model):
     notification_time = models.DateTimeField('notification time', null=True)
     expected_amount = models.FloatField(default=0)
     notification_status = models.BooleanField(default=True)
-
-    def change_notification_status(self):
-        """Change notification status."""
-        if self.notification_status is True:
-            self.notification_status = False
-        else:
-            self.notification_status = True
+    is_last = models.BooleanField(default=False)
 
 
 class Intake(models.Model):

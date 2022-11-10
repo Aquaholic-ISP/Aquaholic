@@ -69,7 +69,7 @@ class CalculateView(TestCase):
         """input invalid value"""
         response = self.client.post('/aquaholic/calculate', data={"weight": "weight", "exercise_time": 0})
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Please, enter a positive number in both fields.", html=True)
+        self.assertContains(response, "Please, enter numbers in both fields.", html=True)
 
 
 class TemplateUsed(TestCase):

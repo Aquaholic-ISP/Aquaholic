@@ -49,5 +49,7 @@ class Schedule(models.Model):
 class Intake(models.Model):
     """Intake class for collect water intake of user per day."""
     user_info = models.ForeignKey(UserInfo, on_delete=models.CASCADE, null=True)
+    # TODO rename user_drinks_amount to total_amount
     user_drinks_amount = models.FloatField(default=0)
+    # TODO rename intake_date to date
     intake_date = models.DateTimeField(default=timezone.now)

@@ -6,7 +6,8 @@ from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
 from django.utils.timezone import make_aware
 from django.shortcuts import render
-import datetime, calendar
+import datetime
+import calendar
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -18,22 +19,26 @@ def get_total_hours(first_notification_time, last_notification_time):
     return round(time.seconds / 3600)
 
 
+# TODO rename class in format "Class-nameView"
 class HomePage(generic.ListView):
     """A class that represents the home page view."""
     template_name = 'aquaholic/home.html'
 
     def get(self, request, *args, **kwargs):
         user = request.user
+        # intake date default time is 10 am
         date = datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0)
         if user.is_authenticated:
+            # for new user, create new user info
             if not UserInfo.objects.filter(user_id=user.id).exists():
                 UserInfo.objects.create(user_id=user.id)
-            userinfo = UserInfo.objects.get(user_id=user.id)
-            if Intake.objects.filter(user_info_id=userinfo.id, intake_date=date).exists():
-                all_intake = Intake.objects.get(user_info_id=userinfo.id, intake_date=date)
+
+            user_info = UserInfo.objects.get(user_id=user.id)
+            if Intake.objects.filter(user_info_id=user_info.id, intake_date=date).exists():
+                all_intake = Intake.objects.get(user_info_id=user_info.id, intake_date=date)
                 if all_intake:
-                    goal = userinfo.water_amount_per_day
-                    amount = int(all_intake.user_drinks_amount / goal * 100)
+                    goal = user_info.water_amount_per_day
+                    amount = int(all_intake.user_drinks_amount / goal * 100)  # amount = percentage
                     if amount <= 100:
                         return render(request, self.template_name, {"all_intake": f"{amount}"})
                     elif amount > 100:
@@ -60,13 +65,18 @@ class Calculate(generic.ListView):
     def post(self, request):
         try:
             weight = float(request.POST["weight"])
-            exercise_time = float(request.POST["exercise_time"])
+            # TODO if weight =0 then result = 0
+            # if weight == 0:
+            #     return render(request, self.template_name,
+            #                   {'message': "Weight must be greater than 0."})
+            exercise_time = float(request.POST["exercise_time"])  # TODO exercise duration
             water_amount_per_day = ((weight * KILOGRAM_TO_POUND * 0.5)
                                     + (exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
+            # TODO extract method to calculate
             return render(request, self.template_name,
                           {'result': f"{water_amount_per_day:.2f}"})
         except ValueError:
-            message = "Please, enter a positive number in both fields."
+            message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
                           {'message': message})
 
@@ -76,7 +86,7 @@ class CalculateAuth(generic.DetailView):
     template_name = 'aquaholic/calculation_auth.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'user': request.user})
+        return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
         try:
@@ -85,9 +95,12 @@ class CalculateAuth(generic.DetailView):
             user_info.exercise_time = float(request.POST["exercise_time"])
             user_info.water_amount_per_day = ((user_info.weight * KILOGRAM_TO_POUND * 0.5)
                                               + (user_info.exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
+            # TODO extract method to calculate
             user_info.get_water_amount_per_hour()
             user_info.save()
 
+            # update schedule
+            # TODO try eliminate for loop
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
                 one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
@@ -95,7 +108,7 @@ class CalculateAuth(generic.DetailView):
             return render(request, self.template_name,
                           {'result': f"{user_info.water_amount_per_day:.2f}"})
         except ValueError:
-            message = "Please, enter a positive number in both fields."
+            message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
                           {'message': message})
 
@@ -105,14 +118,9 @@ class SetUp(generic.DetailView):
     template_name = 'aquaholic/set_up.html'
 
     def get(self, request, *args, **kwargs):
-        # user who have already generate token doesn't have to generate token
-        return render(request, self.template_name, {'user': request.user})
+        return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
-        token_exist = False
-        token = UserInfo.objects.get(user_id=request.user.id).notify_token
-        if token is not None:
-            token_exist = True
         try:
             first = request.POST["first_notification"]
             last = request.POST["last_notification"]
@@ -122,50 +130,55 @@ class SetUp(generic.DetailView):
                 message = "Please, enter different time or time difference is more than 1 hour."
                 return render(request, self.template_name,
                               {'message': message})
-            user = UserInfo.objects.get(user_id=request.user.id)
-            user.first_notification_time = first_notify_time
-            user.last_notification_time = last_notify_time
-            user.save()
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            user_info.first_notification_time = first_notify_time
+            user_info.last_notification_time = last_notify_time
 
-            user = request.user
-            userinfo = UserInfo.objects.get(user_id=user.id)
             # calculate and save total hours and water amount per hour to database
-            userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
-                                                   userinfo.last_notification_time)
-            userinfo.get_water_amount_per_hour()
-            userinfo.save()
+            user_info.total_hours = get_total_hours(user_info.first_notification_time,
+                                                    user_info.last_notification_time)
+            user_info.get_water_amount_per_hour()
+            user_info.save()
 
             # get total hours, first notification time and expected amount (water amount to dink per hour)
-            total_hours = int(userinfo.total_hours)
-            first_notify_time = userinfo.first_notification_time
-            expected_amount = userinfo.water_amount_per_hour
+            total_hours = int(user_info.total_hours)
+            # TODO refactor variables to inline
+            first_notify_time = user_info.first_notification_time
+            expected_amount = user_info.water_amount_per_hour
 
             first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
             last_notification_time = first_notification_time + datetime.timedelta(hours=total_hours)
 
-            # user already have schedule
-            if Schedule.objects.filter(user_info_id=userinfo.id).exists():
-                found_schedule = Schedule.objects.filter(user_info_id=userinfo.id)
+            # TODO extract function to delete schedule
+            # user already have schedule, remove all old schedules
+            if Schedule.objects.filter(user_info_id=user_info.id).exists():
+                found_schedule = Schedule.objects.filter(user_info_id=user_info.id)
                 for one_schedule in found_schedule:
                     one_schedule.delete()
-            # create schedule
+            # create new schedule
+            # last notification time less than now, the schedule will notify tomorrow
             if last_notification_time < datetime.datetime.now():
                 first_notification_time += datetime.timedelta(hours=24)
+
+            notification_time = first_notification_time
+            # TODO extract function to create schedule
             for i in range(total_hours+1):
-                Schedule.objects.create(user_info_id=userinfo.id,
-                                        notification_time=first_notification_time,
+                Schedule.objects.create(user_info_id=user_info.id,
+                                        notification_time=notification_time,
                                         expected_amount=round(expected_amount, 2),
-                                        notification_status=(first_notification_time < datetime.datetime.now()),
+                                        notification_status=(notification_time < datetime.datetime.now()),
                                         is_last=(i == total_hours)
                                         )
-                first_notification_time += datetime.timedelta(hours=1)
-            if token_exist:
-                return HttpResponseRedirect(reverse('aquaholic:schedule', args=(user.id,)))
+                notification_time += datetime.timedelta(hours=1)
+
+            if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
+                return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
             else:
+                # redirect to line notify website for generate token
                 url = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=fVKMI2Q1k3MY5D3w2g0Hwt" \
                       "&redirect_uri=http://127.0.0.1:8000/noti/callback/&scope=notify&state=testing123 "
                 return HttpResponseRedirect(url)
-        except:
+        except ValueError:
             message = "Please, enter time in both fields."
             return render(request, self.template_name,
                           {'message': message})
@@ -175,13 +188,13 @@ class NotificationCallback(generic.DetailView):
     """A class that handles the callback after user authorize notification."""
 
     def get(self, request, *args, **kwargs):
-        """Send welcome message to new user."""
+        """Send welcome message to new user and save generated token to user info."""
         code = request.GET['code']
         token = get_access_token(code)
         send_notification("Welcome to aquaholic", token)
-        user = UserInfo.objects.get(user_id=request.user.id)
-        user.notify_token = token
-        user.save()
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        user_info.notify_token = token
+        user_info.save()
         return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
 
 
@@ -190,10 +203,11 @@ class ScheduleView(generic.DetailView):
     template_name = 'aquaholic/schedule.html'
 
     def get(self, request, *args, **kwargs):
+        # TODO refactor user to inline
         user = request.user
-        userinfo = UserInfo.objects.get(user_id=user.id)
+        user_info = UserInfo.objects.get(user_id=user.id)
         return render(request, self.template_name,
-                      {'schedule': Schedule.objects.filter(user_info_id=userinfo.id)})
+                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
 
 
 class Input(generic.DetailView):
@@ -202,31 +216,36 @@ class Input(generic.DetailView):
     template_name = 'aquaholic/input.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'user': request.user})
+        return render(request, self.template_name)
     
     def post(self, request, *args, **kwargs):
         try:
             amount = request.POST["amount"]
             date = request.POST["date"]
+            # default time for intake date is 10 am
             intake_date = datetime.datetime.strptime(date, '%Y-%m-%d') + datetime.timedelta(hours=10)
             aware_date = make_aware(intake_date)
-            userinfo = UserInfo.objects.get(user_id=request.user.id)
-            if Intake.objects.filter(user_info_id=userinfo.id, intake_date=aware_date).exists():
-                intake = Intake.objects.get(user_info_id=userinfo.id, intake_date=aware_date)
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            # User already have intake for the given day, add amount of water to existed amount
+            if Intake.objects.filter(user_info_id=user_info.id, intake_date=aware_date).exists():
+                intake = Intake.objects.get(user_info_id=user_info.id, intake_date=aware_date)
                 intake.user_drinks_amount += float(amount)
                 intake.save()
             else:
-                Intake.objects.create(user_info_id=userinfo.id,
+                Intake.objects.create(user_info_id=user_info.id,
                                       intake_date=intake_date,
                                       user_drinks_amount=amount)
+            # TODO change from redirect to render and show message that amount already save
+            #  in case for user want to input many time
             return HttpResponseRedirect(reverse('aquaholic:home'))
-        except:
+        except ValueError:
             message = "Please, input in the field."
             return render(request, self.template_name,
                           {'message': message})
 
 
 def get_five_recent_years():
+    # TODO add docstring for method
     this_year = datetime.datetime.now().year
     return [this_year-i for i in range(5)]
 
@@ -237,27 +256,32 @@ class History(generic.DetailView):
     template_name = 'aquaholic/history.html'
 
     def get(self, request, *args, **kwargs):
+        # TODO refactor user to inline
         user = request.user
-        userinfo = UserInfo.objects.get(user_id=user.id)
-        all_intake = Intake.objects.filter(user_info_id=userinfo.id)
+        user_info = UserInfo.objects.get(user_id=user.id)
+        all_intake = Intake.objects.filter(user_info_id=user_info.id)
         sorted_intakes = all_intake.order_by('intake_date')
 
         today = datetime.datetime.now()
         this_month = today.month
         this_year = today.year
+        # TODO rename num_days and days to be more meaningful num_days->num_days_in_month, days->all_amount_in_month
         num_days = calendar.monthrange(this_year, this_month)[1]
         days = dict()
         for day in range(1, num_days+1):
             days[datetime.date(this_year, this_month, day).strftime("%d %b %Y")] = 0
 
         for intake in sorted_intakes:
+            # TODO refactor inline -> intake_date, intake_date_month, intake_date_year
             intake_date = intake.intake_date
             intake_date_month = intake_date.month
             intake_date_year = intake_date.year
             if (this_month == intake_date_month) and (this_year == intake_date_year):
+                # change amount of water in days dict
                 days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
+        # TODO remove unnecessary context -> all_intake
         return render(request, self.template_name, {"all_intake": all_intake,
-                                                    "goal": userinfo.water_amount_per_day,
+                                                    "goal": user_info.water_amount_per_day,
                                                     "date": list(days.keys()),
                                                     "amount": list(days.values()),
                                                     "recent_year": get_five_recent_years(),
@@ -266,8 +290,8 @@ class History(generic.DetailView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        userinfo = UserInfo.objects.get(user_id=user.id)
-        all_intake = Intake.objects.filter(user_info_id=userinfo.id)
+        user_info = UserInfo.objects.get(user_id=user.id)
+        all_intake = Intake.objects.filter(user_info_id=user_info.id)
         sorted_intakes = all_intake.order_by('intake_date')
 
         selected_month = int(request.POST['month'])
@@ -285,7 +309,7 @@ class History(generic.DetailView):
             if (selected_month == intake_date_month) and (selected_year == intake_date_year):
                 days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
         return render(request, self.template_name, {"all_intake": all_intake,
-                                                    "goal": userinfo.water_amount_per_day,
+                                                    "goal": user_info.water_amount_per_day,
                                                     "date": list(days.keys()),
                                                     "amount": list(days.values()),
                                                     "recent_year": get_five_recent_years(),

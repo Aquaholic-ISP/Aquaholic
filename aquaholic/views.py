@@ -8,6 +8,7 @@ from django.utils.timezone import make_aware
 from django.shortcuts import render
 import datetime
 import calendar
+from django.utils import timezone
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -19,8 +20,7 @@ def get_total_hours(first_notification_time, last_notification_time):
     return round(time.seconds / 3600)
 
 
-# TODO rename class in format "Class-nameView"
-class HomePage(generic.ListView):
+class HomePageView(generic.ListView):
     """A class that represents the home page view."""
     template_name = 'aquaholic/home.html'
 
@@ -33,6 +33,8 @@ class HomePage(generic.ListView):
             if not UserInfo.objects.filter(user_id=user.id).exists():
                 UserInfo.objects.create(user_id=user.id)
             user_info = UserInfo.objects.get(user_id=user.id)
+            if user_info.water_amount_per_day == 0:
+                return render(request, 'aquaholic/regis.html')
             if Intake.objects.filter(user_info_id=user_info.id, intake_date=date).exists():
                 all_intake = Intake.objects.get(user_info_id=user_info.id, intake_date=date)
                 if all_intake:
@@ -46,14 +48,15 @@ class HomePage(generic.ListView):
         return render(request, self.template_name)
 
 
-class AboutUs(generic.ListView):
+class AboutUsView(generic.ListView):
     """A class that represents the about us page view."""
     template_name = 'aquaholic/about_us.html'
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
 
-class Profile(generic.DeleteView):
+
+class ProfileView(generic.DetailView):
     """A class that represents the user's profile page view"""
     template_name = "aquaholic/profile.html"
 
@@ -61,7 +64,8 @@ class Profile(generic.DeleteView):
         user = request.user
         return render(request, self.template_name)
 
-class Calculate(generic.ListView):
+
+class CalculateView(generic.ListView):
     """A class that represents the calculation page view."""
     template_name = 'aquaholic/calculate.html'
 
@@ -71,10 +75,6 @@ class Calculate(generic.ListView):
     def post(self, request):
         try:
             weight = float(request.POST["weight"])
-            # TODO if weight =0 then result = 0
-            # if weight == 0:
-            #     return render(request, self.template_name,
-            #                   {'message': "Weight must be greater than 0."})
             exercise_time = float(request.POST["exercise_time"])  # TODO exercise duration
             water_amount_per_day = ((weight * KILOGRAM_TO_POUND * 0.5)
                                     + (exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
@@ -87,7 +87,7 @@ class Calculate(generic.ListView):
                           {'message': message})
 
 
-class CalculateAuth(generic.DetailView):
+class CalculateAuthView(generic.DetailView):
     """A class that represents the calculation page view for authenticate user."""
     template_name = 'aquaholic/calculation_auth.html'
 
@@ -106,8 +106,10 @@ class CalculateAuth(generic.DetailView):
             user_info.save()
 
             # update schedule
-            # TODO try eliminate for loop
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
+            if len(all_schedules) == 0:
+                return render(request, 'aquaholic/regis.html',
+                              {'result': f"{round(user_info.water_amount_per_day):.2f}"})
             for one_schedule in all_schedules:
                 one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
                 one_schedule.save()
@@ -119,7 +121,7 @@ class CalculateAuth(generic.DetailView):
                           {'message': message})
 
 
-class SetUp(generic.DetailView):
+class SetUpView(generic.DetailView):
     """A class that represents the set up page view."""
     template_name = 'aquaholic/set_up.html'
 
@@ -148,34 +150,21 @@ class SetUp(generic.DetailView):
 
             # get total hours, first notification time and expected amount (water amount to dink per hour)
             total_hours = int(user_info.total_hours)
-            # TODO refactor variables to inline
-            first_notify_time = user_info.first_notification_time
             expected_amount = user_info.water_amount_per_hour
 
-            first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
+            first_notification_time = datetime.datetime.combine(datetime.date.today(),
+                                                                user_info.first_notification_time)
             last_notification_time = first_notification_time + datetime.timedelta(hours=total_hours)
 
-            # TODO extract function to delete schedule
             # user already have schedule, remove all old schedules
-            if Schedule.objects.filter(user_info_id=user_info.id).exists():
-                found_schedule = Schedule.objects.filter(user_info_id=user_info.id)
-                for one_schedule in found_schedule:
-                    one_schedule.delete()
+            self.delete_schedule(user_info)
             # create new schedule
             # last notification time less than now, the schedule will notify tomorrow
             if last_notification_time < datetime.datetime.now():
                 first_notification_time += datetime.timedelta(hours=24)
 
             notification_time = first_notification_time
-            # TODO extract function to create schedule
-            for i in range(total_hours+1):
-                Schedule.objects.create(user_info_id=user_info.id,
-                                        notification_time=notification_time,
-                                        expected_amount=round(expected_amount, 2),
-                                        notification_status=(notification_time < datetime.datetime.now()),
-                                        is_last=(i == total_hours)
-                                        )
-                notification_time += datetime.timedelta(hours=1)
+            self.create_schedule(expected_amount, notification_time, total_hours, user_info)
 
             if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
@@ -189,8 +178,26 @@ class SetUp(generic.DetailView):
             return render(request, self.template_name,
                           {'message': message})
 
+    @staticmethod
+    def create_schedule(expected_amount, notification_time, total_hours, user_info):
+        for i in range(total_hours + 1):
+            Schedule.objects.create(user_info_id=user_info.id,
+                                    notification_time=notification_time,
+                                    expected_amount=int(expected_amount),
+                                    notification_status=(notification_time < datetime.datetime.now()),
+                                    is_last=(i == total_hours)
+                                    )
+            notification_time += datetime.timedelta(hours=1)
 
-class NotificationCallback(generic.DetailView):
+    @staticmethod
+    def delete_schedule(user_info):
+        if Schedule.objects.filter(user_info_id=user_info.id).exists():
+            found_schedule = Schedule.objects.filter(user_info_id=user_info.id)
+            for one_schedule in found_schedule:
+                one_schedule.delete()
+
+
+class NotificationCallbackView(generic.DetailView):
     """A class that handles the callback after user authorize notification."""
 
     def get(self, request, *args, **kwargs):
@@ -209,21 +216,38 @@ class ScheduleView(generic.DetailView):
     template_name = 'aquaholic/schedule.html'
 
     def get(self, request, *args, **kwargs):
-        # TODO refactor user to inline
-        user = request.user
-        user_info = UserInfo.objects.get(user_id=user.id)
+        user_info = UserInfo.objects.get(user_id=request.user.id)
         return render(request, self.template_name,
                       {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
 
+    def post(self, request, *args, **kwargs):
+        status = request.POST['status']
+        if status == "turn off":
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            user_schedule = Schedule.objects.filter(user_info_id=user_info.id)
+            for row in user_schedule:
+                row.notification_status = True
+                row.save()
+            return render(request, self.template_name,
+                          {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
+        else:
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            user_schedule = Schedule.objects.filter(user_info_id=user_info.id)
+            for row in user_schedule:
+                row.notification_status = row.notification_time < timezone.now()
+                row.save()
+            return render(request, self.template_name,
+                          {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
 
-class Input(generic.DetailView):
+
+class InputView(generic.DetailView):
     """A class that represents the input page view."""
     model = Intake
     template_name = 'aquaholic/input.html'
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
-    
+
     def post(self, request, *args, **kwargs):
         try:
             amount = request.POST["amount"]
@@ -250,74 +274,53 @@ class Input(generic.DetailView):
                           {'message': message})
 
 
-def get_five_recent_years():
-    # TODO add docstring for method
-    this_year = datetime.datetime.now().year
-    return [this_year-i for i in range(5)]
-
-
-class History(generic.DetailView):
+class HistoryView(generic.DetailView):
     """A class that represents the history page view."""
     model = Intake
     template_name = 'aquaholic/history.html'
 
-    def get(self, request, *args, **kwargs):
-        # TODO refactor user to inline
-        user = request.user
-        user_info = UserInfo.objects.get(user_id=user.id)
+    def show_history(self, request, selected_year, selected_month):
+        """Get the data needed for history page and send those data as a context to history.html."""
+        user_info = UserInfo.objects.get(user_id=request.user.id)
         all_intake = Intake.objects.filter(user_info_id=user_info.id)
-        sorted_intakes = all_intake.order_by('intake_date')
+        sorted_intakes = all_intake.order_by('intake_date')  # sort data by date
 
+        # count the number of days in the selected month
+        num_days_in_month = calendar.monthrange(selected_year, selected_month)[1]
+
+        # initialize a dictionary with date as a key and a list of amount, and bar color of the bar as a value
+        all_amount_in_month = dict()
+        for day in range(1, num_days_in_month + 1):
+            all_amount_in_month[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = [0, "#d4f1f9"]
+
+        # TODO create a function in model for filtering Intake that is in specific month and year
+        goal = user_info.water_amount_per_day
+        for intake in sorted_intakes:
+            if (selected_month == intake.intake_date.month) and (selected_year == intake.intake_date.year):
+                # change amount of water of that date
+                all_amount_in_month[intake.intake_date.strftime("%d %b %Y")][0] = intake.user_drinks_amount
+                if intake.user_drinks_amount < goal:
+                    # the bar color will be red if the amount doesn't reach the goal
+                    all_amount_in_month[intake.intake_date.strftime("%d %b %Y")][1] = "#FF9999"
+        return render(request, self.template_name, {"goal": goal,
+                                                    "date": list(all_amount_in_month.keys()),
+                                                    "amount": list(val[0] for val in all_amount_in_month.values()),
+                                                    "recent_year": [datetime.datetime.now().year - i for i in range(5)],
+                                                    "selected_month_int": selected_month,
+                                                    "selected_month_str": datetime.date(2022, selected_month,
+                                                                                        1).strftime('%b'),
+                                                    "selected_year": selected_year,
+                                                    "bar_colors": list(val[1] for val in all_amount_in_month.values())})
+
+    def get(self, request, *args, **kwargs):
+        """Go to the history page showing the intake history of this month."""
         today = datetime.datetime.now()
         this_month = today.month
         this_year = today.year
-        # TODO rename num_days and days to be more meaningful num_days->num_days_in_month, days->all_amount_in_month
-        num_days = calendar.monthrange(this_year, this_month)[1]
-        days = dict()
-        for day in range(1, num_days+1):
-            days[datetime.date(this_year, this_month, day).strftime("%d %b %Y")] = 0
-
-        for intake in sorted_intakes:
-            # TODO refactor inline -> intake_date, intake_date_month, intake_date_year
-            intake_date = intake.intake_date
-            intake_date_month = intake_date.month
-            intake_date_year = intake_date.year
-            if (this_month == intake_date_month) and (this_year == intake_date_year):
-                # change amount of water in days dict
-                days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
-        # TODO remove unnecessary context -> all_intake
-        return render(request, self.template_name, {"all_intake": all_intake,
-                                                    "goal": user_info.water_amount_per_day,
-                                                    "date": list(days.keys()),
-                                                    "amount": list(days.values()),
-                                                    "recent_year": get_five_recent_years(),
-                                                    "selected_month_int": this_month,
-                                                    "selected_month_str": today.strftime("%b")})
+        return self.show_history(request, this_year, this_month)
 
     def post(self, request, *args, **kwargs):
-        user = request.user
-        user_info = UserInfo.objects.get(user_id=user.id)
-        all_intake = Intake.objects.filter(user_info_id=user_info.id)
-        sorted_intakes = all_intake.order_by('intake_date')
-
+        """Go to the history page showing the intake history of selected month and year."""
         selected_month = int(request.POST['month'])
         selected_year = int(request.POST['year'])
-        num_days = calendar.monthrange(selected_year, selected_month)[1]
-
-        days = dict()
-        for day in range(1, num_days + 1):
-            days[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = 0
-
-        for intake in sorted_intakes:
-            intake_date = intake.intake_date
-            intake_date_month = intake_date.month
-            intake_date_year = intake_date.year
-            if (selected_month == intake_date_month) and (selected_year == intake_date_year):
-                days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
-        return render(request, self.template_name, {"all_intake": all_intake,
-                                                    "goal": user_info.water_amount_per_day,
-                                                    "date": list(days.keys()),
-                                                    "amount": list(days.values()),
-                                                    "recent_year": get_five_recent_years(),
-                                                    "selected_month_int": selected_month,
-                                                    "selected_month_str": datetime.date(2022, selected_month, 1).strftime('%b')})
+        return self.show_history(request, selected_year, selected_month)

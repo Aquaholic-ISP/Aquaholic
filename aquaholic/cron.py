@@ -12,7 +12,8 @@ def update_notification():
         one_to_send.notification_status = True
         one_to_send.save()
 
-    last_to_send = Schedule.objects.filter(notification_status=True, is_last=True)
+    last_to_send = Schedule.objects.filter(notification_status=True, is_last=True,
+                                           notification_time__lte=datetime.datetime.now())
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)

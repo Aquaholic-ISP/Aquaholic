@@ -45,6 +45,8 @@ class HomePageView(generic.ListView):
                     elif amount > 100:
                         amount = 100
                         return render(request, self.template_name, {"all_intake": f"{amount}"})
+            if user_info.water_amount_per_day > 0:
+                return render(request, self.template_name, {"goal": f"{user_info.water_amount_per_day:.2f}"})
         return render(request, self.template_name)
 
 

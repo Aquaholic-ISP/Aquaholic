@@ -32,7 +32,6 @@ class HomePage(generic.ListView):
             # for new user, create new user info
             if not UserInfo.objects.filter(user_id=user.id).exists():
                 UserInfo.objects.create(user_id=user.id)
-
             user_info = UserInfo.objects.get(user_id=user.id)
             if Intake.objects.filter(user_info_id=user_info.id, intake_date=date).exists():
                 all_intake = Intake.objects.get(user_info_id=user_info.id, intake_date=date)
@@ -54,6 +53,13 @@ class AboutUs(generic.ListView):
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
 
+class Profile(generic.DeleteView):
+    """A class that represents the user's profile page view"""
+    template_name = "aquaholic/profile.html"
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        return render(request, self.template_name)
 
 class Calculate(generic.ListView):
     """A class that represents the calculation page view."""

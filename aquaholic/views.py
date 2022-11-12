@@ -8,6 +8,7 @@ from django.utils.timezone import make_aware
 from django.shortcuts import render
 import datetime
 import calendar
+from django.utils import timezone
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -174,7 +175,7 @@ class SetUpView(generic.DetailView):
         for i in range(total_hours + 1):
             Schedule.objects.create(user_info_id=user_info.id,
                                     notification_time=notification_time,
-                                    expected_amount=round(expected_amount, 2),
+                                    expected_amount=int(expected_amount),
                                     notification_status=(notification_time < datetime.datetime.now()),
                                     is_last=(i == total_hours)
                                     )
@@ -210,6 +211,25 @@ class ScheduleView(generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         return render(request, self.template_name,
                       {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
+
+    def post(self, request, *args, **kwargs):
+        status = request.POST['status']
+        if status == "turn off":
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            user_schedule = Schedule.objects.filter(user_info_id=user_info.id)
+            for row in user_schedule:
+                row.notification_status = True
+                row.save()
+            return render(request, self.template_name,
+                          {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
+        else:
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            user_schedule = Schedule.objects.filter(user_info_id=user_info.id)
+            for row in user_schedule:
+                row.notification_status = row.notification_time < timezone.now()
+                row.save()
+            return render(request, self.template_name,
+                          {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
 
 
 class InputView(generic.DetailView):

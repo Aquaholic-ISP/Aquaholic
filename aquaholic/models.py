@@ -41,7 +41,7 @@ class Schedule(models.Model):
     """Schedule class for create notification time."""
     user_info = models.ForeignKey(UserInfo, on_delete=models.CASCADE, null=True)
     notification_time = models.DateTimeField('notification time', null=True)
-    expected_amount = models.FloatField(default=0)
+    expected_amount = models.IntegerField(default=0)
     notification_status = models.BooleanField(default=True)
     is_last = models.BooleanField(default=False)
 

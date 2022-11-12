@@ -17,4 +17,5 @@ urlpatterns = [
     path('aquaholic/<int:pk>/input', views.Input.as_view(), name='input'),
     path('aquaholic/<int:pk>/history', views.History.as_view(), name='history'),
     path('aquaholic/about_us', views.AboutUs.as_view(), name='about_us'),
+    path('aquaholic/profile', views.Profile.as_view(), name="profile"),
 ]

@@ -36,7 +36,7 @@
     position: relative;
     float: right;
     right: 50px;
-    margin-top: 0%;
+    margin-top: 2%;
 }
 
 .navbar ul li{
@@ -123,6 +123,42 @@
     }
 }
 
+.profile {
+    width: 12%;
+    position: relative;
+    text-align: center;
+    margin-left: 45%;
+}
+
+.profile ul li{
+    list-style: none;
+    position: relative;
+    text-align: center;
+    font-size: 18px;
+}
+
+.profile ul li a{
+    text-decoration: none;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.profile ul li::after{
+    content: '';
+    height: 3px;
+    width: 0%;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    transition: 0.5s;
+}
+
+.profile ul li:hover::after{
+    width: 100%;
+}
+
 .allbtn button{
     width: 150px;
     padding: 10px 0;
@@ -168,6 +204,10 @@
     font-family: "Poppins", sans-serif;
 }
 
+.head-auth {
+    line-height: 1.6;
+}
+
 .head-auth h3{
     margin: 0;
     font-size: 35px;
@@ -177,7 +217,7 @@
 }
 
 .head-auth h1{
-    margin: 0;
+    margin-bottom: -2%;
     margin-top: -2%;
 }
 

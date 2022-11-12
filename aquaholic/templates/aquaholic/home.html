@@ -18,11 +18,19 @@
 <div class="entrance">
 
     {% if user.is_authenticated %}
+
     <div class="getin">
 
         <div class="head-auth">
+
             <h3>Aquaholic</h3>
             <h1>Welcome Back, {{ user.first_name }}</h1>
+            <div class="profile">
+                <ul>
+                    <li><a href="profile">visit your profile</a></li>
+                </ul>
+            </div>
+            
         </div>
 
         <div class="allbtn">

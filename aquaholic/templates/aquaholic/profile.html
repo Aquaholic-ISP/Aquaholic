@@ -1,0 +1,27 @@
+{% load static %}
+
+<html>
+    <head>
+        <title>User Profile</title>
+        <link rel="stylesheet" href="{% static 'aquaholic/style9.css' %}">
+    </head>
+
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+
+        <img id="profilepic" src="https://i.imgur.com/uR6acjH.jpg">
+        <div class="context">
+            <p>Name: {{ user.first_name }}</p>
+            <p>Weight: {{ user.weight }}</p>
+            <p>Exercise duration: {{ user.exercise_time }}</p>
+            <p>Last changed: </p>
+        </div>
+
+    </div>
+
+</html>

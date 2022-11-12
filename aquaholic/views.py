@@ -34,6 +34,8 @@ class HomePage(generic.ListView):
                 UserInfo.objects.create(user_id=user.id)
 
             user_info = UserInfo.objects.get(user_id=user.id)
+            if user_info.water_amount_per_day == 0:
+                return render(request, 'aquaholic/regis.html')
             if Intake.objects.filter(user_info_id=user_info.id, intake_date=date).exists():
                 all_intake = Intake.objects.get(user_info_id=user_info.id, intake_date=date)
                 if all_intake:
@@ -102,6 +104,9 @@ class CalculateAuth(generic.DetailView):
             # update schedule
             # TODO try eliminate for loop
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
+            if len(all_schedules) == 0:
+                return render(request, 'aquaholic/regis.html',
+                              {'result': f"{round(user_info.water_amount_per_day):.2f}"})
             for one_schedule in all_schedules:
                 one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
                 one_schedule.save()

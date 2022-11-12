@@ -320,10 +320,10 @@
 
 .goal {
     position: absolute;
-    margin-left: 46%;
+    margin-left: 48%;
     margin-top: 5%;
 }
 
-.goal h2{
-    font-size: 40px;
+.goal h5{
+    font-size: 35px;
 }

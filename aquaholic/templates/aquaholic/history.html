@@ -36,6 +36,7 @@
       <option value=12>Dec</option>
     </select>
     <select id="year" name="year">
+      <option value={{selected_year}}>{{selected_year}}</option>
       {% for year in recent_year %}
          <option value={{year}}>{{year}}</option>
       {% endfor %}
@@ -56,7 +57,7 @@
     labels: labels,
     datasets: [{
       label: 'The amount of water that you drink each day (ml)',
-      backgroundColor: '#d4f1f9',
+      backgroundColor: {{bar_colors|safe}},
       borderColor: '#d4f1f9',
       data: {{amount|safe}},
     }]

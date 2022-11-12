@@ -266,65 +266,52 @@ class InputView(generic.DetailView):
                           {'message': message})
 
 
-def get_five_recent_years():
-    # TODO add docstring for method
-    this_year = datetime.datetime.now().year
-    return [this_year-i for i in range(5)]
-
-
 class HistoryView(generic.DetailView):
     """A class that represents the history page view."""
     model = Intake
     template_name = 'aquaholic/history.html'
 
-    def get(self, request, *args, **kwargs):
+    def show_history(self, request, selected_year, selected_month):
+        """Get the data needed for history page and send those data as a context to history.html."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
         all_intake = Intake.objects.filter(user_info_id=user_info.id)
-        sorted_intakes = all_intake.order_by('intake_date')
+        sorted_intakes = all_intake.order_by('intake_date')  # sort data by date
 
+        # count the number of days in the selected month
+        num_days_in_month = calendar.monthrange(selected_year, selected_month)[1]
+
+        # initialize a dictionary with date as a key and a list of amount, and bar color of the bar as a value
+        all_amount_in_month = dict()
+        for day in range(1, num_days_in_month + 1):
+            all_amount_in_month[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = [0, "#d4f1f9"]
+
+        # TODO create a function in model for filtering Intake that is in specific month and year
+        goal = user_info.water_amount_per_day
+        for intake in sorted_intakes:
+            if (selected_month == intake.intake_date.month) and (selected_year == intake.intake_date.year):
+                # change amount of water of that date
+                all_amount_in_month[intake.intake_date.strftime("%d %b %Y")][0] = intake.user_drinks_amount
+                if intake.user_drinks_amount < goal:
+                    # the bar color will be red if the amount doesn't reach the goal
+                    all_amount_in_month[intake.intake_date.strftime("%d %b %Y")][1] = "#FF9999"
+        return render(request, self.template_name, {"goal": goal,
+                                                    "date": list(all_amount_in_month.keys()),
+                                                    "amount": list(val[0] for val in all_amount_in_month.values()),
+                                                    "recent_year": [datetime.datetime.now().year - i for i in range(5)],
+                                                    "selected_month_int": selected_month,
+                                                    "selected_month_str": datetime.date(2022, selected_month, 1).strftime('%b'),
+                                                    "selected_year": selected_year,
+                                                    "bar_colors": list(val[1] for val in all_amount_in_month.values())})
+
+    def get(self, request, *args, **kwargs):
+        """Go to the history page showing the intake history of this month."""
         today = datetime.datetime.now()
         this_month = today.month
         this_year = today.year
-        num_days_in_month = calendar.monthrange(this_year, this_month)[1]
-        all_amount_in_month = dict()
-        for day in range(1, num_days_in_month+1):
-            all_amount_in_month[datetime.date(this_year, this_month, day).strftime("%d %b %Y")] = 0
-
-        for intake in sorted_intakes:
-            if (this_month == intake.intake_date.month) and (this_year == intake.intake_date.year):
-                # change amount of water in all_amount_in_month dict
-                all_amount_in_month[intake.intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
-        return render(request, self.template_name, {"goal": user_info.water_amount_per_day,
-                                                    "date": list(all_amount_in_month.keys()),
-                                                    "amount": list(all_amount_in_month.values()),
-                                                    "recent_year": get_five_recent_years(),
-                                                    "selected_month_int": this_month,
-                                                    "selected_month_str": today.strftime("%b")})
+        return self.show_history(request, this_year, this_month)
 
     def post(self, request, *args, **kwargs):
-        user = request.user
-        user_info = UserInfo.objects.get(user_id=user.id)
-        all_intake = Intake.objects.filter(user_info_id=user_info.id)
-        sorted_intakes = all_intake.order_by('intake_date')
-
+        """Go to the history page showing the intake history of selected month and year."""
         selected_month = int(request.POST['month'])
         selected_year = int(request.POST['year'])
-        num_days = calendar.monthrange(selected_year, selected_month)[1]
-
-        days = dict()
-        for day in range(1, num_days + 1):
-            days[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = 0
-
-        for intake in sorted_intakes:
-            intake_date = intake.intake_date
-            intake_date_month = intake_date.month
-            intake_date_year = intake_date.year
-            if (selected_month == intake_date_month) and (selected_year == intake_date_year):
-                days[intake_date.strftime("%d %b %Y")] = intake.user_drinks_amount
-        return render(request, self.template_name, {"all_intake": all_intake,
-                                                    "goal": user_info.water_amount_per_day,
-                                                    "date": list(days.keys()),
-                                                    "amount": list(days.values()),
-                                                    "recent_year": get_five_recent_years(),
-                                                    "selected_month_int": selected_month,
-                                                    "selected_month_str": datetime.date(2022, selected_month, 1).strftime('%b')})
+        return self.show_history(request, selected_year, selected_month)

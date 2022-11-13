@@ -283,6 +283,11 @@ input[type="checkbox"]{
   }
 }
 
+.buttonlogin {
+  position: relative;
+  text-align: center;
+}
+
 .head-auth {
   margin-top: 10%;
 }

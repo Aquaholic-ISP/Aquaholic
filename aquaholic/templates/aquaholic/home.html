@@ -104,6 +104,19 @@
         <h2>Aquaholic</h2>
     </div>
     <p><b>Improve your drinking habits now.</b></p>
+
+    <div class="buttonlogin">
+
+        <form action="{% provider_login_url 'line' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn1"><span></span>Login with Line</button>
+        </form>
+        <form action="{% url 'aquaholic:calculate' %}" method="GET">
+            {% csrf_token %}
+            <button type="submit" class="btn2"><span></span>Calculate</button>
+        </form>
+
+    </div>
     {% endif %}
 
 <!-- <div class="entrance">

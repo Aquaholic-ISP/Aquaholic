@@ -4,7 +4,7 @@
 
 <html>
 <head>
-    <link rel="stylesheet" href="{% static 'aquaholic/style.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'aquaholic/style.css' %}"> -->
     <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
     <title>Home page of Aquaholic</title>
 </head>
@@ -16,7 +16,6 @@
         {% if user.is_authenticated %}
         <li><a href="/">Home</a></li>
         <li><a href="/aquaholic/profile">Profile</a></li>
-<!--        <li><a href="calculate_auth">Calculate</a></li>-->
         <li><form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
             {% csrf_token %}
             <button type="submit" style="border:none">calculate</button>
@@ -33,7 +32,81 @@
     </ul>
 </div>
 
-<div class="entrance">
+<div class="content">
+    
+    {% if user.is_authenticated %}
+        <div class="head-auth">
+
+            <h3>Aquaholic</h3>
+            <h1 style="font-size: 80px;">Welcome Back, {{ user.first_name }}</h1>
+            <div class="profile">
+                <ul>
+                    <li><a href="profile">visit your profile</a></li>
+                </ul>
+            </div>
+            
+        </div>
+
+        <div class="allbtn">
+
+            <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit" style="width: 220px;">calculate your goal</button>
+            </form>
+
+            <form action="{% url 'aquaholic:set_up' user.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit" style="width: 220px;">Set Notification schedule</button>
+            </form>
+
+            <form action="{% url 'aquaholic:schedule' user.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit" style="width: 220px;">Notification schedule</button>
+            </form>
+
+            <form action="{% url 'aquaholic:history' user.id %}" method="get">
+                {% csrf_token %}
+                <button type="submit" style="width: 220px;">History</button>
+            </form>
+
+            <form method="post" action="{% url 'account_logout' %}">
+                {% csrf_token %}
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                {% endif %}
+                <button class="STYLE_ME" type="submit" style="width: 220px;">Logout</button>
+            </form>
+
+        </div>
+
+        <div class="goal">
+            <h5>Today Goal: {{goal}} ml</h5>
+            <h5>Your Progress: {{all_intake}} ml</h5>
+        </div>
+
+        <div class="wrap-contain">
+            <div class="container">
+                <div class="progress intake" style="width:{{  all_intake_percentage }}%">{{ all_intake_percentage }}%</div>
+            </div>
+            <form action="{% url 'aquaholic:input' user.id %}" method="get">
+                    {% csrf_token %}
+                    <button type="submit">Input your intake</button>
+                </form>
+        </div>
+
+    {% endif %}
+
+    {% if not user.is_authenticated %}
+    <div class="water">
+        <h2>Aquaholic</h2>
+        <h2>Aquaholic</h2>
+        <h2>Aquaholic</h2>
+        <h2>Aquaholic</h2>
+    </div>
+    <p><b>Improve your drinking habits now.</b></p>
+    {% endif %}
+
+<!-- <div class="entrance">
 
     {% if user.is_authenticated %}
 
@@ -127,5 +200,5 @@
         </div>
 
     {% endif %}
-</div>
+</div> -->
 </html>

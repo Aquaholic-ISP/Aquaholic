@@ -31,26 +31,28 @@
     </ul>
 </div>
 
-<h1>Set your new schedule</h1>
-<div class="setup">
-    <form action="{% url 'aquaholic:set_up' user.id %}" method="POST">
-        {% csrf_token %}
+<div class="content">
+    <h1>Set your new schedule</h1>
+    <div class="setup">
+        <form action="{% url 'aquaholic:set_up' user.id %}" method="POST">
+            {% csrf_token %}
+            <br>
+            <label style="font-size: 30px;">Enter your first notification time</label>
+            <input style="margin-left: 114px; font-size: 18px;" type="time" name="first_notification">
+            <br>
+            <label style="font-size: 30px;">Enter your last notification time</label>
+            <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification">
+            <br>
+            <label style="font-size: 30px; ">Notify every</label>
+            <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_step" min="1" value="1">
+            <label style="font-size: 30px;">hours</label>
+            <br>
+            {% if message %}
+                <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
+            {% endif %}
+            <button  type="submit" style="margin-top: 40px;">Generate schedule</button>
+        </form>
         <br>
-        <label style="font-size: 30px;">Enter your first notification time</label>
-        <input style="margin-left: 114px; font-size: 18px;" type="time" name="first_notification">
-        <br>
-        <label style="font-size: 30px;">Enter your last notification time</label>
-        <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification">
-        <br>
-        <label style="font-size: 30px; ">Notify every</label>
-        <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_step" min="1" value="1">
-        <label style="font-size: 30px;">hours</label>
-        <br>
-        {% if message %}
-            <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
-        {% endif %}
-        <button  type="submit" style="margin-top: 40px;">Generate schedule</button>
-    </form>
-    <br>
-</div>
+    </div>
+</div>    
 </html>

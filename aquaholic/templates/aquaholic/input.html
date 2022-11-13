@@ -17,7 +17,6 @@
         {% if user.is_authenticated %}
         <li><a href="/">Home</a></li>
         <li><a href="/aquaholic/profile">Profile</a></li>
-<!--        <li><a href="calculate_auth">Calculate</a></li>-->
         <li><form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
             {% csrf_token %}
             <button type="submit" style="border:none">calculate</button>
@@ -31,62 +30,64 @@
     </ul>
 </div>
 
-<div class="head">
-    <h1>How much have you drink ?</h1>
-</div>
-
-<div class="wrapbutton">
-        <button type="button" id="small" name="small" value="150"><img src="https://i.imgur.com/Bz4bGyZ.png" width="185" height="170"></button>
-        <button type="submit" id="glass" name="glass" value="200"><img src="https://i.imgur.com/NlANHha.png" width="185" height="170"></button>
-        <button type="submit" id="medium" name="medium" value="480"><img src="https://i.imgur.com/yxXe2Hl.png" width="185" height="170"></button>
-        <button type="submit" id="bottle" name="bottle" value="600"><img src="https://i.imgur.com/OKWOlYq.png" width="185" height="170"></button>
-</div>
-
-<div class="wrapinfo">
-    <form action="{% url 'aquaholic:input' user.id %}" method="post">
-        {% csrf_token %}
-
-        <div class="date">
-            <label>Date: </label> 
-            <input id="date" type="date" name="date"/> 
-
-            <script>
-            var date = new Date();
-            var currentDate = date.toISOString().slice(0,10);
-            var currentTime = date.getHours() + ':' + date.getMinutes();
-
-            document.getElementById('date').value = currentDate;
-            </script>
+    <div class="content">
+        <div class="head">
+        <h1>How much have you drink ?</h1>
         </div>
 
-        <div class="amount">
-            <label>Enter the amount: </label>
-            <input type="number" name="amount" id="input_amount" min="0" value=0 step="0.01">
-            <script>
-                const button = document.getElementsByClassName("wrapbutton");
-                let amtInput = document.getElementById("input_amount");
-
-                for (let btn of button[0].children) {
-                    btn.addEventListener('click', updateButton);
-                }
-
-                function updateButton(event){
-                    let size = event.currentTarget.name;
-                    let amount = event.currentTarget.value;
-                    amtInput.value = amount;
-                }
-            </script>
+        <div class="wrapbutton">
+            <button type="button" id="small" name="small" value="150"><img src="https://i.imgur.com/Bz4bGyZ.png" width="185" height="170"></button>
+            <button type="submit" id="glass" name="glass" value="200"><img src="https://i.imgur.com/NlANHha.png" width="185" height="170"></button>
+            <button type="submit" id="medium" name="medium" value="480"><img src="https://i.imgur.com/yxXe2Hl.png" width="185" height="170"></button>
+            <button type="submit" id="bottle" name="bottle" value="600"><img src="https://i.imgur.com/OKWOlYq.png" width="185" height="170"></button>
         </div>
 
-        <div class="save">
-            <button type="submit">Save</button>
+        <div class="wrapinfo">
+        <form action="{% url 'aquaholic:input' user.id %}" method="post">
+            {% csrf_token %}
+
+            <div class="date">
+                <label>Date: </label> 
+                <input id="date" type="date" name="date"/> 
+
+                <script>
+                var date = new Date();
+                var currentDate = date.toISOString().slice(0,10);
+                var currentTime = date.getHours() + ':' + date.getMinutes();
+
+                document.getElementById('date').value = currentDate;
+                </script>
+            </div>
+
+            <div class="amount">
+                <label>Enter the amount: </label>
+                <input type="number" name="amount" id="input_amount" min="0" value=0 step="0.01">
+                <script>
+                    const button = document.getElementsByClassName("wrapbutton");
+                    let amtInput = document.getElementById("input_amount");
+
+                    for (let btn of button[0].children) {
+                        btn.addEventListener('click', updateButton);
+                    }
+
+                    function updateButton(event){
+                        let size = event.currentTarget.name;
+                        let amount = event.currentTarget.value;
+                        amtInput.value = amount;
+                    }
+                </script>
+            </div>
+
+            <div class="save">
+                <button type="submit">Save</button>
+            </div>
+
+            {% if message %}
+                <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
+            {% endif %}
+
+        </form>
         </div>
-
-        {% if message %}
-            <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
-        {% endif %}
-
-    </form>
-</div>
+    </div>
 
 </html>

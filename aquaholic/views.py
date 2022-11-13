@@ -45,14 +45,15 @@ class HomePageView(generic.ListView):
                 if all_intake:
                     goal = user_info.water_amount_per_day
                     intake = all_intake.total_amount
-                    amount = int(all_intake.total_amount / goal * 100)  # amount = percentage
-                    if amount <= 100:
-                        return render(request, self.template_name, {"all_intake": f"{amount}",
-                                                                    "intake": f"{intake}",
+                    all_intake_percentage = int(intake / goal * 100)  # amount = percentage
+                    if all_intake_percentage <= 100:
+                        return render(request, self.template_name, {"all_intake_percentage": f"{all_intake_percentage}",
+                                                                    "all_intake": f"{intake}",
                                                                     "goal": f"{user_info.water_amount_per_day:.2f}"})
-                    elif amount > 100:
-                        amount = 100
-                        return render(request, self.template_name, {"all_intake": f"{amount}",
+                    elif all_intake_percentage > 100:
+                        all_intake_percentage = 100
+                        return render(request, self.template_name, {" all_intake_percentage": f"{all_intake_percentage}",
+                                                                    "all_intake": f"{intake}",
                                                                     "goal": f"{user_info.water_amount_per_day:.2f}"})
             return render(request, self.template_name, {"goal": f"{user_info.water_amount_per_day:.2f}"})
         return render(request, self.template_name)

@@ -121,12 +121,12 @@
 
         <div class="goal">
             <h5>Today Goal: {{goal}} ml</h5>
-            <h5>Your Progress: {{intake}} ml</h5>
+            <h5>Your Progress: {{all_intake}} ml</h5>
         </div>
 
         <div class="wrap-contain">
             <div class="container">
-                <div class="progress intake" style="width:{{ all_intake }}%">{{all_intake}}%</div>
+                <div class="progress intake" style="width:{{  all_intake_percentage }}%">{{ all_intake_percentage }}%</div>
             </div>
             <form action="{% url 'aquaholic:input' user.id %}" method="get">
                     {% csrf_token %}

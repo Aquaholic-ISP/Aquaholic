@@ -74,7 +74,7 @@ class ProfileView(generic.DetailView):
 
         return render(request, self.template_name, {"first_name": f'{user.first_name}', 
                                                     "weight": f"{user_info.weight}",
-                                                    "exercise_time": f"{user_info.exercise_time}",
+                                                    "exercise_duration": f"{user_info.exercise_duration}",
                                                     "join": f"{date_join}", 
                                                     "user_id": f"{user.id}"})
 

@@ -256,7 +256,7 @@ class InputViewTest(TestCase):
         # datetime in database = actual time + 10 hours
         db_time = datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10)
         intake1 = Intake.objects.get(user_info_id=user_info.id, intake_date=db_time)
-        self.assertEqual(200, intake1.user_drinks_amount)
+        self.assertEqual(200, intake1.total_amount)
 
         # user save the amount of water and save again
         input_url = reverse('aquaholic:input', args=(user1.id,))
@@ -268,4 +268,4 @@ class InputViewTest(TestCase):
         # the amount of water topped up from the already existing amount
         db_time = datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10)
         intake1 = Intake.objects.get(user_info_id=user_info.id, intake_date=db_time)
-        self.assertEqual(700, intake1.user_drinks_amount)
+        self.assertEqual(700, intake1.total_amount)

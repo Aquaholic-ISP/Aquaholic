@@ -5,7 +5,7 @@ from .models import UserInfo, Schedule, Intake
 class UserInfoAdmin(admin.ModelAdmin):
     list_display = ('user',
                     'weight',
-                    'exercise_time',
+                    'exercise_duration',
                     'water_amount_per_day',
                     'first_notification_time',
                     'last_notification_time',
@@ -15,7 +15,7 @@ class UserInfoAdmin(admin.ModelAdmin):
                     )
     list_filter = ['user',
                     'weight',
-                    'exercise_time',
+                    'exercise_duration',
                     'water_amount_per_day',
                     'first_notification_time',
                     'last_notification_time',
@@ -42,13 +42,13 @@ class ScheduleAdmin(admin.ModelAdmin):
 
 class IntakeAdmin(admin.ModelAdmin):
     list_display = ('user_info',
-                    'user_drinks_amount',
-                    'intake_date',
+                    'total_amount',
+                    'date',
                     )
 
     list_filter = ['user_info',
-                   'user_drinks_amount',
-                   'intake_date',
+                   'total_amount',
+                   'date',
                    ]
     search_fields = ['user_info']
 

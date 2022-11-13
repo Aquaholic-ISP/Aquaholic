@@ -6,7 +6,7 @@
     color: #0E1646;
     font-family: "Poppins", sans-serif;
 }
-
+/*
 .navbar{
     display: flex;
     margin: auto;
@@ -46,12 +46,13 @@
 .navbar ul li:hover::after{
     width: 100%;
 }
-
+*/
 h1{
     font-size: 90px;
     margin-top: 230px;
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
+
 }
 
 .setup button{
@@ -65,7 +66,7 @@ h1{
     border: 2px solid #0E1646;
     background: transparent;
     cursor: pointer;
-    position: relative;
+    /*position: relative;*/
     overflow: hidden;
 }
 

@@ -5,14 +5,32 @@
 <html>
 <head>
         <link rel="stylesheet" href="{% static 'aquaholic/style6.css' %}">
+    <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
     <title>Input of water intake</title>
 </head>
 
-<div class="navbar">
-    <ul>
-        <li><a href="/">Home</a></li>
-    </ul>
-</div>
+<!--<div class="navbar">-->
+<!--    <ul>-->
+<!--        <li><a href="/">Home</a></li>-->
+<!--    </ul>-->
+<!--</div>-->
+<input type="checkbox" id="active">
+    <label for="active" class="menu-btn"><span></span></label>
+    <label for="active" class="close"></label>
+    <div class="navbar">
+      <ul>
+          {% if user.is_authenticated %}
+            <li><a href="/">Home</a></li>
+            <li><a href="/aquaholic/profile">Profile</a></li>
+            <li><a href="calculate_auth">Calculate</a></li>
+            <li><a href="set_up">Set Schedule</a></li>
+            <li><a href="schedule">Schedule</a></li>
+            <li><a href="input">Input</a></li>
+            <li><a href="history">History</a></li>
+            <li><a href="/aquaholic/about_us">About us</a></li>
+          {% endif %}
+      </ul>
+    </div>
 
 <div class="head">
     <h1>How much have you drink ?</h1>

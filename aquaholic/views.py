@@ -11,6 +11,11 @@ import calendar
 from django.utils import timezone
 
 
+def get_water_amount_per_day(weight, exercise_time):
+    """Calculate amount of water per day."""
+    return ((weight * KILOGRAM_TO_POUND * 0.5) + (exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
+
+
 def get_total_hours(first_notification_time, last_notification_time):
     """Calculate total hours from first and last notification time."""
     date = datetime.date(1, 1, 1)
@@ -35,11 +40,11 @@ class HomePageView(generic.ListView):
             user_info = UserInfo.objects.get(user_id=user.id)
             if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html')
-            if Intake.objects.filter(user_info_id=user_info.id, intake_date=date).exists():
-                all_intake = Intake.objects.get(user_info_id=user_info.id, intake_date=date)
+            if Intake.objects.filter(user_info_id=user_info.id, date=date).exists():
+                all_intake = Intake.objects.get(user_info_id=user_info.id, date=date)
                 if all_intake:
                     goal = user_info.water_amount_per_day
-                    amount = int(all_intake.user_drinks_amount / goal * 100)  # amount = percentage
+                    amount = int(all_intake.total_amount / goal * 100)  # amount = percentage
                     if amount <= 100:
                         return render(request, self.template_name, {"all_intake": f"{amount}",
                                                                     "goal": f"{user_info.water_amount_per_day:.2f}"})
@@ -70,8 +75,9 @@ class ProfileView(generic.DetailView):
 
         return render(request, self.template_name, {"first_name": f'{user.first_name}', 
                                                     "weight": f"{user_info.weight}",
-                                                    "exercise_time": f"{user_info.exercise_time}",
-                                                    "join": f"{date_join}"})
+                                                    "exercise_duration": f"{user_info.exercise_duration}",
+                                                    "join": f"{date_join}", 
+                                                    "user_id": f"{user.id}"})
 
 
 class CalculateView(generic.ListView):
@@ -84,12 +90,9 @@ class CalculateView(generic.ListView):
     def post(self, request):
         try:
             weight = float(request.POST["weight"])
-            exercise_time = float(request.POST["exercise_time"])  # TODO exercise duration
-            water_amount_per_day = ((weight * KILOGRAM_TO_POUND * 0.5)
-                                    + (exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
-            # TODO extract method to calculate
+            exercise_duration = float(request.POST["exercise_duration"])
             return render(request, self.template_name,
-                          {'result': f"{water_amount_per_day:.2f}"})
+                          {'result': f"{get_water_amount_per_day(weight, exercise_duration):.2f}"})
         except ValueError:
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
@@ -107,10 +110,8 @@ class CalculateAuthView(generic.DetailView):
         try:
             user_info = UserInfo.objects.get(user_id=request.user.id)
             user_info.weight = float(request.POST["weight"])
-            user_info.exercise_time = float(request.POST["exercise_time"])
-            user_info.water_amount_per_day = ((user_info.weight * KILOGRAM_TO_POUND * 0.5)
-                                              + (user_info.exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
-            # TODO extract method to calculate
+            user_info.exercise_duration = float(request.POST["exercise_duration"])
+            user_info.water_amount_per_day = get_water_amount_per_day(user_info.weight, user_info.exercise_duration)
             user_info.get_water_amount_per_hour()
             user_info.save()
 
@@ -141,6 +142,7 @@ class SetUpView(generic.DetailView):
         try:
             first = request.POST["first_notification"]
             last = request.POST["last_notification"]
+            step = int(request.POST["notify_step"])
             first_notify_time = datetime.datetime.strptime(first, "%H:%M").time()
             last_notify_time = datetime.datetime.strptime(last, "%H:%M").time()
             if first == last or get_total_hours(first_notify_time, last_notify_time) == 0:
@@ -150,6 +152,7 @@ class SetUpView(generic.DetailView):
             user_info = UserInfo.objects.get(user_id=request.user.id)
             user_info.first_notification_time = first_notify_time
             user_info.last_notification_time = last_notify_time
+            user_info.time_interval = step
 
             # calculate and save total hours and water amount per hour to database
             user_info.total_hours = get_total_hours(user_info.first_notification_time,
@@ -173,7 +176,7 @@ class SetUpView(generic.DetailView):
                 first_notification_time += datetime.timedelta(hours=24)
 
             notification_time = first_notification_time
-            self.create_schedule(expected_amount, notification_time, total_hours, user_info)
+            self.create_schedule(expected_amount, notification_time, total_hours, user_info, step)
 
             if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
@@ -188,15 +191,15 @@ class SetUpView(generic.DetailView):
                           {'message': message})
 
     @staticmethod
-    def create_schedule(expected_amount, notification_time, total_hours, user_info):
-        for i in range(total_hours + 1):
+    def create_schedule(expected_amount, notification_time, total_hours, user_info, step):
+        for i in range(0, total_hours + 1, step):
             Schedule.objects.create(user_info_id=user_info.id,
                                     notification_time=notification_time,
                                     expected_amount=int(expected_amount),
                                     notification_status=(notification_time < datetime.datetime.now()),
                                     is_last=(i == total_hours)
                                     )
-            notification_time += datetime.timedelta(hours=1)
+            notification_time += datetime.timedelta(hours=step)
 
     @staticmethod
     def delete_schedule(user_info):
@@ -266,17 +269,18 @@ class InputView(generic.DetailView):
             aware_date = make_aware(intake_date)
             user_info = UserInfo.objects.get(user_id=request.user.id)
             # User already have intake for the given day, add amount of water to existed amount
-            if Intake.objects.filter(user_info_id=user_info.id, intake_date=aware_date).exists():
-                intake = Intake.objects.get(user_info_id=user_info.id, intake_date=aware_date)
-                intake.user_drinks_amount += float(amount)
+            if Intake.objects.filter(user_info_id=user_info.id, date=aware_date).exists():
+                intake = Intake.objects.get(user_info_id=user_info.id, date=aware_date)
+                intake.total_amount += float(amount)
                 intake.save()
             else:
                 Intake.objects.create(user_info_id=user_info.id,
-                                      intake_date=intake_date,
-                                      user_drinks_amount=amount)
-            # TODO change from redirect to render and show message that amount already save
-            #  in case for user want to input many time
-            return HttpResponseRedirect(reverse('aquaholic:home'))
+                                      date=intake_date,
+                                      total_amount=amount)
+            # return HttpResponseRedirect(reverse('aquaholic:home'))
+            message = "Saved !"
+            return render(request, self.template_name,
+                          {'message': message})
         except ValueError:
             message = "Please, input in the field."
             return render(request, self.template_name,
@@ -292,7 +296,7 @@ class HistoryView(generic.DetailView):
         """Get the data needed for history page and send those data as a context to history.html."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
         all_intake = Intake.objects.filter(user_info_id=user_info.id)
-        sorted_intakes = all_intake.order_by('intake_date')  # sort data by date
+        sorted_intakes = all_intake.order_by('date')  # sort data by date
 
         # count the number of days in the selected month
         num_days_in_month = calendar.monthrange(selected_year, selected_month)[1]
@@ -305,12 +309,12 @@ class HistoryView(generic.DetailView):
         # TODO create a function in model for filtering Intake that is in specific month and year
         goal = user_info.water_amount_per_day
         for intake in sorted_intakes:
-            if (selected_month == intake.intake_date.month) and (selected_year == intake.intake_date.year):
+            if (selected_month == intake.date.month) and (selected_year == intake.date.year):
                 # change amount of water of that date
-                all_amount_in_month[intake.intake_date.strftime("%d %b %Y")][0] = intake.user_drinks_amount
-                if intake.user_drinks_amount < goal:
+                all_amount_in_month[intake.date.strftime("%d %b %Y")][0] = intake.total_amount
+                if intake.total_amount < goal:
                     # the bar color will be red if the amount doesn't reach the goal
-                    all_amount_in_month[intake.intake_date.strftime("%d %b %Y")][1] = "#FF9999"
+                    all_amount_in_month[intake.date.strftime("%d %b %Y")][1] = "#FF9999"
         return render(request, self.template_name, {"goal": goal,
                                                     "date": list(all_amount_in_month.keys()),
                                                     "amount": list(val[0] for val in all_amount_in_month.values()),

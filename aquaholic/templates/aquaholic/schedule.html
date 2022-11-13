@@ -2,14 +2,37 @@
 {% load socialaccount %}
 {% load i18n %}
         <link rel="stylesheet" href="{% static 'aquaholic/style5.css' %}">
+<link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
 <h1>Your notification schedule</h1>
-<div class="navbar">
-        <ul>
-<!--                <li><a href="{% url 'aquaholic:home' %}"><button type="button">Home</button></a></li>-->
-                        <li><a href="/">Home</a></li>
+<!--<div class="navbar">-->
+<!--        <ul>-->
+<!--&lt;!&ndash;                <li><a href="{% url 'aquaholic:home' %}"><button type="button">Home</button></a></li>&ndash;&gt;-->
+<!--                        <li><a href="/">Home</a></li>-->
 
-        </ul>
-</div>
+<!--        </ul>-->
+<!--</div>-->
+
+<input type="checkbox" id="active">
+    <label for="active" class="menu-btn"><span></span></label>
+    <label for="active" class="close"></label>
+    <div class="navbar">
+      <ul>
+          {% if user.is_authenticated %}
+            <li><a href="/">Home</a></li>
+            <li><a href="/aquaholic/profile">Profile</a></li>
+            <li><a href="calculate_auth">Calculate</a></li>
+            <li><a href="set_up">Set Schedule</a></li>
+            <li><a href="schedule">Schedule</a></li>
+            <li><a href="input">Input</a></li>
+            <li><a href="history">History</a></li>
+            <li><a href="/aquaholic/about_us">About us</a></li>
+          {% endif %}
+      </ul>
+    </div>
+
+
+
+
 <div class="schedule">
         <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
 <table border="1" cellpadding=10>

@@ -50,6 +50,8 @@ class HomePageView(generic.ListView):
                     elif amount > 100:
                         amount = 100
                         return render(request, self.template_name, {"all_intake": f"{amount}"})
+            if user_info.water_amount_per_day > 0:
+                return render(request, self.template_name, {"goal": f"{user_info.water_amount_per_day:.2f}"})
         return render(request, self.template_name)
 
 
@@ -67,7 +69,13 @@ class ProfileView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        return render(request, self.template_name)
+        user_info = UserInfo.objects.get(user_id=user.id)
+        date_join = user.date_joined.date()
+
+        return render(request, self.template_name, {"first_name": f'{user.first_name}', 
+                                                    "weight": f"{user_info.weight}",
+                                                    "exercise_time": f"{user_info.exercise_time}",
+                                                    "join": f"{date_join}"})
 
 
 class CalculateView(generic.ListView):

@@ -47,6 +47,7 @@ class HomePageView(generic.ListView):
                         amount = 100
                         return render(request, self.template_name, {"all_intake": f"{amount}",
                                                                     "goal": f"{user_info.water_amount_per_day:.2f}"})
+            return render(request, self.template_name, {"goal": f"{user_info.water_amount_per_day:.2f}"})
         return render(request, self.template_name)
 
 

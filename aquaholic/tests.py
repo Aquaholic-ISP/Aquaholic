@@ -13,7 +13,7 @@ def create_userinfo(weight, exercise_time, first_notification_time, last_notific
     given number of `days` offset to now (negative for questions published
     in the past, positive for questions that have yet to be published).
     """
-    return UserInfo.objects.create(weight=weight, exercise_time=exercise_time, first_notification_time=first_notification_time,
+    return UserInfo.objects.create(weight=weight, exercise_duration=exercise_time, first_notification_time=first_notification_time,
                     last_notification_time=last_notification_time)
 
 
@@ -21,7 +21,7 @@ class UserInfoModelTests(TestCase):
     def test_amount_of_water(self):
         """calculate the amount of water from user input weight
         and exercise time."""
-        user = UserInfo(weight=50, exercise_time=60)
+        user = UserInfo(weight=50, exercise_duration=60)
         user.get_water_amount_per_day()
         amount = 2339.7265
         self.assertAlmostEqual(amount, user.water_amount_per_day, places=4)
@@ -91,8 +91,8 @@ class TemplateUsed(TestCase):
         page = client.get(reverse('aquaholic:set_up', args=(user.id,)))
         self.assertTemplateUsed(page, 'aquaholic/set_up.html')
 
-        userinfo = UserInfo.objects.create(weight=50, exercise_time=30, first_notification_time=datetime.time(8,0,0),
-                                           last_notification_time=datetime.time(22 , 0,0), user_id=user.id)
+        userinfo = UserInfo.objects.create(weight=50, exercise_duration=30, first_notification_time=datetime.time(8,0,0),
+                                           last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
         first_notify_time = userinfo.first_notification_time
         first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
         userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
@@ -149,7 +149,7 @@ class ScheduleView(TestCase):
         user.save()
         client = Client()
         client.login(username='testuser', password='12345')
-        userinfo = UserInfo.objects.create(weight=50, exercise_time=30, first_notification_time=datetime.time(11, 0, 0),
+        userinfo = UserInfo.objects.create(weight=50, exercise_duration=30, first_notification_time=datetime.time(11, 0, 0),
                                            last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
         userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
                                                userinfo.last_notification_time)
@@ -165,7 +165,7 @@ class ScheduleView(TestCase):
         user.save()
         client = Client()
         client.login(username='testuser', password='12345')
-        userinfo = UserInfo.objects.create(weight=50, exercise_time=30, first_notification_time=datetime.time(11, 0, 0),
+        userinfo = UserInfo.objects.create(weight=50, exercise_duration=30, first_notification_time=datetime.time(11, 0, 0),
                                            last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
         userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
                                                userinfo.last_notification_time)
@@ -200,7 +200,7 @@ class HistoryViewTest(TestCase):
         first_notify_time = datetime.time(8, 0, 0)
         last_notify_time = datetime.time(23, 0, 0)
         userinfo = UserInfo.objects.create(weight=50,
-                                           exercise_time=60,
+                                           exercise_duration=60,
                                            first_notification_time=first_notify_time,
                                            last_notification_time=last_notify_time,
                                            user_id=user.id)
@@ -209,8 +209,8 @@ class HistoryViewTest(TestCase):
 
         # user input amount of water and go to history page
         Intake.objects.create(user_info_id=userinfo.id,
-                              intake_date=datetime.datetime.today(),
-                              user_drinks_amount=500)
+                              date=datetime.datetime.today(),
+                              total_amount=500)
         response = client.get(reverse('aquaholic:history', args=(user.id,)))
         self.assertEqual(response.status_code, 200)
         history_url = reverse('aquaholic:history', args=(user.id,))
@@ -248,14 +248,14 @@ class InputViewTest(TestCase):
         form_data = {"amount": "200",
                      "date": "2022-11-05"}
         response = client.post(input_url, form_data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         # get userInfo object from database
         user_info = UserInfo.objects.get(user_id=user1.id)
 
         # datetime in database = actual time + 10 hours
         db_time = datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10)
-        intake1 = Intake.objects.get(user_info_id=user_info.id, intake_date=db_time)
+        intake1 = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(200, intake1.total_amount)
 
         # user save the amount of water and save again
@@ -263,9 +263,9 @@ class InputViewTest(TestCase):
         form_data = {"amount": "500",
                      "date": "2022-11-05"}
         response = client.post(input_url, form_data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         # the amount of water topped up from the already existing amount
         db_time = datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10)
-        intake1 = Intake.objects.get(user_info_id=user_info.id, intake_date=db_time)
+        intake1 = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(700, intake1.total_amount)

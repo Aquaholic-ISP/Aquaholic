@@ -9,96 +9,27 @@
     <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
 </head>
 
-<!--<div class="navbar">-->
-<!--    <ul>-->
-<!--        <li><a href="/">Home</a></li>-->
-<!--    </ul>-->
-<!--</div>-->
-
-<!--<details>-->
-<!--    <summary></summary>-->
-<!--<nav class="navbar">-->
-<!--    {% if user.is_authenticated %}-->
-<!--    <a href="/">Home</a>-->
-<!--    <a href="/aquaholic/profile">Profile</a>-->
-<!--    <a href="calculate_auth">Calculate</a>-->
-<!--    <a href="set_up">Set Up</a>-->
-<!--    <a href="schedule">Schedule</a>-->
-<!--    <a href="input">Input</a>-->
-<!--    <a href="history">History</a>-->
-<!--    <a href="/aquaholic/about_us">About us</a>-->
-<!--    {% endif %}-->
-<!--    </nav>-->
-<!--</details>-->
-
-<!--<nav>-->
-<!--  <div class="navicon">-->
-<!--    <div></div>-->
-<!--  </div>-->
-<!--<div class="navbar">-->
-<!--    {% if user.is_authenticated %}-->
-<!--    <a href="/">Home</a>-->
-<!--    <a href="/aquaholic/profile">Profile</a>-->
-<!--    <a href="calculate_auth">Calculate</a>-->
-<!--    <a href="set_up">Set Up</a>-->
-<!--    <a href="schedule">Schedule</a>-->
-<!--    <a href="input">Input</a>-->
-<!--    <a href="history">History</a>-->
-<!--    <a href="/aquaholic/about_us">About us</a>-->
-<!--    {% endif %}-->
-<!--    </div>-->
-<!--</nav>-->
-
-
- <input type="checkbox" id="active">
-    <label for="active" class="menu-btn"><span></span></label>
-    <label for="active" class="close"></label>
-    <div class="navbar">
-      <ul>
-          {% if user.is_authenticated %}
-            <li><a href="/">Home</a></li>
-            <li><a href="/aquaholic/profile">Profile</a></li>
-            <li><a href="calculate_auth">Calculate</a></li>
-            <li><a href="set_up">Set Schedule</a></li>
-            <li><a href="schedule">Schedule</a></li>
-            <li><a href="input">Input</a></li>
-            <li><a href="history">History</a></li>
-            <li><a href="/aquaholic/about_us">About us</a></li>
-          {% endif %}
-      </ul>
-    </div>
-
-
-<!--{% if user.is_authenticated %}-->
-<!--            <li><form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">-->
-<!--                {% csrf_token %}-->
-<!--                <button type="submit" style="border:none;">calculate</button>-->
-<!--            </form></li>-->
-
-<!--            <li><form action="{% url 'aquaholic:set_up' user.id %}" method="get">-->
-<!--                {% csrf_token %}-->
-<!--                <button type="submit"style="border:none;">Set Up</button>-->
-<!--            </form></li>-->
-
-<!--            <li><form action="{% url 'aquaholic:schedule' user.id %}" method="get">-->
-<!--                {% csrf_token %}-->
-<!--                <button type="submit" style="border:none;">Schedule</button>-->
-<!--            </form></li>-->
-
-<!--            <li><form action="{% url 'aquaholic:input' user.id %}" method="get">-->
-<!--                {% csrf_token %}-->
-<!--                <button type="submit" style="border:none;">Input</button>-->
-<!--            </form></li>-->
-
-<!--            <li><form action="{% url 'aquaholic:history' user.id %}" method="get">-->
-<!--                {% csrf_token %}-->
-<!--                <button type="submit" style="border:none;">History</button>-->
-<!--            </form></li>-->
-
-<!--            <li><a href="about_us">About us</a></li>-->
-<!--            {% endif %}-->
-<!--      </ul>-->
-<!--</div>-->
+<input type="checkbox" id="active">
+<label for="active" class="menu-btn"><span></span></label>
+<label for="active" class="close"></label>
+<div class="navbar">
+    <ul>
+        {% if user.is_authenticated %}
+        <li><a href="/">Home</a></li>
+        <li><a href="/aquaholic/profile">Profile</a></li>
+<!--        <li><a href="calculate_auth">Calculate</a></li>-->
+        <li><form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
+            {% csrf_token %}
+            <button type="submit" style="border:none">calculate</button>
+        </form></li>
+        <li><a href="{% url 'aquaholic:set_up' user.id %}">Set Schedule</a></li>
+        <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>
+        <li><a href="{% url 'aquaholic:input' user.id %}">Input</a></li>
+        <li><a href="{% url 'aquaholic:history' user.id %}">History</a></li>
+        <li><a href="/aquaholic/about_us">About us</a></li>
+        {% endif %}
+    </ul>
+</div>
 
 <h1>Set your new schedule</h1>
 <div class="setup">

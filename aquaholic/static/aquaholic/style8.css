@@ -5,7 +5,6 @@
     margin: 0;
     padding: 0;
     text-align: center;
-    color: #0E1646;
     font-family: "Poppins", sans-serif;
 }
 
@@ -13,44 +12,51 @@ html {
     scroll-behavior: smooth;
 }
 
-.section1 {
-    border: #0e164600 solid;
-    background: linear-gradient(27.5deg, #1d5c96 50%, #7db0de 58%);
-    width: 99.6%;
+#section1 {
+    background: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
+    color: white;
+    width: 100%;
     height: 100%;
 }
 
-.header {
-    width: 50%;
-    background: transparent;
-    margin-top: 25%;
-    margin-left: 4%;
-}
-
-.header h1{
-    text-align: left;
-}
-
-.describtion p{
-    text-align: left;
-}
-
-.describtion ul li{
+ul li{
     list-style: none;
     position: relative;
-    text-align: left;
     font-size: 16px;
 }
 
-.section2 {
-    border: #0e164600 solid;
-    width: 99.6%;
+.container1 {
+    position: relative;
+    width: 50%;
+    top: 30%;
+    left: 25%;
+}
+.container1 h1 {
+    font-size: 60px;
+}
+
+.container1 p {
+    font-size: 18px;
+}
+
+.container1 li a {
+    font-size: 18px;
+}
+
+#creators {
+    color: #0E1646;
+    background-color: aliceblue;
+    width: 100%;
     height: 100%;
 }
 
-.section2 h1 {
+.container2 {
+    position: relative;
+    top: 20%;
+}
+
+.header h1{
     font-size: 50px;
-    margin-top: 6%;
 }
 
 .creator {
@@ -59,9 +65,13 @@ html {
     display: flex;
 }
 
+.creator img {
+    border-radius: 100px;
+}
+
 .picture1 {
-    width: 17.4%;
-    margin-left: 6%;
+    width: 21.4%;
+    margin-left: 3%;
 }
 
 .picture1 img{
@@ -70,8 +80,8 @@ html {
 }
 
 .picture2 {
-    width: 17.4%;
-    margin-left: 6%;
+    width: 21.4%;
+    margin-left: 3%;
 }
 
 .picture2 img{
@@ -80,8 +90,8 @@ html {
 }
 
 .picture3 {
-    width: 17.4%;
-    margin-left: 6%;
+    width: 21.4%;
+    margin-left: 3%;
 }
 
 .picture3 img{
@@ -90,11 +100,11 @@ html {
 }
 
 .picture4 {
-    width: 17.4%;
-    margin-left: 6%;
+    width: 21.4%;
+    margin-left: 3%;
 }
 
 .picture4 img{
     width: 300px;
     height: 300px;
-}
+} 

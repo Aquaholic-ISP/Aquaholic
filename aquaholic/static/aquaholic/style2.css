@@ -5,7 +5,6 @@
     margin: 0;
     padding: 0;
     text-align: center;
-    background-color: #4682B4;
     color: #0E1646;
     font-family: "Poppins", sans-serif;
 }
@@ -17,44 +16,10 @@ h1{
     -12px 12px 20px rgba(0,0,0,0.5);
 }
 
-.navbar{
-    display: flex;
-    margin: auto;
-    align-items: flex-start;
-    background: transparent;
-    position: relative;
-    float: right;
-    top: -335px;
-    right: 50px;
-}
-
-.navbar ul li{
-    list-style: none;
-    position: relative;
-    text-align: center;
-    font-size: 25px;
-}
-
-.navbar ul li a{
-    text-decoration: none;
-    color: #fff;
-    text-transform: uppercase;
-    text-align: center;
-}
-
-.navbar ul li::after{
-    content: '';
-    height: 3px;
-    width: 0%;
-    background: #fff;
+.calpart {
     position: absolute;
-    left: 0;
-    bottom: -10px;
-    transition: 0.5s;
-}
-
-.navbar ul li:hover::after{
-    width: 100%;
+    margin-top: 5%;
+    margin-left: 25%;
 }
 
 .calpart button{
@@ -105,7 +70,7 @@ img {
     background: transparent;
     align: center;
     align-items: center;
-    bottom: -30px;
+    margin-top: 20%;
 }
 
 .join p{

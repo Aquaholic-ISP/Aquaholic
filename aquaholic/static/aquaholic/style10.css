@@ -1,0 +1,433 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
+    color: #0E1646;
+    font-family: "Poppins", sans-serif;
+}
+
+.navbar{
+    position: fixed;
+    top: 0;
+    right: -100%;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(-45deg, #efddfb 0%, #1a8cff 100%);
+    transition: all 0.6s ease-in-out;
+    line-height: 200%;
+    z-index: 1;
+}
+#active:checked ~ .navbar{
+    right:0;
+}
+.menu-btn{
+    position: absolute;
+    z-index: 2;
+    right: 20px;
+    top: 20px;
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    background: transparent;
+}
+
+.menu-btn span,
+.menu-btn:before,
+.menu-btn:after{
+	content: "";
+	position: absolute;
+	top: calc(50% - 1px);
+	left: 30%;
+	width: 40%;
+	border-bottom: 2px solid #000;
+	transition: transform .6s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+.menu-btn:before{
+    transform: translateY(-8px);
+}
+.menu-btn:after{
+    transform: translateY(8px);
+}
+
+.close {
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	transition: background .6s;
+}
+
+#active:checked + .menu-btn span {
+	transform: scaleX(0);
+}
+#active:checked + .menu-btn:before {
+	transform: rotate(45deg);
+    border-color: #fff;
+}
+#active:checked + .menu-btn:after {
+	transform: rotate(-45deg);
+    border-color: #fff;
+}
+
+.navbar ul{
+    position: absolute;
+    top: 50%;
+    left: 44%;
+    height: 60%;
+    transform: translate(-50%, -50%);
+    list-style: none;
+    text-align: center;
+    vertical-align:top;
+}
+
+.navbar ul li{
+    height: 10%;
+    margin: 15px 0;
+}
+.navbar ul li a{
+    width: 350px;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: 500;
+    padding: 5px 30px;
+    color: #fff;
+    border-radius: 50px;
+    position: absolute;
+    line-height: 50px;
+    margin: 5px 30px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transition: transform .6s cubic-bezier(0.215, 0.61, 0.355, 5);
+    background: transparent;
+}
+
+.navbar ul li a:after{
+    position: absolute;
+    content: "";
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    border-radius: 50px;
+    transform: scaleY(0);
+    z-index: -1;
+    transition: transform 0.3s ease;
+}
+.navbar ul li a:hover:after{
+    transform: scaleY(1);
+}
+    .navbar ul li a:hover{
+    color: #1a73e8;
+}
+
+input[type="checkbox"]{
+    display: none;
+}
+
+.content{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    text-align: center;
+    width: 100%;
+    background: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
+    color: #0E1646;
+    height: 100%;
+}
+
+
+.head-auth {
+    margin-top: 10%;
+}
+
+.head-auth h1{
+    font-size: 80px;
+}
+
+#active:checked ~ .navbar ul li a{
+    opacity: 1;
+}
+.navbar ul li a{
+    transition: opacity 1.2s, transform 1.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translateX(100px);
+}
+#active:checked ~ .navbar ul li a{
+	transform: none;
+	transition-timing-function: ease, cubic-bezier(.1,1.3,.3,1);
+    transition-delay: .6s;
+    transform: translateX(-100px);
+}
+
+.navbar button{
+    width: 350px;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: 500;
+    padding: 5px 30px;
+    color: #fff;
+    border-radius: 50px;
+    position: absolute;
+    line-height: 50px;
+    margin: 5px 30px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transition: transform .6s cubic-bezier(0.215, 0.61, 0.355, 5);
+    background: transparent;
+}
+
+.navbar button:after{
+    position: absolute;
+    content: "";
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    border-radius: 50px;
+    transform: scaleY(0);
+    z-index: -1;
+    transition: transform 0.3s ease;
+}
+.navbar button:hover:after{
+    transform: scaleY(1);
+}
+.navbar button:hover{
+    color: #1a73e8;
+}
+
+input[type="checkbox"]{
+    display: none;
+}
+
+#active:checked ~ .navbar button{
+    opacity: 1;
+}
+.navbar button{
+    transition: opacity 1.2s, transform 1.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translateX(100px);
+}
+#active:checked ~ .navbar button{
+	transform: none;
+	transition-timing-function: ease, cubic-bezier(.1,1.3,.3,1);
+    transition-delay: .6s;
+    transform: translateX(-100px);
+}
+
+.water {
+    position: relative;
+    width: 100%;
+    height: 28vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    font-family: "Poppins", sans-serif;
+}
+
+.water h2{
+    position: absolute;
+    font-size: 14vw;
+    background: transparent;
+}
+
+.water h2:nth-child(1){
+    color: #fff;
+    text-shadow: -2px 2px 0px #183954,
+    -4px 4px 0px #183954,
+    -6px 6px 0px #183954,
+    -8px 8px 0px #183954,
+    -18px 18px 20px rgba(0,0,0,0.5),
+    -18px 18px 50px rgba(0,0,0,0.5);
+}
+
+.water h2:nth-child(2){
+    color: #2196f3;
+    opacity: 0.5;
+    animation: animate 3s ease-in-out infinite;
+}
+
+.water h2:nth-child(3){
+    color: #2196f3;
+    opacity: 0.5;
+    animation: animate 6s ease-in-out infinite;
+}
+
+.water h2:nth-child(4){
+    color: #2196f3;
+    animation: animate 4s ease-in-out infinite;
+}
+
+@keyframes animate{
+    0%, 100%
+    {
+        clip-path: polygon(0% 46%, 16% 45%, 34% 52%, 50% 61%, 68% 65%, 85% 61%, 100% 53%, 100% 100%, 0% 100%);
+    }
+    50%
+    {
+        clip-path: polygon(0 59%, 18% 67%, 36% 70%, 51% 66%, 66% 56%, 82% 49%, 100% 45%, 100% 100%, 0% 100%);
+    }
+}
+
+.buttonlogin {
+    position: relative;
+    text-align: center;
+}
+
+.buttonlogin form {
+    display: inline-block;
+    position: relative;
+    margin: auto;
+    width: 150px;
+    height: 30px;
+}
+
+.buttonlogin button{
+    width: 150px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.head-auth {
+    margin-top: 10%;
+}
+
+.head-auth h1{
+    font-size: 60px;
+}
+
+.allbtn {
+    width: 60%;
+    background: transparent;
+    position: absolute;
+    margin-top: 3%;
+}
+
+.allbtn form{
+    margin: auto;
+    position: relative;
+    justify-content: center;
+    margin-left: 50%;
+    margin-top: -3%;
+    background: transparent;
+}
+
+.allbtn button{
+    width: 150px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    margin: 20px;
+    right: 400px;
+}
+
+.wrap-contain {
+    width: 50%;
+    background: transparent;
+    position: absolute;
+    margin-top: 10%;
+    margin-left: 35%;
+}
+
+.wrap-contain button{
+    width: 150px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: white;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.wrap-contain form{
+    margin: auto;
+    position: relative;
+    justify-content: center;
+    margin-left: 0%;
+    margin-top: 2%;
+    background: transparent;
+}
+
+.container {
+    border: #0E1646 solid;
+    margin: 0px auto;
+    margin-right:0px;
+    background-color: rgb(192, 192, 192);
+    width: 100%;
+    height: 70px;
+    border-radius: 15px;
+}
+
+.progress {
+    background-color:#0E1646;
+    color: white;
+    padding: 5px;
+    text-align: right;
+    font-size: 40px;
+    border-radius: 15px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+    -webkit-transition: 0.4s linear;
+    -moz-transition: 0.4s linear;
+    -o-transition: 0.4s linear;
+    transition: 0.4s linear;
+    -webkit-transition-property: width;
+    -moz-transition-property: width;
+    -o-transition-property: width;
+    transition-property: width;
+    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.intake {
+    width: 0%;
+}
+
+.container form {
+    background: transparent;
+}
+
+.logout form{
+    position: relative;
+    top: 20px;
+}
+
+.goal {
+    position: absolute;
+    margin-left: 52%;
+    margin-top: 5%;
+}
+
+.goal h5{
+    font-size: 20px;
+}

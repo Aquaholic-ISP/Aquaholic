@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
 </head>
 
-    <h1>Calculate Your Water Intake</h1>
+
 
 <input type="checkbox" id="active">
 <label for="active" class="menu-btn"><span></span></label>
@@ -32,6 +32,7 @@
     </ul>
 </div>
 <div class="content">
+    <h1>Calculate Your Water Intake</h1>
     <div class="calmain">
         <div class="calpart" >
         <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="POST">

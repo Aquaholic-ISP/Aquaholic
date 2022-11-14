@@ -18,7 +18,7 @@ h1{
 
 .calpart {
     position: absolute;
-    margin-top: 25%;
+    margin-top: 5%;
     margin-left: 25%;
 }
 
@@ -70,7 +70,7 @@ img {
     background: transparent;
     align: center;
     align-items: center;
-    bottom: -30px;
+    margin-top: 20%;
 }
 
 .join p{

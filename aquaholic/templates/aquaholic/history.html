@@ -11,12 +11,6 @@
 
 <body>
 
-<!--<div class="navbar">-->
-<!--  <ul>-->
-<!--    <li><a href="/">Home</a></li>-->
-<!--  </ul>-->
-<!--</div>-->
-
 <input type="checkbox" id="active">
 <label for="active" class="menu-btn"><span></span></label>
 <label for="active" class="close"></label>
@@ -25,10 +19,9 @@
         {% if user.is_authenticated %}
         <li><a href="/">Home</a></li>
         <li><a href="/aquaholic/profile">Profile</a></li>
-<!--        <li><a href="calculate_auth">Calculate</a></li>-->
         <li><form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
             {% csrf_token %}
-            <button type="submit" style="border:none">calculate</button>
+            <button type="submit" style="border:none">Calculate</button>
         </form></li>
         <li><a href="{% url 'aquaholic:set_up' user.id %}">Set Schedule</a></li>
         <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>

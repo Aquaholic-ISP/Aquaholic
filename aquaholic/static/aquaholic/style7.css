@@ -2,7 +2,8 @@
     margin: 0;
     padding: 0;
     text-align: center;
-    background-color: #FFFFFF;
+    /*background-color: #FFFFFF;*/
+    background: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
     color: #0E1646;
     font-family: "Poppins", sans-serif;
 }
@@ -51,8 +52,17 @@
     font-size: 60px;
 }
 
+.search label{
+    background: transparent;
+    position: relative;
+}
 
-.search button{
+.search select{
+    background: #FFFFFF;
+    position: relative;
+}
+
+.search button {
     width: 50px;
     height:20px;
     padding: 10px auto;
@@ -61,8 +71,12 @@
     border-radius: 25px;
     font-weight: bold;
     border: 2px solid #0E1646;
-    background: transparent;
+    background: #FFFFFF;
     cursor: pointer;
     position: relative;
     overflow: hidden;
+}
+
+canvas {
+    background: #FFFFFF;
 }

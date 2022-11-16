@@ -233,6 +233,7 @@ input[type="checkbox"]{
     justify-content: center;
     align-items: center;
     background: transparent;
+    margin-top: 14%;
     font-family: "Poppins", sans-serif;
 }
 

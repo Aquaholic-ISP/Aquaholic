@@ -8,14 +8,9 @@
 
 h1{
     font-size: 90px;
-<<<<<<< HEAD
-    margin-top: 100px;
-=======
     margin-top: 10%;
->>>>>>> 18636c17466a3ecec24abab5d30e7fbbfeed6931
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
-
 }
 
 .setup button{

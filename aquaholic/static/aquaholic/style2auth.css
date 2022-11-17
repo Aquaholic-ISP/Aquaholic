@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+
+
+*{
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    color: #0E1646;
+    font-family: "Poppins", sans-serif;
+}
+
+h1{
+    font-size: 90px;
+    margin-top: 14%;
+    text-shadow:
+    -12px 12px 20px rgba(0,0,0,0.5);
+}
+
+.calpart {
+    position: absolute;
+    margin-top: 3%;
+    margin-left: 25%;
+}
+
+.calpart button{
+    width: 250px;
+    height:50px;
+    padding: 20px auto;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: 1;
+}
+
+
+.calpart input{
+    width: 125px;
+    height: 40px;
+    line-height: 1.65;
+    border: 1px solid #0E1646;
+    border-radius: 25px;
+}
+
+.calpart label {
+        display: inline-block;
+        width: 460px;
+}
+
+.calpart #weightl {
+    font-size: 30px; 
+    position: absolute; 
+}
+
+.calpart #weightin {
+    margin-left: 114px; 
+    font-size: 18px;
+    margin-left: 80.5%;
+}
+
+.result #amount-result {
+    width: 200%;
+    position: absolute;
+    line-height: 300%; 
+    font-size: 30px;
+    margin-top: 4%;
+    margin-left: -50%;
+    font-size: 25px;
+}
+
+.join {
+    line-height: 200%;
+    display: inline-flex;
+    position: relative;
+    background: transparent;
+    align-items: center;
+    margin-top: 20%;
+}
+
+.join p{
+    background: transparent;
+}
+
+.join button{
+    width: 150px;
+    height:50px;
+    padding: 20px auto;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}

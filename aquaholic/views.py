@@ -6,6 +6,7 @@ from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect
 from django.utils.timezone import make_aware
 from django.shortcuts import render
+from decouple import config
 import datetime
 import calendar
 from django.utils import timezone
@@ -217,8 +218,8 @@ class SetUpView(generic.DetailView):
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
             else:
                 # redirect to line notify website for generate token
-                url = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=fVKMI2Q1k3MY5D3w2g0Hwt" \
-                      "&redirect_uri=http://127.0.0.1:8000/noti/callback/&scope=notify&state=testing123 "
+                url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
+                      f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
                 return HttpResponseRedirect(url)
         except ValueError:
             message = "Please, enter time in both fields."

@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
 import os.path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY', default='missing-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default="127.0.0.1")
 
 
 # Application definition
@@ -119,6 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -137,12 +138,13 @@ LOGOUT_REDIRECT_URL = '/aquaholic/'
 SOCIALACCOUNT_PROVIDERS = {
     'line': {
               'APP': {
-                  'client_id': '1657561314',
-                  'secret': 'e10c8555ec6cf7d549bd83677e75ac26'
+                  'client_id': config("CLIENT_ID"),
+                  'secret': config("CLIENT_SECRET")
               },
               "SCOPE": ['profile', 'openid', 'email']
           }
 }
+
 
 CRONJOBS = [
     ('*/1 * * * *', 'aquaholic.cron.update_notification'),

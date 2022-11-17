@@ -175,6 +175,13 @@ class SetUpView(generic.DetailView):
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
+        """Handle tasks after user clicked save.
+
+        Update the database and redirect user to line
+        notify authorization or schedule page in case that
+        the user already has notify token. User will stay on
+        set up page if the value is invalid.
+        """
         try:
             first = request.POST["first_notification"]
             last = request.POST["last_notification"]
@@ -186,33 +193,9 @@ class SetUpView(generic.DetailView):
                 return render(request, self.template_name,
                               {'message': message})
             user_info = UserInfo.objects.get(user_id=request.user.id)
-            user_info.first_notification_time = first_notify_time
-            user_info.last_notification_time = last_notify_time
-            user_info.time_interval = step
-
-            # calculate and save total hours and water amount per hour to database
-            user_info.total_hours = get_total_hours(user_info.first_notification_time,
-                                                    user_info.last_notification_time)
-            user_info.get_water_amount_per_hour()
-            user_info.save()
-
-            # get total hours, first notification time and expected amount (water amount to dink per hour)
-            total_hours = int(user_info.total_hours)
-            expected_amount = user_info.water_amount_per_hour
-
-            first_notification_time = datetime.datetime.combine(datetime.date.today(),
-                                                                user_info.first_notification_time)
-            last_notification_time = first_notification_time + datetime.timedelta(hours=total_hours)
-
-            # user already have schedule, remove all old schedules
-            self.delete_schedule(user_info)
-            # create new schedule
-            # last notification time less than now, the schedule will notify tomorrow
-            if last_notification_time < datetime.datetime.now():
-                first_notification_time += datetime.timedelta(hours=24)
-
-            notification_time = first_notification_time
-            self.create_schedule(expected_amount, notification_time, total_hours, user_info, step)
+            self.update_user_info(first_notify_time, last_notify_time, step, user_info)
+            self.delete_schedule(user_info)  # remove all old schedules if any
+            self.create_schedule(user_info, step)  # create new schedule
 
             if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
@@ -227,7 +210,31 @@ class SetUpView(generic.DetailView):
                           {'message': message})
 
     @staticmethod
-    def create_schedule(expected_amount, notification_time, total_hours, user_info, step):
+    def update_user_info(first_notify_time, last_notify_time, step, user_info):
+        """Save new user information to the database."""
+        user_info.first_notification_time = first_notify_time
+        user_info.last_notification_time = last_notify_time
+        user_info.time_interval = step
+        # calculate and save total hours and water amount per hour to database
+        user_info.total_hours = get_total_hours(user_info.first_notification_time,
+                                                user_info.last_notification_time)
+        user_info.get_water_amount_per_hour()
+        user_info.save()
+
+    @staticmethod
+    def create_schedule(user_info, step):
+        """Create new schedule provided the new information given."""
+        # get total hours, first notification time and expected amount (water amount to drink per hour)
+        total_hours = int(user_info.total_hours)
+        expected_amount = user_info.water_amount_per_hour
+        first_notification_time = datetime.datetime.combine(datetime.date.today(),
+                                                            user_info.first_notification_time)
+        last_notification_time = first_notification_time + datetime.timedelta(hours=total_hours)
+        # last notification time less than now, the schedule will notify tomorrow
+        if last_notification_time < datetime.datetime.now():
+            first_notification_time += datetime.timedelta(hours=24)
+
+        notification_time = first_notification_time
         for i in range(0, total_hours + 1, step):
             Schedule.objects.create(user_info_id=user_info.id,
                                     notification_time=notification_time,
@@ -239,6 +246,7 @@ class SetUpView(generic.DetailView):
 
     @staticmethod
     def delete_schedule(user_info):
+        """Delete all the existing schedule for this user"""
         if Schedule.objects.filter(user_info_id=user_info.id).exists():
             found_schedule = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in found_schedule:
@@ -330,10 +338,6 @@ class HistoryView(generic.DetailView):
 
     def show_history(self, request, selected_year, selected_month):
         """Get the data needed for history page and send those data as a context to history.html."""
-        user_info = UserInfo.objects.get(user_id=request.user.id)
-        all_intake = Intake.objects.filter(user_info_id=user_info.id)
-        sorted_intakes = all_intake.order_by('date')  # sort data by date
-
         # count the number of days in the selected month
         num_days_in_month = calendar.monthrange(selected_year, selected_month)[1]
 
@@ -342,15 +346,17 @@ class HistoryView(generic.DetailView):
         for day in range(1, num_days_in_month + 1):
             all_amount_in_month[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = [0, "#d4f1f9"]
 
-        # TODO create a function in model for filtering Intake that is in specific month and year
+        # filter all intakes in selected month and year and update to the dictionary
+        user_info = UserInfo.objects.get(user_id=request.user.id)
         goal = user_info.water_amount_per_day
-        for intake in sorted_intakes:
-            if (selected_month == intake.date.month) and (selected_year == intake.date.year):
-                # change amount of water of that date
-                all_amount_in_month[intake.date.strftime("%d %b %Y")][0] = intake.total_amount
-                if intake.total_amount < goal:
-                    # the bar color will be red if the amount doesn't reach the goal
-                    all_amount_in_month[intake.date.strftime("%d %b %Y")][1] = "#FF9999"
+        all_sorted_intakes = Intake.objects.filter(user_info_id=user_info.id,
+                                                   date__month=selected_month,
+                                                   date__year=selected_year).order_by('date')
+        for intake in all_sorted_intakes:
+            all_amount_in_month[intake.date.strftime("%d %b %Y")][0] = intake.total_amount
+            if intake.total_amount < goal:
+                # the bar color will be red if the amount doesn't reach the goal
+                all_amount_in_month[intake.date.strftime("%d %b %Y")][1] = "#FF9999"
         return render(request, self.template_name, {"goal": goal,
                                                     "date": list(all_amount_in_month.keys()),
                                                     "amount": list(val[0] for val in all_amount_in_month.values()),
@@ -362,7 +368,7 @@ class HistoryView(generic.DetailView):
                                                     "bar_colors": list(val[1] for val in all_amount_in_month.values())})
 
     def get(self, request, *args, **kwargs):
-        """Go to the history page showing the intake history of this month."""
+        """Go to the history page showing the intake history of this month and year."""
         today = datetime.datetime.now()
         this_month = today.month
         this_year = today.year

@@ -1,0 +1,21 @@
+{% load static %}
+
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'aquaholic/style2.css' %}">
+    <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
+</head>
+
+
+<div class="content">
+    <h2>Oops, the page that you're looking for doesn't exist.</h2>
+    <div class="calmain">
+        <div class="join">
+            <form action="/" method="get">
+                {% csrf_token %}
+                <button type="submit">Home</button>
+            </form>
+        </div>
+    </div>
+</div>
+</html>

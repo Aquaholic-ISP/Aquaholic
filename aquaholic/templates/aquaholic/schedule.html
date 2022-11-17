@@ -4,13 +4,7 @@
         <link rel="stylesheet" href="{% static 'aquaholic/style5.css' %}">
 <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
 <h1>Your notification schedule</h1>
-<!--<div class="navbar">-->
-<!--        <ul>-->
-<!--&lt;!&ndash;                <li><a href="{% url 'aquaholic:home' %}"><button type="button">Home</button></a></li>&ndash;&gt;-->
-<!--                        <li><a href="/">Home</a></li>-->
 
-<!--        </ul>-->
-<!--</div>-->
 
 <input type="checkbox" id="active">
 <label for="active" class="menu-btn"><span></span></label>
@@ -34,7 +28,10 @@
 </div>
 
 <div class="content">
-    <div class="schedule">
+    {% if message %}
+        <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
+    {% endif %}
+    <div class="schedule"
             <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
     <table border="1" cellpadding=10>
         <th style="text-align:center">Time</th>
@@ -45,7 +42,6 @@
         {% if data.notification_status %}
             <td>{{data.notification_time}}</td>
             <td style="text-align:center">{{data.expected_amount}}</td>
-    <!--                <td style="text-align:center">{{data.is_last}}</td>-->
     <td><label class="switch">
         <input type="checkbox" disabled>
 
@@ -56,18 +52,15 @@
         {% else %}
             <td> {{data.notification_time}}</td>
             <td style="text-align:center">{{data.expected_amount}}</td>
-    <!--                        <td style="text-align:center">{{data.is_last}}</td>-->
 
                 <td><label class="switch">
         <input type="checkbox"  checked="checked" disabled>
-    <!--                 <p  style="display:none">Checkbox is checked</p>-->
 
         <span class="slider round"></span>
                 </label></td>
         {% endif %}
         </tr>
 
-    <!--                {{ data.notification_status }}-->
     {% endfor %}
 
     </table><br>

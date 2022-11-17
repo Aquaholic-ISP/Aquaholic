@@ -5,6 +5,7 @@ from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.timezone import make_aware
+from django.template import RequestContext
 from django.shortcuts import render
 from decouple import config
 import datetime
@@ -31,6 +32,18 @@ def login_alert(request):
     return render(request, 'aquaholic/alert.html')
 
 
+def handler404(request, *args, **argv):
+    response = render('404.html', RequestContext(request))
+    response.status_code = 404
+    return response
+
+
+def handler500(request, *args, **argv):
+    response = render('500.html', RequestContext(request))
+    response.status_code = 500
+    return response
+
+
 class HomePageView(generic.ListView):
     """A class that represents the home page view."""
     template_name = 'aquaholic/home.html'
@@ -44,24 +57,27 @@ class HomePageView(generic.ListView):
             if not UserInfo.objects.filter(user_id=user.id).exists():
                 UserInfo.objects.create(user_id=user.id)
             user_info = UserInfo.objects.get(user_id=user.id)
-            if user_info.water_amount_per_day == 0:
-                return render(request, 'aquaholic/regis.html')
             if Intake.objects.filter(user_info_id=user_info.id, date=date).exists():
                 all_intake = Intake.objects.get(user_info_id=user_info.id, date=date)
                 if all_intake:
                     goal = user_info.water_amount_per_day
                     intake = all_intake.total_amount
-                    all_intake_percentage = int(intake / goal * 100)  # amount = percentage
-                    if all_intake_percentage <= 100:
-                        return render(request, self.template_name, {"all_intake_percentage": f"{all_intake_percentage}",
-                                                                    "all_intake": f"{intake}",
-                                                                    "goal": f"{user_info.water_amount_per_day:.2f}"})
-                    elif all_intake_percentage > 100:
-                        all_intake_percentage = 100
-                        return render(request, self.template_name, {" all_intake_percentage": f"{all_intake_percentage}",
-                                                                    "all_intake": f"{intake}",
-                                                                    "goal": f"{user_info.water_amount_per_day:.2f}"})
-            return render(request, self.template_name, {"goal": f"{user_info.water_amount_per_day:.2f}"})
+                    if goal != 0:
+                        all_intake_percentage = int(intake / goal * 100)  # amount = percentage
+                        if all_intake_percentage <= 100:
+                            return render(request, self.template_name, {"all_intake_percentage": f"{all_intake_percentage}",
+                                                                        "all_intake": f"{intake}",
+                                                                        "goal": f"{user_info.water_amount_per_day:.2f}",
+                                                                        "has_info": True})
+                        elif all_intake_percentage > 100:
+                            all_intake_percentage = 100
+                            return render(request, self.template_name, {"all_intake_percentage": f"{all_intake_percentage}",
+                                                                        "all_intake": f"{intake}",
+                                                                        "goal": f"{user_info.water_amount_per_day:.2f}",
+                                                                        "has_info": True})
+
+            return render(request, self.template_name,
+                          {"goal": f"{user_info.water_amount_per_day:.2f}", "has_info": True})
         return render(request, self.template_name)
 
 
@@ -108,37 +124,37 @@ class CalculateView(generic.ListView):
                           {'message': message})
 
 
-class RegistrationView(LoginRequiredMixin, generic.DetailView):
-    template_name = 'aquaholic/regis.html'
-
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
-
-    def post(self, request, *args, **kwargs):
-        try:
-            user_info = UserInfo.objects.get(user_id=request.user.id)
-            user_info.weight = float(request.POST["weight"])
-            user_info.exercise_duration = float(request.POST["exercise_duration"])
-            user_info.water_amount_per_day = get_water_amount_per_day(user_info.weight, user_info.exercise_duration)
-            user_info.get_water_amount_per_hour()
-            user_info.save()
-
-            if user_info.water_amount_per_day == 0:
-                return render(request, 'aquaholic/regis.html',
-                              {'result': f"{round(user_info.water_amount_per_day):.2f}"})
-
-            # update schedule
-            all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
-            for one_schedule in all_schedules:
-                one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
-                one_schedule.save()
-            return render(request, self.template_name,
-                          {'result': f"{user_info.water_amount_per_day:.2f}"})
-        except ValueError:
-            message = "Please, enter numbers in both fields."
-            return render(request, self.template_name,
-                          {'message': message})
-
+# class RegistrationView(LoginRequiredMixin, generic.DetailView):
+#     template_name = 'aquaholic/regis.html'
+#
+#     def get(self, request, *args, **kwargs):
+#         return render(request, self.template_name)
+#
+#     def post(self, request, *args, **kwargs):
+#         try:
+#             user_info = UserInfo.objects.get(user_id=request.user.id)
+#             user_info.weight = float(request.POST["weight"])
+#             user_info.exercise_duration = float(request.POST["exercise_duration"])
+#             user_info.water_amount_per_day = get_water_amount_per_day(user_info.weight, user_info.exercise_duration)
+#             user_info.get_water_amount_per_hour()
+#             user_info.save()
+#
+#             if user_info.water_amount_per_day == 0:
+#                 return render(request, 'aquaholic/regis.html',
+#                               {'result': f"{round(user_info.water_amount_per_day):.2f}"})
+#
+#             # update schedule
+#             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
+#             for one_schedule in all_schedules:
+#                 one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
+#                 one_schedule.save()
+#             return render(request, self.template_name,
+#                           {'result': f"{user_info.water_amount_per_day:.2f}"})
+#         except ValueError:
+#             message = "Please, enter numbers in both fields."
+#             return render(request, self.template_name,
+#                           {'message': message})
+#
 
 class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the calculation page view for authenticate user."""
@@ -155,10 +171,6 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
             user_info.water_amount_per_day = get_water_amount_per_day(user_info.weight, user_info.exercise_duration)
             user_info.get_water_amount_per_hour()
             user_info.save()
-
-            if user_info.water_amount_per_day == 0:
-                return render(request, 'aquaholic/regis.html',
-                              {'result': f"{round(user_info.water_amount_per_day):.2f}"})
 
             # update schedule
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
@@ -178,7 +190,13 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
     template_name = 'aquaholic/set_up.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        return render(request, self.template_name,
+                      {'weight': user_info.weight,
+                       "exercise_duration": user_info.exercise_duration,
+                       "first_time": user_info.first_notification_time.strftime("%H:%M"),
+                       "last_time": user_info.last_notification_time.strftime("%H:%M"),
+                       "step": user_info.time_interval})
 
     def post(self, request, *args, **kwargs):
         """Handle tasks after user clicked save.
@@ -189,6 +207,8 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         set up page if the value is invalid.
         """
         try:
+            weight = float(request.POST["weight"])
+            exercise_duration = float(request.POST["exercise_duration"])
             first = request.POST["first_notification"]
             last = request.POST["last_notification"]
             step = int(request.POST["notify_step"])
@@ -199,28 +219,45 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                 return render(request, self.template_name,
                               {'message': message})
             user_info = UserInfo.objects.get(user_id=request.user.id)
-            self.update_user_info(first_notify_time, last_notify_time, step, user_info)
+            self.update_user_info(first_notify_time, last_notify_time, step, user_info, weight, exercise_duration)
             self.delete_schedule(user_info)  # remove all old schedules if any
-            self.create_schedule(user_info, step)  # create new schedule
+            if user_info.water_amount_per_day != 0:
+                self.create_schedule(user_info, step)  # create new schedule
 
             if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
-                return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
+                return render(request, self.template_name,
+                              {'weight': user_info.weight,
+                               "exercise_duration": user_info.exercise_duration,
+                               "first_time": user_info.first_notification_time.strftime("%H:%M"),
+                               "last_time": user_info.last_notification_time.strftime("%H:%M"),
+                               "step": user_info.time_interval,
+                               "message": "saved!"})
             else:
                 # redirect to line notify website for generate token
                 url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
                       f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
                 return HttpResponseRedirect(url)
         except ValueError:
-            message = "Please, enter time in both fields."
+            message = "Please, don't leave any field blank."
+            user_info = UserInfo.objects.get(user_id=request.user.id)
             return render(request, self.template_name,
-                          {'message': message})
+                          {'weight': user_info.weight,
+                           "exercise_duration": user_info.exercise_duration,
+                           "first_time": user_info.first_notification_time.strftime("%H:%M"),
+                           "last_time": user_info.last_notification_time.strftime("%H:%M"),
+                           "step": user_info.time_interval,
+                           'message': message})
 
     @staticmethod
-    def update_user_info(first_notify_time, last_notify_time, step, user_info):
+    def update_user_info(first_notify_time, last_notify_time, step, user_info, weight, exercise_duration):
         """Save new user information to the database."""
+        user_info.weight = weight
+        user_info.exercise_duration = exercise_duration
         user_info.first_notification_time = first_notify_time
         user_info.last_notification_time = last_notify_time
         user_info.time_interval = step
+        user_info.save()
+        user_info.water_amount_per_day = get_water_amount_per_day(user_info.weight, user_info.exercise_duration)
         # calculate and save total hours and water amount per hour to database
         user_info.total_hours = get_total_hours(user_info.first_notification_time,
                                                 user_info.last_notification_time)
@@ -270,7 +307,13 @@ class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         user_info.notify_token = token
         user_info.save()
-        return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
+        return render(request, 'aquaholic/set_up.html',
+                      {'weight': user_info.weight,
+                       "exercise_duration": user_info.exercise_duration,
+                       "first_time": user_info.first_notification_time.strftime("%H:%M"),
+                       "last_time": user_info.last_notification_time.strftime("%H:%M"),
+                       "step": user_info.time_interval,
+                       'message': "saved!"})
 
 
 class ScheduleView(LoginRequiredMixin, generic.DetailView):
@@ -279,6 +322,11 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.water_amount_per_day == 0:
+            message = "Please, enter your weight and exercise time first"
+            return render(request, self.template_name,
+                          {'schedule': Schedule.objects.filter(user_info_id=user_info.id),
+                           'message': message})
         return render(request, self.template_name,
                       {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
 
@@ -325,7 +373,7 @@ class InputView(LoginRequiredMixin, generic.DetailView):
                 intake.save()
             else:
                 Intake.objects.create(user_info_id=user_info.id,
-                                      date=intake_date,
+                                      date=aware_date,
                                       total_amount=amount)
             # return HttpResponseRedirect(reverse('aquaholic:home'))
             message = "Saved !"

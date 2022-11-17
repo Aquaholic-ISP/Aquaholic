@@ -5,12 +5,15 @@ from . import views
 
 app_name = "aquaholic"
 
+handler404 = 'aquaholic.views.handler404'
+handler500 = 'aquaholic.views.handler500'
+
 urlpatterns = [
     path('noti/callback/', views.NotificationCallbackView.as_view(), name="callback"),
     path('aquaholic/<int:pk>/calculate', views.CalculateAuthView.as_view(), name='calculate_auth'),
     path('aquaholic/<int:pk>/set_up', views.SetUpView.as_view(), name='set_up'),
     path('aquaholic/<int:pk>/schedule', views.ScheduleView.as_view(), name='schedule'),
-    path('aquaholic/<int:pk>/registration', views.RegistrationView.as_view(), name='registration'),
+    # path('aquaholic/<int:pk>/registration', views.RegistrationView.as_view(), name='registration'),
 
     path('aquaholic/', views.HomePageView.as_view(), name='home'),
     path("", RedirectView.as_view(url="/aquaholic/")),

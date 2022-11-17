@@ -11,14 +11,7 @@
 
 h1{
     font-size: 90px;
-    margin-top: 13%;
-    text-shadow:
-    -12px 12px 20px rgba(0,0,0,0.5);
-}
-
-h2{
-    font-size: 60px;
-    margin-top: 150px;
+    margin-top: 14%;
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
 }
@@ -48,6 +41,7 @@ input[type=number]::-webkit-inner-spin-button {
   -webkit-appearance: 1;
 }
 
+
 .calpart input{
     width: 125px;
     height: 40px;
@@ -61,10 +55,25 @@ input[type=number]::-webkit-inner-spin-button {
         width: 460px;
 }
 
-#result {
+.calpart #weightl {
+    font-size: 30px; 
+    position: absolute; 
+}
+
+.calpart #weightin {
+    margin-left: 114px; 
+    font-size: 18px;
+    margin-left: 80.5%;
+}
+
+.result #amount-result {
+    width: 200%;
     position: absolute;
-    margin-top: 16%;
-    margin-left: 20%;
+    line-height: 300%; 
+    font-size: 30px;
+    margin-top: 4%;
+    margin-left: -50%;
+    font-size: 25px;
 }
 
 .join {
@@ -73,7 +82,7 @@ input[type=number]::-webkit-inner-spin-button {
     position: relative;
     background: transparent;
     align-items: center;
-    margin-top: 23%;
+    margin-top: 20%;
 }
 
 .join p{

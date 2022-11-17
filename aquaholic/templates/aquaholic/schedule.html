@@ -1,10 +1,22 @@
 {% load static %}
 {% load socialaccount %}
 {% load i18n %}
+<<<<<<< HEAD
         <link rel="stylesheet" href="{% static 'aquaholic/style5.css' %}">
 <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
 <h1>Your notification schedule</h1>
 
+=======
+
+
+<html>      
+<head>
+    <title>Your Notification Schedule</title>
+    <link rel="stylesheet" href="{% static 'aquaholic/style5.css' %}">
+    <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
+</head>
+
+>>>>>>> 18636c17466a3ecec24abab5d30e7fbbfeed6931
 
 <input type="checkbox" id="active">
 <label for="active" class="menu-btn"><span></span></label>
@@ -28,45 +40,43 @@
 </div>
 
 <div class="content">
-    {% if message %}
-        <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
-    {% endif %}
-    <div class="schedule"
-            <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
-    <table border="1" cellpadding=10>
-        <th style="text-align:center">Time</th>
-        <th style="text-align:center">Amount</th>
-        <th style="text-align:center">status</th>
-    {% for data in schedule %}
-        <tr>
-        {% if data.notification_status %}
-            <td>{{data.notification_time}}</td>
-            <td style="text-align:center">{{data.expected_amount}}</td>
-    <td><label class="switch">
-        <input type="checkbox" disabled>
+    <h1>Your notification schedule</h1>
+    <div class="scrollindiv">
 
-        <span class="slider round"></span>
-                </label></td>
-            <td>
-            </td>
-        {% else %}
-            <td> {{data.notification_time}}</td>
-            <td style="text-align:center">{{data.expected_amount}}</td>
+            <div class="schedule">
+                <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
+                <table border="1" cellpadding=10>
+                <th style="text-align:center; width: 250px;">Time</th>
+                <th style="text-align:center; width: 250px;">Amount (ml)</th>
+                <th style="text-align:center; width: 250px;">status</th>
+                {% for data in schedule %}
+                    <tr>
+                    {% if data.notification_status %}
+                        <td>{{data.notification_time}}</td>
+                        <td style="text-align:center">{{data.expected_amount}}</td>
+                        
+                        <td><label class="switch">
+                        <input type="checkbox" disabled>
 
-                <td><label class="switch">
-        <input type="checkbox"  checked="checked" disabled>
+                        <span class="slider round"></span>
+                        </label></td>
+                        <td></td>
+                    {% else %}
+                        <td> {{data.notification_time}}</td>
+                        <td style="text-align:center">{{data.expected_amount}}</td>
+                        <td><label class="switch">
+                        <input type="checkbox"  checked="checked" disabled>
+                        <span class="slider round"></span>
+                        </label></td>
+                    {% endif %}
+                    </tr>
+                {% endfor %}
 
-        <span class="slider round"></span>
-                </label></td>
-        {% endif %}
-        </tr>
-
-    {% endfor %}
-
-    </table><br>
-            </form>
-
+                </table><br>
+                </form>
+        </div>
     </div>
+
 
     <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
         {% csrf_token %}
@@ -75,3 +85,5 @@
     </form>
 
 </div>
+
+</html> 

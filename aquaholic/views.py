@@ -33,7 +33,7 @@ class HomePageView(generic.ListView):
     def get(self, request, *args, **kwargs):
         user = request.user
         # intake date default time is 10 am
-        date = datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0)
+        date = make_aware(datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0))
         if user.is_authenticated:
             # for new user, create new user info
             if not UserInfo.objects.filter(user_id=user.id).exists():
@@ -133,6 +133,7 @@ class RegistrationView(generic.DetailView):
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
                           {'message': message})
+
 
 class CalculateAuthView(generic.DetailView):
     """A class that represents the calculation page view for authenticate user."""
@@ -237,7 +238,7 @@ class SetUpView(generic.DetailView):
         notification_time = first_notification_time
         for i in range(0, total_hours + 1, step):
             Schedule.objects.create(user_info_id=user_info.id,
-                                    notification_time=notification_time,
+                                    notification_time=make_aware(notification_time),
                                     expected_amount=int(expected_amount),
                                     notification_status=(notification_time < datetime.datetime.now()),
                                     is_last=(i == total_hours)

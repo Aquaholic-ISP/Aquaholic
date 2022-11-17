@@ -11,14 +11,14 @@
 
 h1{
     font-size: 90px;
-    margin-top: 20px;
+    margin-top: 13%;
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
 }
 
 .calpart {
     position: absolute;
-    margin-top: 5%;
+    margin-top: 3%;
     margin-left: 25%;
 }
 
@@ -54,13 +54,10 @@ input[type=number]::-webkit-inner-spin-button {
         width: 460px;
 }
 
-
-img {
-    position: fixed;
-    top: 380px;
-    margin-left: 590px;
-    background: transparent;
-    transform: rotate(335deg);
+#result {
+    position: absolute;
+    margin-top: 16%;
+    margin-left: 20%;
 }
 
 .join {
@@ -70,7 +67,7 @@ img {
     background: transparent;
     align: center;
     align-items: center;
-    margin-top: 20%;
+    margin-top: 23%;
 }
 
 .join p{

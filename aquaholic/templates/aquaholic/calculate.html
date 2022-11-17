@@ -41,10 +41,8 @@
         </form>
         </div>
         {% if result %}
-        <p style="line-height: 300%; font-size: 30px;">The amount of water that you should drink is <b>{{result}}</b> ml.</p>
+        <p id="result" style="line-height: 300%; font-size: 30px;">The amount of water that you should drink is <b>{{result}}</b> ml.</p>
         {% endif %}
-        <img src="https://i.pinimg.com/originals/3f/ce/50/3fce500cf135060b549eb758a743db87.gif"
-             alt="water bottle"  width="250" />
         <div class="join">
             <form action="{% provider_login_url 'line' %}" method="post">
                 {% csrf_token %}

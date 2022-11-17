@@ -3,7 +3,7 @@ from .models import Schedule, Intake
 from django.shortcuts import reverse
 from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.timezone import make_aware
 from django.shortcuts import render
 from decouple import config
@@ -380,3 +380,30 @@ class HistoryView(generic.DetailView):
         selected_month = int(request.POST['month'])
         selected_year = int(request.POST['year'])
         return self.show_history(request, selected_year, selected_month)
+
+
+def update_notification(request):
+    """Send notification to the user and update their status.
+
+    Cron-job.org will call this view every 5 minutes to check
+    if it's the time to send notification. After the last notification
+    in a user's schedule is sent, the time in the schedule will be
+    added by 24 hours.
+    """
+    all_to_send = Schedule.objects.filter(notification_time__lte=datetime.datetime.now(),
+                                          notification_status=False)
+    for one_to_send in all_to_send:
+        send_notification(f"Don't forget to drink at least {one_to_send.expected_amount} ml of water",
+                          one_to_send.user_info.notify_token)
+        one_to_send.notification_status = True
+        one_to_send.save()
+
+    last_to_send = Schedule.objects.filter(notification_status=True, is_last=True)
+    for last_schedule in last_to_send:
+        user_info = last_schedule.user_info
+        user_schedule = Schedule.objects.filter(user_info=user_info)
+        for schedule in user_schedule:
+            schedule.notification_time += datetime.timedelta(hours=24)
+            schedule.notification_status = False
+            schedule.save()
+    return HttpResponse()

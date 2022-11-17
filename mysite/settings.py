@@ -134,6 +134,7 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 2
 LOGIN_REDIRECT_URL = '/aquaholic/'
 LOGOUT_REDIRECT_URL = '/aquaholic/'
+LOGIN_URL = "/aquaholic/alert"
 
 SOCIALACCOUNT_PROVIDERS = {
     'line': {

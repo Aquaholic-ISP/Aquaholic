@@ -10,6 +10,7 @@ from decouple import config
 import datetime
 import calendar
 from django.utils import timezone
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def get_water_amount_per_day(weight, exercise_time):
@@ -24,6 +25,10 @@ def get_total_hours(first_notification_time, last_notification_time):
     last_time = datetime.datetime.combine(date, last_notification_time)
     time = last_time - first_time
     return round(time.seconds / 3600)
+
+
+def login_alert(request):
+    return render(request, 'aquaholic/alert.html')
 
 
 class HomePageView(generic.ListView):
@@ -68,7 +73,7 @@ class AboutUsView(generic.ListView):
         return render(request, self.template_name)
 
 
-class ProfileView(generic.DetailView):
+class ProfileView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the user's profile page view"""
     template_name = "aquaholic/profile.html"
 
@@ -103,7 +108,7 @@ class CalculateView(generic.ListView):
                           {'message': message})
 
 
-class RegistrationView(generic.DetailView):
+class RegistrationView(LoginRequiredMixin, generic.DetailView):
     template_name = 'aquaholic/regis.html'
 
     def get(self, request, *args, **kwargs):
@@ -135,7 +140,7 @@ class RegistrationView(generic.DetailView):
                           {'message': message})
 
 
-class CalculateAuthView(generic.DetailView):
+class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the calculation page view for authenticate user."""
     template_name = 'aquaholic/calculation_auth.html'
 
@@ -168,7 +173,7 @@ class CalculateAuthView(generic.DetailView):
                           {'message': message})
 
 
-class SetUpView(generic.DetailView):
+class SetUpView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the set up page view."""
     template_name = 'aquaholic/set_up.html'
 
@@ -254,7 +259,7 @@ class SetUpView(generic.DetailView):
                 one_schedule.delete()
 
 
-class NotificationCallbackView(generic.DetailView):
+class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
     """A class that handles the callback after user authorize notification."""
 
     def get(self, request, *args, **kwargs):
@@ -268,7 +273,7 @@ class NotificationCallbackView(generic.DetailView):
         return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
 
 
-class ScheduleView(generic.DetailView):
+class ScheduleView(LoginRequiredMixin, generic.DetailView):
     model = Schedule
     template_name = 'aquaholic/schedule.html'
 
@@ -297,7 +302,7 @@ class ScheduleView(generic.DetailView):
                           {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
 
 
-class InputView(generic.DetailView):
+class InputView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the input page view."""
     model = Intake
     template_name = 'aquaholic/input.html'
@@ -332,7 +337,7 @@ class InputView(generic.DetailView):
                           {'message': message})
 
 
-class HistoryView(generic.DetailView):
+class HistoryView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the history page view."""
     model = Intake
     template_name = 'aquaholic/history.html'

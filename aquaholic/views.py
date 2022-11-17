@@ -76,10 +76,10 @@ class ProfileView(generic.DetailView):
         user_info = UserInfo.objects.get(user_id=user.id)
         date_join = user.date_joined.date()
 
-        return render(request, self.template_name, {"first_name": f'{user.first_name}', 
+        return render(request, self.template_name, {"first_name": f'{user.first_name}',
                                                     "weight": f"{user_info.weight}",
                                                     "exercise_duration": f"{user_info.exercise_duration}",
-                                                    "join": f"{date_join}", 
+                                                    "join": f"{date_join}",
                                                     "user_id": f"{user.id}"})
 
 
@@ -102,6 +102,37 @@ class CalculateView(generic.ListView):
                           {'message': message})
 
 
+class RegistrationView(generic.DetailView):
+    template_name = 'aquaholic/regis.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            user_info.weight = float(request.POST["weight"])
+            user_info.exercise_duration = float(request.POST["exercise_duration"])
+            user_info.water_amount_per_day = get_water_amount_per_day(user_info.weight, user_info.exercise_duration)
+            user_info.get_water_amount_per_hour()
+            user_info.save()
+
+            if user_info.water_amount_per_day == 0:
+                return render(request, 'aquaholic/regis.html',
+                              {'result': f"{round(user_info.water_amount_per_day):.2f}"})
+
+            # update schedule
+            all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
+            for one_schedule in all_schedules:
+                one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
+                one_schedule.save()
+            return render(request, self.template_name,
+                          {'result': f"{user_info.water_amount_per_day:.2f}"})
+        except ValueError:
+            message = "Please, enter numbers in both fields."
+            return render(request, self.template_name,
+                          {'message': message})
+
 class CalculateAuthView(generic.DetailView):
     """A class that represents the calculation page view for authenticate user."""
     template_name = 'aquaholic/calculation_auth.html'
@@ -118,11 +149,12 @@ class CalculateAuthView(generic.DetailView):
             user_info.get_water_amount_per_hour()
             user_info.save()
 
-            # update schedule
-            all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
-            if len(all_schedules) == 0:
+            if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html',
                               {'result': f"{round(user_info.water_amount_per_day):.2f}"})
+
+            # update schedule
+            all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
                 one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
                 one_schedule.save()

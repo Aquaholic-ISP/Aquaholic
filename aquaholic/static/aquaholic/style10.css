@@ -352,7 +352,7 @@ input[type="checkbox"]{
     width: 50%;
     background: transparent;
     position: absolute;
-    margin-top: 10%;
+    margin-top:5%;
     margin-left: 35%;
 }
 
@@ -377,6 +377,11 @@ input[type="checkbox"]{
     margin-left: 0%;
     margin-top: 2%;
     background: transparent;
+}
+
+.wrap-contain h5{
+    font-size: 20px;
+    margin-top: 5%;
 }
 
 .container {
@@ -423,12 +428,3 @@ input[type="checkbox"]{
     top: 20px;
 }
 
-.goal {
-    position: absolute;
-    margin-left: 52%;
-    margin-top: 5%;
-}
-
-.goal h5{
-    font-size: 20px;
-}

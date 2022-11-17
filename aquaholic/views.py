@@ -52,33 +52,37 @@ class HomePageView(generic.ListView):
         user = request.user
         # intake date default time is 10 am
         date = make_aware(datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0))
-        if user.is_authenticated:
-            # for new user, create new user info
-            if not UserInfo.objects.filter(user_id=user.id).exists():
-                UserInfo.objects.create(user_id=user.id)
-            user_info = UserInfo.objects.get(user_id=user.id)
-            if Intake.objects.filter(user_info_id=user_info.id, date=date).exists():
-                all_intake = Intake.objects.get(user_info_id=user_info.id, date=date)
-                if all_intake:
-                    goal = user_info.water_amount_per_day
-                    intake = all_intake.total_amount
-                    if goal != 0:
-                        all_intake_percentage = int(intake / goal * 100)  # amount = percentage
-                        if all_intake_percentage <= 100:
-                            return render(request, self.template_name, {"all_intake_percentage": f"{all_intake_percentage}",
-                                                                        "all_intake": f"{intake}",
-                                                                        "goal": f"{user_info.water_amount_per_day:.2f}",
-                                                                        "has_info": True})
-                        elif all_intake_percentage > 100:
-                            all_intake_percentage = 100
-                            return render(request, self.template_name, {"all_intake_percentage": f"{all_intake_percentage}",
-                                                                        "all_intake": f"{intake}",
-                                                                        "goal": f"{user_info.water_amount_per_day:.2f}",
-                                                                        "has_info": True})
-
+        print(date)
+        print(datetime.datetime.today())
+        if not user.is_authenticated:
+            return render(request, self.template_name)
+        # for new user, create new user info
+        if not UserInfo.objects.filter(user_id=user.id).exists():
+            UserInfo.objects.create(user_id=user.id)
+        user_info = UserInfo.objects.get(user_id=user.id)
+        if not Intake.objects.filter(user_info_id=user_info.id, date=date).exists():
+            print(Intake.objects.filter(user_info_id=user_info.id, date=date).exists())
+            print(1)
             return render(request, self.template_name,
-                          {"goal": f"{user_info.water_amount_per_day:.2f}", "has_info": True})
-        return render(request, self.template_name)
+                          {"user_intake_percentage": 0,
+                           "goal": int(user_info.water_amount_per_day),
+                           "user_intake": 0})
+        user_intake = Intake.objects.get(user_info_id=user_info.id, date=date)
+        goal = user_info.water_amount_per_day
+        intake = user_intake.total_amount
+        if goal != 0:
+            print(2)
+            user_intake_percentage = int(intake / goal * 100)
+            if user_intake_percentage > 100:
+                user_intake_percentage = 100
+            return render(request, self.template_name, {"user_intake_percentage": user_intake_percentage,
+                                                        "user_intake": int(intake),
+                                                        "goal": int(user_info.water_amount_per_day)})
+        print(3)
+        return render(request, self.template_name,
+                      {"user_intake_percentage": 0,
+                       "goal": int(user_info.water_amount_per_day),
+                       "user_intake": int(intake)})
 
 
 class AboutUsView(generic.ListView):
@@ -363,7 +367,7 @@ class InputView(LoginRequiredMixin, generic.DetailView):
             amount = request.POST["amount"]
             date = request.POST["date"]
             # default time for intake date is 10 am
-            intake_date = datetime.datetime.strptime(date, '%Y-%m-%d') + datetime.timedelta(hours=10)
+            intake_date = datetime.datetime.strptime(date, '%Y-%m-%d').replace(hour=10, minute=0, second=0, microsecond=0)
             aware_date = make_aware(intake_date)
             user_info = UserInfo.objects.get(user_id=request.user.id)
             # User already have intake for the given day, add amount of water to existed amount

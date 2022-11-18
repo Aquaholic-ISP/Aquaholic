@@ -10,6 +10,7 @@ from django.utils.timezone import make_aware
 from .models import Schedule, Intake, UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -285,6 +286,9 @@ class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
         """Send welcome message to new user and save generated token to user info."""
         code = request.GET['code']
         token = get_access_token(code)
+        if not token:
+            messages.error(request, "Sorry, notification feature is not available right now.")
+            return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
         send_notification("Welcome to aquaholic", token)
         user_info = UserInfo.objects.get(user_id=request.user.id)
         user_info.notify_token = token

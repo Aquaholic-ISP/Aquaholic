@@ -1,6 +1,6 @@
 import requests
 from decouple import config
-
+from json import JSONDecodeError
 
 def get_access_token(code):
     api_url = "https://notify-bot.line.me/oauth/token"
@@ -20,8 +20,10 @@ def get_access_token(code):
         "client_secret": client_secret
     }
     r = requests.post(api_url, headers=headers, data=data)
-    return r.json()['access_token']
-
+    try:
+        return r.json()['access_token']
+    except JSONDecodeError:
+        return None
 
 def send_notification(message, token):
     url = 'https://notify-api.line.me/api/notify'

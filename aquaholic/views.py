@@ -1,21 +1,14 @@
 """Views for Aquaholic application."""
-from django.views import generic
-from .models import Schedule, Intake
-from django.shortcuts import reverse
-from .models import UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
-from .notification import get_access_token, send_notification
-from django.http import HttpResponseRedirect
-from django.utils.timezone import make_aware
-from django.shortcuts import render
-from decouple import config
 import datetime
 import calendar
+from decouple import config
+from django.views import generic
+from django.shortcuts import reverse, render
+from django.http import HttpResponseRedirect
 from django.utils import timezone
-
-
-def get_water_amount_per_day(weight, exercise_time):
-    """Calculate amount of water per day."""
-    return ((weight * KILOGRAM_TO_POUND * 0.5) + (exercise_time / 30) * 12) * OUNCES_TO_MILLILITER
+from django.utils.timezone import make_aware
+from .models import Schedule, Intake, UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
+from .notification import get_access_token, send_notification
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -49,7 +42,7 @@ class HomePageView(generic.ListView):
                 if all_intake:
                     goal = user_info.water_amount_per_day
                     intake = all_intake.total_amount
-                    all_intake_percentage = int(intake / goal * 100)  # amount = percentage
+                    all_intake_percentage = int(intake / goal * 100)
                     if all_intake_percentage <= 100:
                         return render(request, self.template_name, {"all_intake_percentage": f"{all_intake_percentage}",
                                                                     "all_intake": f"{intake}",
@@ -83,7 +76,6 @@ class ProfileView(generic.DetailView):
         user = request.user
         user_info = UserInfo.objects.get(user_id=user.id)
         date_join = user.date_joined.date()
-
         return render(request, self.template_name, {"first_name": f'{user.first_name}',
                                                     "weight": f"{user_info.weight}",
                                                     "exercise_duration": f"{user_info.exercise_duration}",
@@ -105,8 +97,10 @@ class CalculateView(generic.ListView):
         try:
             weight = float(request.POST["weight"])
             exercise_duration = float(request.POST["exercise_duration"])
+            water_amount_per_day = ((weight * KILOGRAM_TO_POUND * 0.5) + (exercise_duration / 30) * 12) \
+                                   * OUNCES_TO_MILLILITER
             return render(request, self.template_name,
-                          {'result': f"{get_water_amount_per_day(weight, exercise_duration):.2f}"})
+                          {'result': f"{water_amount_per_day:.2f}"})
         except ValueError:
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
@@ -128,8 +122,8 @@ class RegistrationView(generic.DetailView):
             user_info = UserInfo.objects.get(user_id=request.user.id)
             user_info.weight = float(request.POST["weight"])
             user_info.exercise_duration = float(request.POST["exercise_duration"])
-            user_info.water_amount_per_day = get_water_amount_per_day(user_info.weight, user_info.exercise_duration)
-            user_info.get_water_amount_per_hour()
+            user_info.set_water_amount_per_day()
+            user_info.set_water_amount_per_hour()
             user_info.save()
 
             if user_info.water_amount_per_day == 0:
@@ -164,8 +158,8 @@ class CalculateAuthView(generic.DetailView):
             user_info = UserInfo.objects.get(user_id=request.user.id)
             user_info.weight = float(request.POST["weight"])
             user_info.exercise_duration = float(request.POST["exercise_duration"])
-            user_info.water_amount_per_day = get_water_amount_per_day(user_info.weight, user_info.exercise_duration)
-            user_info.get_water_amount_per_hour()
+            user_info.set_water_amount_per_day()
+            user_info.set_water_amount_per_hour()
             user_info.save()
 
             if user_info.water_amount_per_day == 0:
@@ -238,7 +232,7 @@ class SetUpView(generic.DetailView):
         # calculate and save total hours and water amount per hour to database
         user_info.total_hours = get_total_hours(user_info.first_notification_time,
                                                 user_info.last_notification_time)
-        user_info.get_water_amount_per_hour()
+        user_info.set_water_amount_per_hour()
         user_info.save()
 
     @staticmethod
@@ -348,7 +342,6 @@ class InputView(generic.DetailView):
                 Intake.objects.create(user_info_id=user_info.id,
                                       date=intake_date,
                                       total_amount=amount)
-            # return HttpResponseRedirect(reverse('aquaholic:home'))
             message = "Saved !"
             return render(request, self.template_name,
                           {'message': message})

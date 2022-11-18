@@ -22,7 +22,7 @@ class UserInfoModelTests(TestCase):
         """calculate the amount of water from user input weight
         and exercise time."""
         user = UserInfo(weight=50, exercise_duration=60)
-        user.get_water_amount_per_day()
+        user.set_water_amount_per_day()
         amount = 2339.7265
         self.assertAlmostEqual(amount, user.water_amount_per_day, places=4)
 
@@ -39,9 +39,9 @@ class UserInfoModelTests(TestCase):
         user = create_userinfo(50, 60, first_notification_time=datetime.time(8, 0, 0),
                                last_notification_time=datetime.time(22, 0, 0))
         per_hour = 167.1233227
-        user.get_water_amount_per_day()
+        user.set_water_amount_per_day()
         user.total_hours = get_total_hours(user.first_notification_time, user.last_notification_time)
-        user.get_water_amount_per_hour()
+        user.set_water_amount_per_hour()
         self.assertAlmostEqual(per_hour, user.water_amount_per_hour, 5)
 
 
@@ -97,7 +97,7 @@ class TemplateUsed(TestCase):
         first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
         userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
                                                userinfo.last_notification_time)
-        userinfo.get_water_amount_per_hour()
+        userinfo.set_water_amount_per_hour()
         userinfo.save()
         expected_amount = userinfo.water_amount_per_hour
         Schedule.objects.create(user_info_id=user.id,
@@ -153,7 +153,7 @@ class ScheduleView(TestCase):
                                            last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
         userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
                                                userinfo.last_notification_time)
-        userinfo.get_water_amount_per_hour()
+        userinfo.set_water_amount_per_hour()
         userinfo.save()
         page = client.get(reverse('aquaholic:schedule', args=(user.id,), ))
         self.assertEqual(page.status_code, 200)
@@ -169,7 +169,7 @@ class ScheduleView(TestCase):
                                            last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
         userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
                                                userinfo.last_notification_time)
-        userinfo.get_water_amount_per_hour()
+        userinfo.set_water_amount_per_hour()
         userinfo.save()
         first_notify_time = userinfo.first_notification_time
         expected_amount = userinfo.water_amount_per_hour

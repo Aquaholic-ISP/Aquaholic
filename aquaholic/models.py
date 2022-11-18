@@ -23,17 +23,14 @@ class UserInfo(models.Model):
     notify_token = models.CharField(max_length=200, null=True)
     time_interval = models.IntegerField(default=1)
 
-    def get_water_amount_per_day(self):
+    def set_water_amount_per_day(self):
         """Calculate amount of water per day."""
         self.water_amount_per_day = ((self.weight * KILOGRAM_TO_POUND * 0.5) + (self.exercise_duration / 30) * 12) * OUNCES_TO_MILLILITER
 
-    def get_water_amount_per_hour(self):
+    def set_water_amount_per_hour(self):
         """Calculate amount of water per hour."""
         if self.total_hours is not None:
             self.water_amount_per_hour = self.water_amount_per_day / (self.total_hours/self.time_interval)
-
-    def send_notification(self):
-        pass
 
 
 class Schedule(models.Model):

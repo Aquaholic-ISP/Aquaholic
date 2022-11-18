@@ -40,8 +40,8 @@
         <div class="calpart" style="line-height: 250%">
         <form action="{% url 'aquaholic:registration' user.id %}" method="POST">
             {% csrf_token%}
-            <label style="font-size: 30px; position: relative;">Enter your weight (kg)</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="number" name="weight" min="1" step="0.01">
+            <label id="weightl" >Enter your weight (kg)</label>
+            <input id="weightin" type="number" name="weight" min="1" step="0.01">
             <br>
             <label style="font-size: 30px;">Enter your exercise time (min)</label>
             <input style="margin-left: 65px; font-size: 18px;" type="number" name="exercise_duration" min="0" step="0.01">
@@ -53,14 +53,12 @@
             <a href="{% url 'aquaholic:set_up' user.id %}">Next</a>
 
         </form>
-
-
         </div>
+        <div class="result">
             {% if result %}
-        <p style="line-height: 300%; font-size: 30px;">The amount of water that you should drink is <b>{{result}}</b> ml.</p>
+                <p id="amount-result">The amount of water that you should drink is <b>{{result}}</b> ml.</p>
             {% endif %}
-        <img src="https://i.pinimg.com/originals/3f/ce/50/3fce500cf135060b549eb758a743db87.gif"
-             alt="water bottle"  width="250" />
+        </div>
     </div>
 </div>
 </html>

@@ -54,10 +54,26 @@ input[type=number]::-webkit-inner-spin-button {
         width: 460px;
 }
 
-#result {
+.calpart #weightl {
+    font-size: 30px; 
+    position: absolute; 
+}
+
+.calpart #weightin {
+    margin-left: 114px; 
+    font-size: 18px;
+    margin-left: 80.5%;
+}
+
+
+.result #amount-result {
+    width: 200%;
     position: absolute;
+    line-height: 300%; 
+    font-size: 30px;
     margin-top: 16%;
-    margin-left: 20%;
+    margin-left: -52%;
+    font-size: 25px;
 }
 
 .join {

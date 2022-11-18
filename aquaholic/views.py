@@ -1,3 +1,4 @@
+"""Views for Aquaholic application."""
 from django.views import generic
 from .models import Schedule, Intake
 from django.shortcuts import reverse
@@ -28,9 +29,11 @@ def get_total_hours(first_notification_time, last_notification_time):
 
 class HomePageView(generic.ListView):
     """A class that represents the home page view."""
+
     template_name = 'aquaholic/home.html'
 
     def get(self, request, *args, **kwargs):
+        """User is authenticated redirect to different page to unauthenticated user."""
         user = request.user
         # intake date default time is 10 am
         date = datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0)
@@ -62,17 +65,21 @@ class HomePageView(generic.ListView):
 
 class AboutUsView(generic.ListView):
     """A class that represents the about us page view."""
+
     template_name = 'aquaholic/about_us.html'
 
     def get(self, request, *args, **kwargs):
+        """Information about application and creator."""
         return render(request, self.template_name)
 
 
 class ProfileView(generic.DetailView):
-    """A class that represents the user's profile page view"""
+    """A class that represents the user's profile page view."""
+
     template_name = "aquaholic/profile.html"
 
     def get(self, request, *args, **kwargs):
+        """Get all the information of authenticated user."""
         user = request.user
         user_info = UserInfo.objects.get(user_id=user.id)
         date_join = user.date_joined.date()
@@ -86,12 +93,15 @@ class ProfileView(generic.DetailView):
 
 class CalculateView(generic.ListView):
     """A class that represents the calculation page view."""
+
     template_name = 'aquaholic/calculate.html'
 
     def get(self, request, *args, **kwargs):
+        """Calculate page for unauthenticated user."""
         return render(request, self.template_name)
 
     def post(self, request):
+        """Water amount per day calculate from user weight and exercise duration for unauthenticated user."""
         try:
             weight = float(request.POST["weight"])
             exercise_duration = float(request.POST["exercise_duration"])
@@ -104,12 +114,16 @@ class CalculateView(generic.ListView):
 
 
 class RegistrationView(generic.DetailView):
+    """A class that represents the calculation page view for new authenticated user."""
+
     template_name = 'aquaholic/regis.html'
 
     def get(self, request, *args, **kwargs):
+        """Registration page for new authenticated user."""
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
+        """Water amount per day calculate from user weight and exercise duration for new authenticated user."""
         try:
             user_info = UserInfo.objects.get(user_id=request.user.id)
             user_info.weight = float(request.POST["weight"])
@@ -134,14 +148,18 @@ class RegistrationView(generic.DetailView):
             return render(request, self.template_name,
                           {'message': message})
 
+
 class CalculateAuthView(generic.DetailView):
     """A class that represents the calculation page view for authenticate user."""
+
     template_name = 'aquaholic/calculation_auth.html'
 
     def get(self, request, *args, **kwargs):
+        """Calculate page for authenticated user."""
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
+        """Water amount per day calculate from user weight and exercise duration for authenticated user."""
         try:
             user_info = UserInfo.objects.get(user_id=request.user.id)
             user_info.weight = float(request.POST["weight"])
@@ -169,9 +187,11 @@ class CalculateAuthView(generic.DetailView):
 
 class SetUpView(generic.DetailView):
     """A class that represents the set up page view."""
+
     template_name = 'aquaholic/set_up.html'
 
     def get(self, request, *args, **kwargs):
+        """Set up schedule page."""
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
@@ -246,7 +266,7 @@ class SetUpView(generic.DetailView):
 
     @staticmethod
     def delete_schedule(user_info):
-        """Delete all the existing schedule for this user"""
+        """Delete all the existing schedule for this user."""
         if Schedule.objects.filter(user_info_id=user_info.id).exists():
             found_schedule = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in found_schedule:
@@ -268,15 +288,19 @@ class NotificationCallbackView(generic.DetailView):
 
 
 class ScheduleView(generic.DetailView):
+    """A class that represents the schedule page view."""
+
     model = Schedule
     template_name = 'aquaholic/schedule.html'
 
     def get(self, request, *args, **kwargs):
+        """Illustrated the schedule for user."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
         return render(request, self.template_name,
                       {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
 
     def post(self, request, *args, **kwargs):
+        """Notification of schedule."""
         status = request.POST['status']
         if status == "turn off":
             user_info = UserInfo.objects.get(user_id=request.user.id)
@@ -298,13 +322,16 @@ class ScheduleView(generic.DetailView):
 
 class InputView(generic.DetailView):
     """A class that represents the input page view."""
+
     model = Intake
     template_name = 'aquaholic/input.html'
 
     def get(self, request, *args, **kwargs):
+        """Input schedule page."""
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
+        """Input the amount of water from user and save to database."""
         try:
             amount = request.POST["amount"]
             date = request.POST["date"]
@@ -333,6 +360,7 @@ class InputView(generic.DetailView):
 
 class HistoryView(generic.DetailView):
     """A class that represents the history page view."""
+
     model = Intake
     template_name = 'aquaholic/history.html'
 

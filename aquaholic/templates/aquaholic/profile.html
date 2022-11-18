@@ -22,6 +22,13 @@
         <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>
         <li><a href="{% url 'aquaholic:input' user.id %}">Input</a></li>
         <li><a href="{% url 'aquaholic:history' user.id %}">History</a></li>
+        <li><form action="{% url 'account_logout' %}" method="post">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+            {% endif %}
+            <button type="submit" style="border:none">Logout</button>
+        </form></li>
         <li><a href="/aquaholic/about_us">About us</a></li>
         </ul>
     </div>

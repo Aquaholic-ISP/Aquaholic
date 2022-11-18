@@ -18,6 +18,10 @@
     <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/aquaholic/calculate">Calculate</a></li>
+        <li><form action="{% provider_login_url 'line' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" style="border:none">Login</button>
+        </form></li>
         <li><a href="/aquaholic/about_us">About us</a></li>
     </ul>
 </div>

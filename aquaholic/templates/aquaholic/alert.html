@@ -1,0 +1,27 @@
+{% load static %}
+{% load socialaccount %}
+{% load i18n %}
+
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'aquaholic/style2.css' %}">
+    <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
+</head>
+
+
+<div class="content">
+    <h2>Oops, seems like you must log in first.</h2>
+    <div class="calmain">
+        <div class="join">
+            <form action="/" method="get">
+                {% csrf_token %}
+                <button type="submit">Home</button>
+            </form>
+            <form action="{% provider_login_url 'line' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Log in</button>
+            </form>
+        </div>
+    </div>
+</div>
+</html>

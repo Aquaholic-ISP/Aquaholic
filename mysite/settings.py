@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='missing-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True)
+DEBUG = config('DEBUG', cast=bool, default=True)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default="127.0.0.1")
 
@@ -134,6 +134,7 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 2
 LOGIN_REDIRECT_URL = '/aquaholic/'
 LOGOUT_REDIRECT_URL = '/aquaholic/'
+LOGIN_URL = "/aquaholic/alert"
 
 SOCIALACCOUNT_PROVIDERS = {
     'line': {

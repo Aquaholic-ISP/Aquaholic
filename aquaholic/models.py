@@ -30,7 +30,8 @@ class UserInfo(models.Model):
     def set_water_amount_per_hour(self):
         """Calculate amount of water per hour."""
         if self.total_hours is not None:
-            self.water_amount_per_hour = self.water_amount_per_day / (self.total_hours/self.time_interval)
+            num_notifications = int(self.total_hours/self.time_interval) + 1  # include last
+            self.water_amount_per_hour = self.water_amount_per_day / num_notifications
 
 
 class Schedule(models.Model):

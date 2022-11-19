@@ -139,8 +139,8 @@ LOGIN_URL = "/aquaholic/alert"
 SOCIALACCOUNT_PROVIDERS = {
     'line': {
               'APP': {
-                  'client_id': config("CLIENT_ID"),
-                  'secret': config("CLIENT_SECRET")
+                  'client_id': config("CLIENT_ID", default="line_oauth_client_id"),
+                  'secret': config("CLIENT_SECRET", default="line_oauth_client_secret")
               },
               "SCOPE": ['profile', 'openid', 'email']
           }

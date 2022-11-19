@@ -8,9 +8,9 @@ def get_access_token(code):
 
     grant_type = "authorization_code"
     code = code
-    redirect_uri = config('REDIRECT_URI_NOTIFY')
-    client_id = config('CLIENT_ID_NOTIFY')
-    client_secret = config('CLIENT_SECRET_NOTIFY')
+    redirect_uri = config('REDIRECT_URI_NOTIFY', default="line_callback_url")
+    client_id = config('CLIENT_ID_NOTIFY', default="line_notify_client_id")
+    client_secret = config('CLIENT_SECRET_NOTIFY', default="line_notify_client_id")
     headers = {'Content-Type': content_type}
     data = {
         "grant_type": grant_type,

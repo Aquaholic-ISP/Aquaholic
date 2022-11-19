@@ -1,6 +1,5 @@
 import requests
 from decouple import config
-from json import JSONDecodeError
 
 
 def get_access_token(code):
@@ -21,10 +20,7 @@ def get_access_token(code):
         "client_secret": client_secret
     }
     r = requests.post(api_url, headers=headers, data=data)
-    try:
-        return r.json()['access_token']
-    except JSONDecodeError:
-        return None
+    return r.json()['access_token']
 
 
 def send_notification(message, token):

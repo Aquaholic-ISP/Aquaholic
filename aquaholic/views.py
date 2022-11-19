@@ -21,8 +21,10 @@ def get_total_hours(first_notification_time, last_notification_time):
     time = last_time - first_time
     return round(time.seconds / 3600)
 
+
 def login_alert(request):
     return render(request, 'aquaholic/alert.html')
+
 
 class HomePageView(generic.ListView):
     """A class that represents the home page view."""
@@ -286,9 +288,6 @@ class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
         """Send welcome message to new user and save generated token to user info."""
         code = request.GET['code']
         token = get_access_token(code)
-        if not token:
-            messages.error(request, "Sorry, notification feature is not available right now.")
-            return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
         send_notification("Welcome to aquaholic", token)
         user_info = UserInfo.objects.get(user_id=request.user.id)
         user_info.notify_token = token

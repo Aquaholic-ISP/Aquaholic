@@ -10,7 +10,6 @@ from django.utils.timezone import make_aware
 from .models import Schedule, Intake, UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
 
 
 def get_total_hours(first_notification_time, last_notification_time):

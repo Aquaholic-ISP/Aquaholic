@@ -444,7 +444,7 @@ def update_notification(request):
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)
         for schedule in user_schedule:
-            schedule.notification_time += datetime.timedelta(hours=24)
+            schedule.notification_time += timezone.timedelta(hours=24)
             schedule.notification_status = False
             schedule.save()
     return HttpResponse()

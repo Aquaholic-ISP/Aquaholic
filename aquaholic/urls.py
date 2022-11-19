@@ -19,5 +19,6 @@ urlpatterns = [
     path('aquaholic/<int:pk>/history', views.HistoryView.as_view(), name='history'),
     path('aquaholic/about_us', views.AboutUsView.as_view(), name='about_us'),
     path('aquaholic/profile', views.ProfileView.as_view(), name="profile"),
+    path('aquaholic/cron', views.update_notification, name='cron'),
     path('aquaholic/alert', views.login_alert, name='alert'),
 ]

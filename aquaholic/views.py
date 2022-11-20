@@ -220,7 +220,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                 return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
             self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
-            self.create_schedule(user_info, interval)  # create new schedule
+            self.create_schedule(user_info)  # create new schedule
             if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
             else:
@@ -246,7 +246,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         user_info.save()
 
     @staticmethod
-    def create_schedule(user_info, interval):
+    def create_schedule(user_info):
         """Create new schedule provided the new information given."""
         # get total hours, first notification time and expected amount (water amount to drink per hour)
         total_hours = int(user_info.total_hours)
@@ -258,6 +258,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         if last_notification_time < datetime.datetime.now():
             first_notification_time += datetime.timedelta(hours=24)
         notification_time = first_notification_time
+        interval = user_info.time_interval
         for i in range(0, total_hours + 1, interval):
             Schedule.objects.create(user_info_id=user_info.id,
                                     notification_time=make_aware(notification_time),

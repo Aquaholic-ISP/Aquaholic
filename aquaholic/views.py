@@ -22,14 +22,17 @@ def get_total_hours(first_notification_time, last_notification_time):
 
 
 def login_alert(request):
+    """Alert from login using line."""
     return render(request, 'aquaholic/alert.html')
 
 
 class HomePageView(generic.ListView):
     """A class that represents the home page view."""
+
     template_name = 'aquaholic/home.html'
 
     def get(self, request, *args, **kwargs):
+        """User is authenticated redirect to different page to unauthenticated user."""
         user = request.user
         # intake date default time is 10 am
         date = make_aware(datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0))
@@ -86,8 +89,7 @@ class CalculateView(generic.ListView):
         try:
             weight = float(request.POST["weight"])
             exercise_duration = float(request.POST["exercise_duration"])
-            water_amount_per_day = ((weight * KILOGRAM_TO_POUND * 0.5) + (exercise_duration / 30) * 12) \
-                                   * OUNCES_TO_MILLILITER
+            water_amount_per_day = ((weight * KILOGRAM_TO_POUND * 0.5) + (exercise_duration / 30) * 12) * OUNCES_TO_MILLILITER
             return render(request, self.template_name,
                           {'result': f"{water_amount_per_day:.2f}"})
         except ValueError:
@@ -133,11 +135,9 @@ class RegistrationView(LoginRequiredMixin, generic.DetailView):
             user_info.set_water_amount_per_day()
             user_info.set_water_amount_per_hour()
             user_info.save()
-
             if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html',
                               {'result': f"{round(user_info.water_amount_per_day):.2f}"})
-
             # update schedule
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
@@ -169,11 +169,9 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
             user_info.set_water_amount_per_day()
             user_info.set_water_amount_per_hour()
             user_info.save()
-
             if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html',
                               {'result': f"{round(user_info.water_amount_per_day):.2f}"})
-
             # update schedule
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
@@ -200,8 +198,8 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
-        """Handle tasks after user clicked save.
-
+        """
+        Handle tasks after user clicked save.
         Update the database and redirect user to line
         notify authorization or schedule page in case that
         the user already has notify token. User will stay on
@@ -223,7 +221,6 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             self.update_user_info(first_notify_time, last_notify_time, step, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
             self.create_schedule(user_info, step)  # create new schedule
-
             if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
             else:
@@ -260,7 +257,6 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         # last notification time less than now, the schedule will notify tomorrow
         if last_notification_time < datetime.datetime.now():
             first_notification_time += datetime.timedelta(hours=24)
-
         notification_time = first_notification_time
         for i in range(0, total_hours + 1, step):
             Schedule.objects.create(user_info_id=user_info.id,
@@ -379,12 +375,10 @@ class HistoryView(LoginRequiredMixin, generic.DetailView):
         """Get the data needed for history page and send those data as a context to history.html."""
         # count the number of days in the selected month
         num_days_in_month = calendar.monthrange(selected_year, selected_month)[1]
-
         # initialize a dictionary with date as a key and a list of amount, and bar color of the bar as a value
         all_amount_in_month = dict()
         for day in range(1, num_days_in_month + 1):
             all_amount_in_month[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = [0, "#d4f1f9"]
-
         # filter all intakes in selected month and year and update to the dictionary
         user_info = UserInfo.objects.get(user_id=request.user.id)
         if user_info.water_amount_per_day == 0:
@@ -423,7 +417,8 @@ class HistoryView(LoginRequiredMixin, generic.DetailView):
 
 
 def update_notification(request):
-    """Send notification to the user and update their status.
+    """
+    Send notification to the user and update their status.
     Cron-job.org will call this view every 5 minutes to check
     if it's the time to send notification. After the last notification
     in a user's schedule is sent, the time in the schedule will be
@@ -436,7 +431,6 @@ def update_notification(request):
                           one_to_send.user_info.notify_token)
         one_to_send.notification_status = True
         one_to_send.save()
-
     last_to_send = Schedule.objects.filter(notification_status=True, is_last=True)
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info

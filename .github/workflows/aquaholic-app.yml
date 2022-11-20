@@ -37,3 +37,10 @@ jobs:
     - name: Test with unittest
       run: |
         python manage.py test aquaholic
+    - name: Test code cov.
+      run: |
+        pip install --upgrade coverage
+        coverage run manage.py test aquaholic
+    - name: Upload
+      uses: codecov/codecov-action@v3
+

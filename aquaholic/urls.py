@@ -10,6 +10,7 @@ urlpatterns = [
     path('aquaholic/<int:pk>/calculate', views.CalculateAuthView.as_view(), name='calculate_auth'),
     path('aquaholic/<int:pk>/set_up', views.SetUpView.as_view(), name='set_up'),
     path('aquaholic/<int:pk>/schedule', views.ScheduleView.as_view(), name='schedule'),
+    path('aquaholic/<int:pk>/registration', views.RegistrationView.as_view(), name='registration'),
 
     path('aquaholic/', views.HomePageView.as_view(), name='home'),
     path("", RedirectView.as_view(url="/aquaholic/")),
@@ -18,4 +19,6 @@ urlpatterns = [
     path('aquaholic/<int:pk>/history', views.HistoryView.as_view(), name='history'),
     path('aquaholic/about_us', views.AboutUsView.as_view(), name='about_us'),
     path('aquaholic/profile', views.ProfileView.as_view(), name="profile"),
+    path('aquaholic/cron', views.update_notification, name='cron'),
+    path('aquaholic/alert', views.login_alert, name='alert'),
 ]

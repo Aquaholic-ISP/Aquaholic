@@ -6,50 +6,37 @@
     font-family: "Poppins", sans-serif;
 }
 
-.navbar{
-    display: flex;
-    margin: auto;
-    align-items: flex-start;
-    background: transparent;
-    position: relative;
-    float: right;
-    top: 0px auto;
-    right: 60px;}
-
-.navbar ul li{
-    list-style: none;
-    position: relative;
-    text-align: center;
-    font-size: 25px;
-}
-
-.navbar ul li a{
-    text-decoration: none;
-    color: #fff;
-    text-transform: uppercase;
-    text-align: center;
-}
-
-.navbar ul li::after{
-    content: '';
-    height: 3px;
-    width: 0%;
-    background: #fff;
-    position: absolute;
-    left: 0;
-    bottom: -10px;
-    transition: 0.5s;
-}
-
-.navbar ul li:hover::after{
-    width: 100%;
-}
 h1{
-    font-size: 30px;
-    margin: 0px auto;
+    font-size: 50px;
+    margin-top: 3%;
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
 }
+
+.content .scrollindiv {
+  margin-left: 15%;
+}
+
+div.scrollindiv {
+  margin:5px;
+  padding:5px;
+  background-color: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
+  width: 1000px;
+  height: 500px;
+  overflow: auto;
+  text-align:justify;
+}
+
+table {
+  margin: 0 auto;
+}
+
+th {
+  position: sticky;
+  top: 0; 
+  z-index: 1;
+}
+
 .switch {
   position: relative;
   display: inline-block;

@@ -1,4 +1,5 @@
 import requests
+from decouple import config
 
 
 def get_access_token(code):
@@ -7,9 +8,9 @@ def get_access_token(code):
 
     grant_type = "authorization_code"
     code = code
-    redirect_uri = "http://127.0.0.1:8000/noti/callback/"
-    client_id = "fVKMI2Q1k3MY5D3w2g0Hwt"
-    client_secret = "7YdamNWV5MXvuH6pwGIHkYGHjLvC0xlcKYtw1OXjzVk"
+    redirect_uri = config('REDIRECT_URI_NOTIFY', default="line_callback_url")
+    client_id = config('CLIENT_ID_NOTIFY', default="line_notify_client_id")
+    client_secret = config('CLIENT_SECRET_NOTIFY', default="line_notify_client_id")
     headers = {'Content-Type': content_type}
     data = {
         "grant_type": grant_type,

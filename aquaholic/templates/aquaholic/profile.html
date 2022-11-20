@@ -16,12 +16,19 @@
         <li><a href="/aquaholic/profile">Profile</a></li>
         <li><form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
             {% csrf_token %}
-            <button type="submit" style="border:none">calculate</button>
+            <button type="submit" style="border:none">Calculate</button>
         </form></li>
         <li><a href="{% url 'aquaholic:set_up' user.id %}">Set Schedule</a></li>
         <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>
         <li><a href="{% url 'aquaholic:input' user.id %}">Input</a></li>
         <li><a href="{% url 'aquaholic:history' user.id %}">History</a></li>
+        <li><form action="{% url 'account_logout' %}" method="post">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+            {% endif %}
+            <button type="submit" style="border:none">Logout</button>
+        </form></li>
         <li><a href="/aquaholic/about_us">About us</a></li>
         </ul>
     </div>
@@ -33,8 +40,8 @@
             <div class="context">
                 <p>Name: {{ first_name }}</p>
                 <p>User ID: {{user_id}}</p>
-                <p>Weight: {{ weight }}</p>
-                <p>Exercise duration: {{ exercise_duration }}</p>
+                <p>Weight: {{ weight }} Kg</p>
+                <p>Exercise duration: {{ exercise_duration }} min</p>
                 <p>First join: {{join}}</p>
             </div>
 

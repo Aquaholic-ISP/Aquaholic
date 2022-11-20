@@ -43,15 +43,15 @@
         <form action="{% url 'aquaholic:set_up' user.id %}" method="POST">
             {% csrf_token %}
             <br>
-            <label id="first" style="font-size: 30px;">Enter your first notification time</label>
+            <label id="first" style="font-size: 25px;">Enter your first notification time</label>
             <input style="margin-left: 114px; font-size: 18px;" type="time" name="first_notification">
             <br>
-            <label id="last" style="font-size: 30px;">Enter your last notification time</label>
+            <label id="last" style="font-size: 25px;">Enter your last notification time</label>
             <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification">
             <br>
-            <label id="frequency" style="font-size: 30px; ">Notify every</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_step" min="1" value="1">
-            <label style="font-size: 30px;">hours</label>
+            <label id="frequency" style="font-size: 25px; ">Notify every</label>
+            <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_interval" min="1" value="1">
+            <label style="font-size: 25px;">hours</label>
             <br>
             {% if message %}
                 <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>

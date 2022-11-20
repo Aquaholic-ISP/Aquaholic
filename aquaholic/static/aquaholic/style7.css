@@ -28,7 +28,6 @@
 .navbar ul li a{
     text-decoration: none;
     color:  #4682B4;
-    text-transform: uppercase;
     text-align: center;
 }
 
@@ -64,7 +63,7 @@
 
 .search button {
     width: 50px;
-    height:20px;
+    height:30px;
     padding: 10px auto;
     text-align: center;
     font-size: 16px;

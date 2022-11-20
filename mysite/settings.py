@@ -150,3 +150,5 @@ SOCIALACCOUNT_PROVIDERS = {
 CRONJOBS = [
     ('*/1 * * * *', 'aquaholic.cron.update_notification'),
 ]
+
+SELENIUM_LOGIN_START_PAGE = "/"

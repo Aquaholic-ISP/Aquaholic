@@ -53,7 +53,7 @@
             <h1 style="font-size: 80px;">Welcome Back, {{ user.first_name }}</h1>
             <div class="profile">
                 <ul>
-                    <li><a href="profile">visit your profile</a></li>
+                    <li><a href="profile">Visit your profile</a></li>
                 </ul>
             </div>
             
@@ -63,7 +63,7 @@
 
             <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
                 {% csrf_token %}
-                <button type="submit" style="width: 220px;">calculate your goal</button>
+                <button type="submit" style="width: 220px;">Calculate your goal</button>
             </form>
 
             <form action="{% url 'aquaholic:set_up' user.id %}" method="get">

@@ -96,7 +96,7 @@ class TemplateUsed(TestCase):
         self.assertTemplateUsed(page, 'aquaholic/set_up.html')
         client.post(reverse("aquaholic:set_up", args=(user.id,)), data={"first_notification": datetime.time(8, 0, 0),
                                                                         "last_notification": datetime.time(22, 0, 0),
-                                                                        "notify_step": 1})
+                                                                        "notify_interval": 1})
         page = client.get(reverse('aquaholic:schedule', args=(user.id,)))
         self.assertTemplateUsed(page, 'aquaholic/schedule.html')
 

@@ -7,9 +7,9 @@ from django.shortcuts import reverse, render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django.utils.timezone import make_aware
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Schedule, Intake, UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -208,7 +208,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         try:
             first = request.POST["first_notification"]
             last = request.POST["last_notification"]
-            step = int(request.POST["notify_step"])
+            interval = int(request.POST["notify_interval"])
             first_notify_time = datetime.datetime.strptime(first, "%H:%M").time()
             last_notify_time = datetime.datetime.strptime(last, "%H:%M").time()
             if first == last or get_total_hours(first_notify_time, last_notify_time) == 0:
@@ -218,9 +218,9 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             user_info = UserInfo.objects.get(user_id=request.user.id)
             if user_info.water_amount_per_day == 0:
                 return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-            self.update_user_info(first_notify_time, last_notify_time, step, user_info)
+            self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
-            self.create_schedule(user_info, step)  # create new schedule
+            self.create_schedule(user_info, interval)  # create new schedule
             if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
             else:
@@ -234,11 +234,11 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                           {'message': message})
 
     @staticmethod
-    def update_user_info(first_notify_time, last_notify_time, step, user_info):
+    def update_user_info(first_notify_time, last_notify_time, interval, user_info):
         """Save new user information to the database."""
         user_info.first_notification_time = first_notify_time
         user_info.last_notification_time = last_notify_time
-        user_info.time_interval = step
+        user_info.time_interval = interval
         # calculate and save total hours and water amount per hour to database
         user_info.total_hours = get_total_hours(user_info.first_notification_time,
                                                 user_info.last_notification_time)
@@ -246,7 +246,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         user_info.save()
 
     @staticmethod
-    def create_schedule(user_info, step):
+    def create_schedule(user_info, interval):
         """Create new schedule provided the new information given."""
         # get total hours, first notification time and expected amount (water amount to drink per hour)
         total_hours = int(user_info.total_hours)
@@ -258,14 +258,14 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         if last_notification_time < datetime.datetime.now():
             first_notification_time += datetime.timedelta(hours=24)
         notification_time = first_notification_time
-        for i in range(0, total_hours + 1, step):
+        for i in range(0, total_hours + 1, interval):
             Schedule.objects.create(user_info_id=user_info.id,
                                     notification_time=make_aware(notification_time),
                                     expected_amount=int(expected_amount),
                                     notification_status=(notification_time < datetime.datetime.now()),
                                     is_last=(i == total_hours)
                                     )
-            notification_time += datetime.timedelta(hours=step)
+            notification_time += datetime.timedelta(hours=interval)
 
     @staticmethod
     def delete_schedule(user_info):

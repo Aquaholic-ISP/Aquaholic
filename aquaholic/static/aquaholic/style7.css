@@ -8,45 +8,6 @@
     font-family: "Poppins", sans-serif;
 }
 
-.navbar{
-    display: flex;
-    align-items: flex-start;
-    background: transparent;
-    position: relative;
-    float: right;
-    right: 50px;
-    margin-top: 0%;
-}
-
-.navbar ul li{
-    list-style: none;
-    position: relative;
-    text-align: center;
-    font-size: 25px;
-}
-
-.navbar ul li a{
-    text-decoration: none;
-    color:  #4682B4;
-    text-align: center;
-}
-
-.navbar ul li::after{
-    content: '';
-    height: 3px;
-    width: 0%;
-    background: #4682B4;
-    position: absolute;
-    left: 0;
-    bottom: -5px;
-    transition: 0.5s;
-}
-
-.navbar ul li:hover::after{
-    width: 100%;
-}
-
-
 .head h1{
     font-size: 60px;
 }

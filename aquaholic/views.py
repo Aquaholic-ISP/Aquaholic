@@ -36,7 +36,7 @@ class HomePageView(generic.ListView):
                 UserInfo.objects.create(user_id=user.id)
             user_info = UserInfo.objects.get(user_id=user.id)
             if user_info.water_amount_per_day == 0:
-                return render(request, 'aquaholic/regis.html')
+                return render(request, 'aquaholic/register.html')
             if Intake.objects.filter(user_info_id=user_info.id, date=date).exists():
                 all_intake = Intake.objects.get(user_info_id=user_info.id, date=date)
                 if all_intake:
@@ -110,7 +110,7 @@ class CalculateView(generic.ListView):
 class RegistrationView(generic.DetailView):
     """A class that represents the calculation page view for new authenticated user."""
 
-    template_name = 'aquaholic/regis.html'
+    template_name = 'aquaholic/register.html'
 
     def get(self, request, *args, **kwargs):
         """Registration page for new authenticated user."""
@@ -127,7 +127,7 @@ class RegistrationView(generic.DetailView):
             user_info.save()
 
             if user_info.water_amount_per_day == 0:
-                return render(request, 'aquaholic/regis.html',
+                return render(request, 'aquaholic/register.html',
                               {'result': f"{round(user_info.water_amount_per_day):.2f}"})
 
             # update schedule
@@ -163,7 +163,7 @@ class CalculateAuthView(generic.DetailView):
             user_info.save()
 
             if user_info.water_amount_per_day == 0:
-                return render(request, 'aquaholic/regis.html',
+                return render(request, 'aquaholic/register.html',
                               {'result': f"{round(user_info.water_amount_per_day):.2f}"})
 
             # update schedule

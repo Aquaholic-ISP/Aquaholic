@@ -25,7 +25,8 @@ def get_access_token(code):
 
 def send_notification(message, token):
     url = 'https://notify-api.line.me/api/notify'
-    token = token
+    if not token:
+        return None
     headers = {'content-type': 'application/x-www-form-urlencoded',
                'Authorization': 'Bearer ' + token}
 

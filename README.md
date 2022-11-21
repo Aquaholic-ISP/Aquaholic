@@ -1,6 +1,6 @@
 # Aquaholic
 [![codecov](https://codecov.io/gh/Aquaholic-ISP/Aquaholic/branch/main/graph/badge.svg?token=F228E2GSLW)](https://codecov.io/gh/Aquaholic-ISP/Aquaholic)
-
+[![Unittest](https://github.com/Aquaholic-ISP/Aquaholic/actions/workflows/aquaholic-app.yml/badge.svg)](https://github.com/Aquaholic-ISP/Aquaholic/actions/workflows/aquaholic-app.yml)
 
 ## Description
 

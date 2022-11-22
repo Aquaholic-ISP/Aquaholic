@@ -10,7 +10,7 @@ from django.utils.timezone import make_aware
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Schedule, Intake, UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
 from .notification import get_access_token, send_notification
-
+from django.conf import settings
 
 def get_total_hours(first_notification_time, last_notification_time):
     """Calculate total hours from first and last notification time."""
@@ -334,7 +334,7 @@ class InputView(LoginRequiredMixin, generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-        return render(request, self.template_name)
+        return render(request, self.template_name, context={"time_zone": settings.TIME_ZONE})
 
     def post(self, request, *args, **kwargs):
         """Input the amount of water from user and save to database."""

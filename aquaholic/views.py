@@ -185,6 +185,22 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
                           {'message': message})
 
 
+class SetUpRegistrationView(LoginRequiredMixin, generic.DetailView):
+    """A class that represents the set up page view."""
+
+    template_name = 'aquaholic/set_up_regist.html'
+
+    def get(self, request, *args, **kwargs):
+        """Set up schedule page."""
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.water_amount_per_day == 0:
+            return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
+        # if request.META['HTTP_REFERER'] == '/aquaholic/<int:pk>/registration':
+        #     context = "True"
+        #     return render(request, self.template_name, context)
+        return render(request, self.template_name)
+
+
 class SetUpView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the set up page view."""
 
@@ -195,6 +211,9 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
+        # if request.META['HTTP_REFERER'] == '/aquaholic/<int:pk>/registration':
+        #     context = "True"
+        #     return render(request, self.template_name, context)
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):

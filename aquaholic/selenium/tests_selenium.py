@@ -1,6 +1,7 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.chrome.options import Options
 from django.contrib.auth.models import User
 from seleniumlogin import force_login
 
@@ -11,7 +12,10 @@ class AuthenticatedViewTests(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.selenium = WebDriver()
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        cls.selenium = WebDriver(chrome_options=chrome_options)
         cls.selenium.implicitly_wait(10)
 
     @classmethod

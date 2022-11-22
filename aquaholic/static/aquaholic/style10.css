@@ -302,7 +302,7 @@ input[type="checkbox"]{
     border-radius: 25px;
     font-weight: bold;
     border: 2px solid #0E1646;
-    background: transparent;
+    background: white;
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -340,7 +340,7 @@ input[type="checkbox"]{
     border-radius: 25px;
     font-weight: bold;
     border: 2px solid #0E1646;
-    background: transparent;
+    background: white;
     cursor: pointer;
     position: relative;
     overflow: hidden;

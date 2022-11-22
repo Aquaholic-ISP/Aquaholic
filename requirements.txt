@@ -3,4 +3,4 @@ python-decouple
 django-allauth
 django-crontab
 selenium
-seleniumlogin
+django-selenium-login

@@ -82,11 +82,18 @@
   const data = {
     labels: labels,
     datasets: [{
-      label: 'The amount of water that you drink each day (ml)',
-      backgroundColor: {{bar_colors|safe}},
+      label: 'Water amount greater than or equal to goal (ml)',
+      backgroundColor: '#d4f1f9',
       borderColor: '#d4f1f9',
-      data: {{amount|safe}},
-    }]
+      data: {{reached_goal_data|safe}},
+    },
+    {
+      label: 'Water amount less than goal (ml)',
+      backgroundColor: '#FF9999',
+      borderColor: '#FF9999',
+      data: {{not_reached_goal_data|safe}},
+    }
+    ]
   };
 
   const config = {

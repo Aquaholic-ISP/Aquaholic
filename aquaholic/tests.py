@@ -15,7 +15,7 @@ def create_userinfo(weight, exercise_time, first_notification_time, last_notific
     in the past, positive for questions that have yet to be published).
     """
     return UserInfo.objects.create(weight=weight, exercise_duration=exercise_time, first_notification_time=first_notification_time,
-                    last_notification_time=last_notification_time)
+                                   last_notification_time=last_notification_time)
 
 
 class UserInfoModelTests(TestCase):
@@ -245,7 +245,7 @@ class InputViewTest(TestCase):
         user_info = UserInfo.objects.get(user_id=user1.id)
 
         # datetime in database = actual time + 10 hours
-        db_time = datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10)
+        db_time = timezone.make_aware(datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10))
         intake1 = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(200, intake1.total_amount)
 
@@ -257,6 +257,6 @@ class InputViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # the amount of water topped up from the already existing amount
-        db_time = datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10)
+        db_time = timezone.make_aware(datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10))
         intake1 = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(700, intake1.total_amount)

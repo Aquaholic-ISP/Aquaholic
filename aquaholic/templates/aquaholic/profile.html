@@ -35,8 +35,7 @@
 
     <div class="content">
         <div class="container">
-
-            <img id="profilepic" src="https://i.imgur.com/uR6acjH.jpg">
+            <img id="profilepic" src="{{ user.socialaccount_set.all.0.get_avatar_url }}">
             <div class="context">
                 <p>Name: {{ first_name }}</p>
                 <p>User ID: {{user_id}}</p>

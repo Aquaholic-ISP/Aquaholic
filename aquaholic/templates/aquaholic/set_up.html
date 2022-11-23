@@ -53,6 +53,11 @@
             <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_interval" min="1" value="1">
             <label style="font-size: 25px;">hours</label>
             <br>
+            <a id="line-connect"  href="{% url 'aquaholic:line-notify' %}">Connect to your Line Notify</a>
+            <button id="help" type="button" onclick="alert('You will be asked to login to your line account and asked which chat or group you would like to receive notifications from our app. For more information, please visit: ')">?</button>
+            <br>
+
+
             {% if message %}
                 <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
             {% endif %}

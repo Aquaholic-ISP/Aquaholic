@@ -25,7 +25,6 @@ h1{
     border: 2px solid #0E1646;
     background: white;
     cursor: pointer;
-    /*position: relative;*/
     overflow: hidden;
 }
 
@@ -55,3 +54,33 @@ h1{
         width: 460px;
         background: transparent;
 }
+
+#help {
+  height: 40px;
+  width: 40px;
+  font-size: 28px;
+  line-height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left: 3%;
+  color: #FFFFFF;
+  background-color: #06C755;
+  border: 2px solid #0E1646;
+}
+
+#line-connect {
+  background-color: #06C755;
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  margin: 4px 2px;
+  margin-top: 3%;
+  border-radius: 15px;
+  border: 2px solid #0E1646;
+  font-weight: bold;
+}
+

@@ -221,13 +221,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
             self.create_schedule(user_info)  # create new schedule
-            if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
-                return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
-            else:
-                # redirect to line notify website for generate token
-                url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
-                      f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
-                return HttpResponseRedirect(url)
+            return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
         except ValueError:
             message = "Please, enter time in both fields."
             return render(request, self.template_name,
@@ -277,6 +271,13 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                 one_schedule.delete()
 
 
+class LineNotifyVerificationView(LoginRequiredMixin, generic.DetailView):
+    def get(self, request, *args, **kwargs):
+        url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
+              f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
+        return HttpResponseRedirect(url)
+
+
 class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
     """A class that handles the callback after user authorize notification."""
 
@@ -288,7 +289,7 @@ class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         user_info.notify_token = token
         user_info.save()
-        return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
+        return HttpResponseRedirect(reverse('aquaholic:set_up', args=(request.user.id,)))
 
 
 class ScheduleView(LoginRequiredMixin, generic.DetailView):

@@ -114,8 +114,7 @@ input[type=number]::-webkit-inner-spin-button {
     border-radius: 25px;
     font-weight: bold;
     border: 2px solid #1b3660;
-    background: #1b3660;
-    color: white;
+    background: white;
     cursor: pointer;
     position: relative;
     overflow: hidden;

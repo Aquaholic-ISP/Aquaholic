@@ -222,7 +222,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
             self.create_schedule(user_info)  # create new schedule
-            message = "saved!"
+            message = "Saved! Please, visit schedule page to see the updates."
             return render(request, self.template_name,
                           {'message': message})
         except ValueError:

@@ -39,7 +39,6 @@
 
 <div class="content">
     <h1>Set your notification schedule</h1>
-    <p style="font-size: 20px; ">Generate a notification schedule for reminding you to drink water throughout the day</p>
     <div class="setup">
         <form action="{% url 'aquaholic:set_up' user.id %}" method="POST">
             {% csrf_token %}

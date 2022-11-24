@@ -8,7 +8,7 @@
 
 h1{
     font-size: 50px;
-    margin-top: 5%;
+    margin-top: 10%;
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
 
@@ -16,6 +16,7 @@ h1{
 
 .setup p{
     display: inline-block;
+    color: white;
 }
 
 .setup button{

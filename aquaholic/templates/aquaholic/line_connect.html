@@ -1,0 +1,33 @@
+{% load static %}
+{% load socialaccount %}
+{% load i18n %}
+<html>
+<head>
+    <title>Set your new schedule</title>
+    <link rel="stylesheet" href="{% static 'aquaholic/style4.css' %}">
+    <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
+</head>
+
+<div class="content">
+    <h1>Set your notification schedule</h1>
+    <p style="font-size: 20px; ">Generate a notification schedule for reminding you to drink water throughout the day</p>
+    <div class="setup">
+        <a id="line-notify"  href="{% url 'aquaholic:line_notify' %}">Connect to your Line Notify</a>
+        <button id="help" type="button" onclick="alert('After clicking - Connect to your Line Notify - , you will be asked to login to your line account and asked which chat or group you would like to receive notifications from our app.')">?</button>
+        <br>
+        {% if has_token %}
+           <p style="font-size: 16px; "> ✅ Line notify is connected. Notification is enabled.</p>
+           <br>
+           <p style="font-size: 12px; "> You can turn off notification anytime in the schedule page or disconnect from line notify anytime at <a href="https://notify-bot.line.me/my/">My page - Line Notify</a></p>
+           <br>
+           <a id="line-connect" href="{% url 'aquaholic:set_up' user.id %}"> See your notification settings </a>
+        {% else %}
+           <p style="font-size: 16px; "> ❌ Line notify is not connected. Notification is not yet enabled.</p>
+           <br>
+           <p style="font-size: 12px; "> Please, connect to your line notify first to receive notification from our app</a></p>
+
+        {% endif %}
+    </div>
+</div>
+
+</html>

@@ -7,11 +7,15 @@
 }
 
 h1{
-    font-size: 90px;
-    margin-top: 10%;
+    font-size: 50px;
+    margin-top: 5%;
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
 
+}
+
+.setup p{
+    display: inline-block;
 }
 
 .setup button{
@@ -38,7 +42,6 @@ h1{
 
 #frequency {
     width: 15%;
-    margin-left: 12%;
 }
 
 .setup input{
@@ -50,9 +53,12 @@ h1{
 }
 
 .setup label {
-        display: inline-block;
-        width: 460px;
-        background: transparent;
+    display: inline-block;
+    width: 250px;
+    background: transparent;
+}
+.setup a {
+    display: inline-block;
 }
 
 #help {
@@ -68,7 +74,7 @@ h1{
   border: 2px solid #0E1646;
 }
 
-#line-connect {
+#line-notify {
   background-color: #06C755;
   border: none;
   color: white;
@@ -84,3 +90,18 @@ h1{
   font-weight: bold;
 }
 
+#line-connect {
+    width: 450px;
+    height:48px;
+    text-align: center;
+    text-decoration: none;
+    margin-top: 3%;
+    font-size: 25px;
+    top: 50%;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: white;
+    cursor: pointer;
+    overflow: hidden;
+}

@@ -21,7 +21,7 @@
             {% csrf_token %}
             <button type="submit" style="border:none">Calculate</button>
         </form></li>
-        <li><a href="{% url 'aquaholic:set_up' user.id %}">Set Schedule</a></li>
+        <li><a href="{% url 'aquaholic:line_connect' user.id %}">Set Schedule</a></li>
         <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>
         <li><a href="{% url 'aquaholic:input' user.id %}">Input</a></li>
         <li><a href="{% url 'aquaholic:history' user.id %}">History</a></li>

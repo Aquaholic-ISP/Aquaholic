@@ -21,7 +21,7 @@
             {% csrf_token %}
             <button type="submit" style="border:none">Calculate</button>
         </form></li>
-        <li><a href="{% url 'aquaholic:set_up' user.id %}">Set Schedule</a></li>
+        <li><a href="{% url 'aquaholic:line_connect' user.id %}">Set Schedule</a></li>
         <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>
         <li><a href="{% url 'aquaholic:input' user.id %}">Input</a></li>
         <li><a href="{% url 'aquaholic:history' user.id %}">History</a></li>
@@ -38,7 +38,8 @@
 </div>
 
 <div class="content">
-    <h1>Set your new schedule</h1>
+    <h1>Set your notification schedule</h1>
+    <p style="font-size: 20px; ">Generate a notification schedule for reminding you to drink water throughout the day</p>
     <div class="setup">
         <form action="{% url 'aquaholic:set_up' user.id %}" method="POST">
             {% csrf_token %}
@@ -50,18 +51,14 @@
             <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification">
             <br>
             <label id="frequency" style="font-size: 25px; ">Notify every</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_interval" min="1" value="1">
-            <label style="font-size: 25px;">hours</label>
+            <input style="margin-left: 30px; font-size: 18px;" type="number" name="notify_interval" min="1" value="1">
+            <label style="font-size: 25px;">hour(s)</label>
             <br>
-            <a id="line-connect"  href="{% url 'aquaholic:line-notify' %}">Connect to your Line Notify</a>
-            <button id="help" type="button" onclick="alert('You will be asked to login to your line account and asked which chat or group you would like to receive notifications from our app. For more information, please visit: ')">?</button>
-            <br>
-
-
             {% if message %}
                 <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
             {% endif %}
-            <button  type="submit" style="margin-top: 40px;">Generate schedule</button>
+            <br>
+            <button  type="submit" style="margin-top: 40px;">save</button>
         </form>
         <br>
     </div>

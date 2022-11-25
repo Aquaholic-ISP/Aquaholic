@@ -42,13 +42,13 @@
     <h1>Calculate Your Water Intake</h1>
     <div class="calmain">
         <div class="calpart" >
-        <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="POST">
+        <form action="{% url 'aquaholic:calculate_auth' user.id %}" method="POST" >
             {% csrf_token%}
             <label id="weightl">Enter your weight (kg)</label>
-            <input id="weightin" type="number" name="weight" min="1" step="0.01">
+            <input id="weightin" type="number" name="weight" min="1" step="0.01" value={{weight}} autocomplete="on">
             <br>
             <label style="font-size: 30px;">Enter your exercise time (min)</label>
-            <input style="margin-left: 65px; font-size: 18px;" type="number" name="exercise_duration" min="0" step="0.01">
+            <input style="margin-left: 65px; font-size: 18px;" type="number" name="exercise_duration" min="0" step="0.01" value={{exercise_duration}} autocomplete="on">
             <br>
             {% if message %}
                 <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
@@ -60,5 +60,7 @@
                 <p id="amount-result">The amount of water that you should drink is <b>{{result}}</b> ml.</p>
             {% endif %}
         </div>
+</div>
+</div>
 </div>
 </html>

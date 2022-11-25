@@ -72,6 +72,10 @@ class CalculateView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Please, enter numbers in both fields.", html=True)
 
+    def test_calculation(self):
+        response = self.client.post('/aquaholic/calculate', data={"weight": 65, "exercise_duration": 120})
+        self.assertContains(response, 3538)
+
 
 class TemplateUsed(TestCase):
     def test_template_used(self):

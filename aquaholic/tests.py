@@ -104,6 +104,8 @@ class TemplateUsed(TestCase):
                                                                         "notify_interval": 1})
         page = client.get(reverse('aquaholic:schedule', args=(user.id,)))
         self.assertTemplateUsed(page, 'aquaholic/schedule.html')
+        page = client.get(reverse('aquaholic:alert'))
+        self.assertTemplateUsed(page, 'aquaholic/alert.html')
 
 
 class LoginWithLine(TestCase):

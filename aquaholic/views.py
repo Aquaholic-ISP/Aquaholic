@@ -448,7 +448,7 @@ def update_notification(request):
     in a user's schedule is sent, the time in the schedule will be
     added by 24 hours.
     """
-    all_to_send = Schedule.objects.filter(notification_time__lte=datetime.datetime.now(),
+    all_to_send = Schedule.objects.filter(notification_time__lte=timezone.now(),
                                           notification_status=False)
     for one_to_send in all_to_send:
         send_notification(f"Don't forget to drink {one_to_send.expected_amount} ml of water",
@@ -457,12 +457,12 @@ def update_notification(request):
         one_to_send.save()
 
     last_to_send = Schedule.objects.filter(notification_status=True, is_last=True,
-                                           notification_time__lte=datetime.datetime.now())
+                                           notification_time__lte=timezone.now())
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)
         for schedule in user_schedule:
-            schedule.notification_time += datetime.timedelta(hours=24)
+            schedule.notification_time += timezone.timedelta(hours=24)
             schedule.notification_status = False
             schedule.save()
     return HttpResponse()

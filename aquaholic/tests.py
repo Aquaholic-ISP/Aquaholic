@@ -117,6 +117,30 @@ class LoginWithLine(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class CalculateAuthView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client.login(username='testuser', password='12345')
+        page1 = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page1.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
+
+    def test_calculation(self):
+        response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
+                                    data={"weight": 65, "exercise_duration": 120})
+        self.assertContains(response, 3538)
+
+    def test_invalid_input(self):
+        """input invalid value"""
+        response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
+                                    data={"weight": "weight", "exercise_duration": 0})
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Please, enter numbers in both fields.", html=True)
+
+
 class SetUpView(TestCase):
     def test_setup_page(self):
         """ authenticated user can redirect to set up page"""

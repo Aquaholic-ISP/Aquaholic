@@ -44,13 +44,13 @@
             {% csrf_token %}
             <br>
             <label id="first" style="font-size: 25px;">Enter your first notification time</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="time" name="first_notification">
+            <input style="margin-left: 114px; font-size: 18px;" type="time" name="first_notification" value="{{ first_noti }}">
             <br>
             <label id="last" style="font-size: 25px;">Enter your last notification time</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification">
+            <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification" value="{{ last_noti }}">
             <br>
             <label id="frequency" style="font-size: 25px; ">Notify every</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_interval" min="1" value="1">
+            <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_interval" min="1" value="{{ noti_hour }}">
             <label style="font-size: 25px;">hours</label>
             <br>
             {% if message %}

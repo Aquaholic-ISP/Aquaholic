@@ -57,12 +57,12 @@ class HomePageView(generic.ListView):
             if user_intake_percentage > 100:
                 user_intake_percentage = 100
             return render(request, self.template_name, {"user_intake_percentage": user_intake_percentage,
-                                                        "user_intake": intake,
+                                                        "user_intake": int(intake),
                                                         "goal": user_info.water_amount_per_day})
         return render(request, self.template_name,
                       {"user_intake_percentage": 0,
                        "goal": user_info.water_amount_per_day,
-                       "user_intake": intake})
+                       "user_intake": int(intake)})
 
 
 class AboutUsView(generic.ListView):

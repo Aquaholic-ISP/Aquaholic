@@ -206,7 +206,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
         return render(request, self.template_name,
-                      {'first_noti': first, 'last_noti': last, 'noti_hour': noti_hour})
+                      {'first_notification': first, 'last_notification': last, 'notification_hour': noti_hour})
 
     def post(self, request, *args, **kwargs):
         """
@@ -243,6 +243,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             message = "Please, enter time in both fields."
             return render(request, self.template_name,
                           {'message': message})
+
 
     @staticmethod
     def update_user_info(first_notify_time, last_notify_time, interval, user_info):
@@ -454,3 +455,4 @@ def update_notification(request):
             schedule.notification_status = False
             schedule.save()
     return HttpResponse()
+

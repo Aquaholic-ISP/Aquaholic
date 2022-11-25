@@ -6,6 +6,7 @@ from django.test import TestCase, Client
 from aquaholic.views import *
 from django.contrib.auth.models import User
 from django.utils import timezone
+from aquaholic.notification import get_access_token, send_notification
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
@@ -268,3 +269,15 @@ class AlertViewTest(TestCase):
         client = Client()
         response = client.get(reverse('aquaholic:profile'))
         self.assertEqual(response.status_code, 302)
+
+
+class Notification(TestCase):
+    def test_token_is_None(self):
+        self.assertIsNone(send_notification("Hi", None))
+
+
+class UpdateNotificationView(TestCase):
+    def test_cron_view_return_blank_page(self):
+        client = Client()
+        response = client.get(reverse('aquaholic:cron'))
+        self.assertEqual(response.status_code, 200)

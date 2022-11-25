@@ -268,4 +268,3 @@ class AlertViewTest(TestCase):
         client = Client()
         response = client.get(reverse('aquaholic:profile'))
         self.assertEqual(response.status_code, 302)
-        self.assertTemplateUsed(response, 'aquaholic/alert.html')

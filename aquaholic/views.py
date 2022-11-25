@@ -386,34 +386,42 @@ class HistoryView(LoginRequiredMixin, generic.DetailView):
 
     def show_history(self, request, selected_year, selected_month):
         """Get the data needed for history page and send those data as a context to history.html."""
-        # count the number of days in the selected month
         num_days_in_month = calendar.monthrange(selected_year, selected_month)[1]
-        # initialize a dictionary with date as a key and a list of amount, and bar color of the bar as a value
-        all_amount_in_month = dict()
+        reached_goal_amount = dict()
+        not_reached_goal_amount= dict()
         for day in range(1, num_days_in_month + 1):
-            all_amount_in_month[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = [0, "#d4f1f9"]
-        # filter all intakes in selected month and year and update to the dictionary
+            reached_goal_amount[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = 0
+            not_reached_goal_amount[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = 0
         user_info = UserInfo.objects.get(user_id=request.user.id)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
         goal = user_info.water_amount_per_day
-        all_sorted_intakes = Intake.objects.filter(user_info_id=user_info.id,
-                                                   date__month=selected_month,
-                                                   date__year=selected_year).order_by('date')
-        for intake in all_sorted_intakes:
-            all_amount_in_month[intake.date.strftime("%d %b %Y")][0] = intake.total_amount
-            if intake.total_amount < goal:
-                # the bar color will be red if the amount doesn't reach the goal
-                all_amount_in_month[intake.date.strftime("%d %b %Y")][1] = "#FF9999"
+        reached_goal = Intake.objects.filter(user_info_id=user_info.id,
+                                             date__month=selected_month,
+                                             date__year=selected_year,
+                                             total_amount__gte=goal).order_by('date')
+        not_reached_goal = Intake.objects.filter(user_info_id=user_info.id,
+                                                 date__month=selected_month,
+                                                 date__year=selected_year,
+                                                 total_amount__lt=goal).order_by('date')
+        for intake in reached_goal:
+            reached_goal_amount[intake.date.strftime("%d %b %Y")] = intake.total_amount
+
+        for intake in not_reached_goal:
+            not_reached_goal_amount[intake.date.strftime("%d %b %Y")] = intake.total_amount
+
         return render(request, self.template_name, {"goal": goal,
-                                                    "date": list(all_amount_in_month.keys()),
-                                                    "amount": list(val[0] for val in all_amount_in_month.values()),
+                                                    "date": list(reached_goal_amount.keys()),
+                                                    "reached_goal_data":
+                                                        list(reached_goal_amount.values()),
+                                                    "not_reached_goal_data":
+                                                        list(not_reached_goal_amount.values()),
                                                     "recent_year": [datetime.datetime.now().year - i for i in range(5)],
                                                     "selected_month_int": selected_month,
                                                     "selected_month_str": datetime.date(2022, selected_month,
                                                                                         1).strftime('%b'),
                                                     "selected_year": selected_year,
-                                                    "bar_colors": list(val[1] for val in all_amount_in_month.values())})
+                                                    })
 
     def get(self, request, *args, **kwargs):
         """Go to the history page showing the intake history of this month and year."""

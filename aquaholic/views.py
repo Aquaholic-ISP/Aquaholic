@@ -47,7 +47,7 @@ class HomePageView(generic.ListView):
         if not Intake.objects.filter(user_info_id=user_info.id, date=date).exists():
             return render(request, self.template_name,
                           {"user_intake_percentage": 0,
-                           "goal": int(user_info.water_amount_per_day),
+                           "goal": user_info.water_amount_per_day,
                            "user_intake": 0})
         user_intake = Intake.objects.get(user_info_id=user_info.id, date=date)
         goal = user_info.water_amount_per_day
@@ -57,12 +57,12 @@ class HomePageView(generic.ListView):
             if user_intake_percentage > 100:
                 user_intake_percentage = 100
             return render(request, self.template_name, {"user_intake_percentage": user_intake_percentage,
-                                                        "user_intake": int(intake),
-                                                        "goal": int(user_info.water_amount_per_day)})
+                                                        "user_intake": intake,
+                                                        "goal": user_info.water_amount_per_day})
         return render(request, self.template_name,
                       {"user_intake_percentage": 0,
-                       "goal": int(user_info.water_amount_per_day),
-                       "user_intake": int(intake)})
+                       "goal": user_info.water_amount_per_day,
+                       "user_intake": intake})
 
 
 class AboutUsView(generic.ListView):
@@ -89,9 +89,9 @@ class CalculateView(generic.ListView):
         try:
             weight = float(request.POST["weight"])
             exercise_duration = float(request.POST["exercise_duration"])
-            water_amount_per_day = ((weight * KILOGRAM_TO_POUND * 0.5) + (exercise_duration / 30) * 12) * OUNCES_TO_MILLILITER
+            water_amount_per_day = int(((weight * KILOGRAM_TO_POUND * 0.5) + (exercise_duration / 30) * 12) * OUNCES_TO_MILLILITER)
             return render(request, self.template_name,
-                          {'result': f"{water_amount_per_day:.2f}"})
+                          {'result': water_amount_per_day})
         except ValueError:
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
@@ -137,14 +137,14 @@ class RegistrationView(LoginRequiredMixin, generic.DetailView):
             user_info.save()
             if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html',
-                              {'result': f"{round(user_info.water_amount_per_day):.2f}"})
+                              {'result': user_info.water_amount_per_day})
             # update schedule
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
-                one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
+                one_schedule.expected_amount = user_info.water_amount_per_hour
                 one_schedule.save()
             return render(request, self.template_name,
-                          {'result': f"{user_info.water_amount_per_day:.2f}"})
+                          {'result': user_info.water_amount_per_day})
         except ValueError:
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
@@ -171,14 +171,14 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
             user_info.save()
             if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html',
-                              {'result': f"{round(user_info.water_amount_per_day):.2f}"})
+                              {'result': user_info.water_amount_per_day})
             # update schedule
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
-                one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
+                one_schedule.expected_amount = user_info.water_amount_per_hour
                 one_schedule.save()
             return render(request, self.template_name,
-                          {'result': f"{user_info.water_amount_per_day:.2f}"})
+                          {'result': user_info.water_amount_per_day})
         except ValueError:
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
@@ -262,7 +262,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         for i in range(0, total_hours + 1, interval):
             Schedule.objects.create(user_info_id=user_info.id,
                                     notification_time=make_aware(notification_time),
-                                    expected_amount=int(expected_amount),
+                                    expected_amount=expected_amount,
                                     notification_status=(notification_time < datetime.datetime.now()),
                                     is_last=(i == total_hours)
                                     )

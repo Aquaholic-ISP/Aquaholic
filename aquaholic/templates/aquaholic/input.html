@@ -58,11 +58,12 @@
                 <input id="date" type="date" name="date"/> 
 
                 <script>
-                var date = new Date();
-                var currentDate = date.toISOString().slice(0,10);
-                var currentTime = date.getHours() + ':' + date.getMinutes();
-
-                document.getElementById('date').value = currentDate;
+                    Date.prototype.getCurrentDate = (function() {
+                        var local = new Date(this);
+                        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+                        return local.toJSON().slice(0,10);
+                    });
+                    document.getElementById('date').value = new Date().getCurrentDate();
                 </script>
             </div>
 

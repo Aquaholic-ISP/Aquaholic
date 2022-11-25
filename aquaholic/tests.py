@@ -260,3 +260,12 @@ class InputViewTest(TestCase):
         db_time = timezone.make_aware(datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10))
         intake1 = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(700, intake1.total_amount)
+
+
+class AlertViewTest(TestCase):
+    def test_unauthenticated_user_cannot_go_to_login_required_page(self):
+        """Unauthenticated user will be redirected to alert page if they are not logged in."""
+        client = Client()
+        response = client.get(reverse('aquaholic:profile'))
+        self.assertEqual(response.status_code, 302)
+        self.assertTemplateUsed(response, 'aquaholic/alert.html')

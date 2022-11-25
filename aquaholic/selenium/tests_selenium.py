@@ -41,4 +41,4 @@ class AuthenticatedViewTests(StaticLiveServerTestCase):
         exercise_duration_input.send_keys(60)
         self.selenium.find_element(By.XPATH, "/html/body/div[2]/div/div[1]/form/button").click()
         result = self.selenium.find_element(By.ID, "amount-result")
-        self.assertIn("2339.73", result.text)
+        self.assertIn("2339", result.text)

@@ -25,7 +25,7 @@ class UserInfoModelTests(TestCase):
         user = UserInfo(weight=50, exercise_duration=60)
         user.set_water_amount_per_day()
         amount = 2339.7265
-        self.assertAlmostEqual(amount, user.water_amount_per_day, places=4)
+        self.assertAlmostEqual(int(amount), user.water_amount_per_day, places=4)
 
     def test_get_total_hour(self):
         """calculate the total hour from user input notification time."""
@@ -43,7 +43,7 @@ class UserInfoModelTests(TestCase):
         user.set_water_amount_per_day()
         user.total_hours = get_total_hours(user.first_notification_time, user.last_notification_time)
         user.set_water_amount_per_hour()
-        self.assertAlmostEqual(per_hour, user.water_amount_per_hour, 2)
+        self.assertAlmostEqual(int(per_hour), user.water_amount_per_hour, 2)
 
 
 class HomePageView(TestCase):

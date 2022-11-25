@@ -159,8 +159,11 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         """Calculate page for authenticated user."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.weight == 0:
+            return render(request, self.template_name)
         return render(request, self.template_name,
-                      {'weight': user_info.weight, 'exercise_duration': user_info.exercise_duration})
+                      {'result': f"{round(user_info.water_amount_per_day):.2f}",
+                       'weight': user_info.weight, 'exercise_duration': user_info.exercise_duration})
 
     def post(self, request, *args, **kwargs):
         """Water amount per day calculate from user weight and exercise duration for authenticated user."""
@@ -228,7 +231,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                 return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
             self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
-            self.create_schedule(user_info, interval)  # create new schedule
+            self.create_schedule(user_info)  # create new schedule
             if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
                 return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
             else:
@@ -240,6 +243,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             message = "Please, enter time in both fields."
             return render(request, self.template_name,
                           {'message': message})
+
 
     @staticmethod
     def update_user_info(first_notify_time, last_notify_time, interval, user_info):
@@ -254,7 +258,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         user_info.save()
 
     @staticmethod
-    def create_schedule(user_info, interval):
+    def create_schedule(user_info):
         """Create new schedule provided the new information given."""
         # get total hours, first notification time and expected amount (water amount to drink per hour)
         total_hours = int(user_info.total_hours)
@@ -266,6 +270,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         if last_notification_time < datetime.datetime.now():
             first_notification_time += datetime.timedelta(hours=24)
         notification_time = first_notification_time
+        interval = user_info.time_interval
         for i in range(0, total_hours + 1, interval):
             Schedule.objects.create(user_info_id=user_info.id,
                                     notification_time=make_aware(notification_time),
@@ -435,16 +440,19 @@ def update_notification(request):
     all_to_send = Schedule.objects.filter(notification_time__lte=datetime.datetime.now(),
                                           notification_status=False)
     for one_to_send in all_to_send:
-        send_notification(f"Don't forget to drink at least {one_to_send.expected_amount} ml of water",
+        send_notification(f"Don't forget to drink {one_to_send.expected_amount} ml of water",
                           one_to_send.user_info.notify_token)
         one_to_send.notification_status = True
         one_to_send.save()
-    last_to_send = Schedule.objects.filter(notification_status=True, is_last=True)
+
+    last_to_send = Schedule.objects.filter(notification_status=True, is_last=True,
+                                           notification_time__lte=datetime.datetime.now())
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)
         for schedule in user_schedule:
-            schedule.notification_time += timezone.timedelta(hours=24)
+            schedule.notification_time += datetime.timedelta(hours=24)
             schedule.notification_status = False
             schedule.save()
     return HttpResponse()
+

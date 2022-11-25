@@ -159,8 +159,11 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         """Calculate page for authenticated user."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.weight == 0:
+            return render(request, self.template_name)
         return render(request, self.template_name,
-                      {'weight': user_info.weight, 'exercise_duration': user_info.exercise_duration})
+                      {'result': f"{round(user_info.water_amount_per_day):.2f}",
+                       'weight': user_info.weight, 'exercise_duration': user_info.exercise_duration})
 
     def post(self, request, *args, **kwargs):
         """Water amount per day calculate from user weight and exercise duration for authenticated user."""

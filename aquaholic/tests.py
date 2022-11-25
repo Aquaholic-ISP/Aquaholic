@@ -6,6 +6,7 @@ from django.test import TestCase, Client
 from aquaholic.views import *
 from django.contrib.auth.models import User
 from django.utils import timezone
+from aquaholic.notification import get_access_token, send_notification
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
@@ -260,3 +261,23 @@ class InputViewTest(TestCase):
         db_time = timezone.make_aware(datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10))
         intake1 = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(700, intake1.total_amount)
+
+
+class AlertViewTest(TestCase):
+    def test_unauthenticated_user_cannot_go_to_login_required_page(self):
+        """Unauthenticated user will be redirected to alert page if they are not logged in."""
+        client = Client()
+        response = client.get(reverse('aquaholic:profile'))
+        self.assertEqual(response.status_code, 302)
+
+
+class Notification(TestCase):
+    def test_token_is_None(self):
+        self.assertIsNone(send_notification("Hi", None))
+
+
+class UpdateNotificationView(TestCase):
+    def test_cron_view_return_blank_page(self):
+        client = Client()
+        response = client.get(reverse('aquaholic:cron'))
+        self.assertEqual(response.status_code, 200)

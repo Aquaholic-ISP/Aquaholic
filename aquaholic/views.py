@@ -158,7 +158,9 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         """Calculate page for authenticated user."""
-        return render(request, self.template_name)
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        return render(request, self.template_name,
+                      {'weight': user_info.weight, 'exercise_duration': user_info.exercise_duration})
 
     def post(self, request, *args, **kwargs):
         """Water amount per day calculate from user weight and exercise duration for authenticated user."""
@@ -171,14 +173,16 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
             user_info.save()
             if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html',
-                              {'result': f"{round(user_info.water_amount_per_day):.2f}"})
+                              {'result': f"{round(user_info.water_amount_per_day):.2f}",
+                               'weight': user_info.weight, 'exercise_duration': user_info.exercise_duration})
             # update schedule
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
                 one_schedule.expected_amount = round(user_info.water_amount_per_hour, 2)
                 one_schedule.save()
             return render(request, self.template_name,
-                          {'result': f"{user_info.water_amount_per_day:.2f}"})
+                          {'result': f"{user_info.water_amount_per_day:.2f}", 'weight': user_info.weight,
+                              'exercise_duration': user_info.exercise_duration})
         except ValueError:
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
@@ -193,9 +197,13 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         """Set up schedule page."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
+        first = user_info.first_notification_time.strftime("%H:%M")
+        last = user_info.last_notification_time.strftime("%H:%M")
+        noti_hour = int(user_info.time_interval)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-        return render(request, self.template_name)
+        return render(request, self.template_name,
+                      {'first_noti': first, 'last_noti': last, 'noti_hour': noti_hour})
 
     def post(self, request, *args, **kwargs):
         """
@@ -302,7 +310,7 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
         return render(request, self.template_name,
-                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
+                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id),})
 
     def post(self, request, *args, **kwargs):
         """Notification of schedule."""

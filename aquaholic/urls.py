@@ -13,6 +13,7 @@ urlpatterns = [
     path('aquaholic/<int:pk>/set_up', views.SetUpView.as_view(), name='set_up'),
     path('aquaholic/<int:pk>/schedule', views.ScheduleView.as_view(), name='schedule'),
     path('aquaholic/<int:pk>/registration', views.RegistrationView.as_view(), name='registration'),
+    path('aquaholic/<int:pk>/new_set_up', views.SetUpRegistrationView.as_view(), name='new_set_up'),
 
     path('aquaholic/', views.HomePageView.as_view(), name='home'),
     path("", RedirectView.as_view(url="/aquaholic/")),

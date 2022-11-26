@@ -1,3 +1,4 @@
+"""Unittests for aquaholic app."""
 import datetime
 from aquaholic.models import UserInfo, Intake
 from django.urls import reverse
@@ -10,26 +11,23 @@ from aquaholic.notification import get_access_token, send_notification, check_to
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
-    """
-    Create a question with the given `question_text` and published the
-    given number of `days` offset to now (negative for questions published
-    in the past, positive for questions that have yet to be published).
-    """
+    """Create user info object with the providing information."""
     return UserInfo.objects.create(weight=weight, exercise_duration=exercise_time, first_notification_time=first_notification_time,
                                    last_notification_time=last_notification_time)
 
 
 class UserInfoModelTests(TestCase):
+    """Test user info model."""
+
     def test_amount_of_water(self):
-        """calculate the amount of water from user input weight
-        and exercise time."""
+        """Calculate the amount of water from user input weight and exercise time."""
         user = UserInfo(weight=50, exercise_duration=60)
         user.set_water_amount_per_day()
         amount = 2339.7265
         self.assertAlmostEqual(int(amount), user.water_amount_per_day, places=4)
 
     def test_get_total_hour(self):
-        """calculate the total hour from user input notification time."""
+        """Calculate the total hour from user input notification time."""
         user = create_userinfo(50, 60, first_notification_time=datetime.time(8, 0, 0),
                                last_notification_time=datetime.time(22, 0, 0))
         user.total_hours = get_total_hours(user.first_notification_time, user.last_notification_time)
@@ -37,7 +35,7 @@ class UserInfoModelTests(TestCase):
         self.assertEqual(total, user.total_hours)
 
     def test_amount_per_hour(self):
-        """calculate the amount of water user to intake per hour."""
+        """Calculate the amount of water user to intake per hour."""
         user = create_userinfo(50, 60, first_notification_time=datetime.time(8, 0, 0),
                                last_notification_time=datetime.time(22, 0, 0))
         per_hour = 155.982
@@ -48,13 +46,15 @@ class UserInfoModelTests(TestCase):
 
 
 class HomePageView(TestCase):
+    """Tests homepage view."""
+
     def test_home_page(self):
-        """redirect to homepage view to calculate water intake"""
+        """Redirect to homepage view to calculate water intake."""
         response = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_to_home_page(self):
-        """client redirect to home page"""
+        """Client redirect to home page."""
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         cal_url = reverse('aquaholic:home')
@@ -62,26 +62,30 @@ class HomePageView(TestCase):
 
 
 class CalculateView(TestCase):
+    """Test the calculate page for unauthenticated user."""
+
     def test_calculate_page(self):
-        """redirect to calculate page to calculate water intake"""
+        """Redirect to calculate page to calculate water intake."""
         response = self.client.get(reverse('aquaholic:calculate'))
         self.assertEqual(response.status_code, 200)
 
     def test_invalid_input(self):
-        """input invalid value"""
+        """Input invalid value."""
         response = self.client.post('/aquaholic/calculate', data={"weight": "weight", "exercise_duration": 0})
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Please, enter numbers in both fields.", html=True)
 
     def test_calculation(self):
+        """Calculate water amount correctly."""
         response = self.client.post('/aquaholic/calculate', data={"weight": 65, "exercise_duration": 120})
         self.assertContains(response, 3538)
 
 
 class TemplateUsed(TestCase):
-    def test_template_used(self):
-        """template used correctly"""
+    """Test the template used in each page is correct."""
 
+    def test_template_used(self):
+        """Template used correctly."""
         response = self.client.get(reverse('aquaholic:calculate'))
         self.assertTemplateUsed(response, 'aquaholic/calculate.html')
         response = self.client.get(reverse('aquaholic:home'))
@@ -109,8 +113,10 @@ class TemplateUsed(TestCase):
 
 
 class LoginWithLine(TestCase):
+    """Tests for line login."""
+
     def test_authenticated_using_line(self):
-        """After login redirect to calculation page"""
+        """After login redirect to calculation page."""
         self.client.login()
         cal_url = reverse('aquaholic:home')
         response = self.client.get(cal_url)
@@ -118,7 +124,10 @@ class LoginWithLine(TestCase):
 
 
 class CalculateAuthView(TestCase):
+    """Test cases for calculate auth view."""
+
     def setUp(self) -> None:
+        """Login and go register first."""
         self.user = User.objects.create(username='testuser')
         self.user.set_password('12345')
         self.user.save()
@@ -129,12 +138,13 @@ class CalculateAuthView(TestCase):
                          data={"weight": 50, "exercise_duration": 0})
 
     def test_calculation(self):
+        """Calculation is done correctly."""
         response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
                                     data={"weight": 65, "exercise_duration": 120})
         self.assertContains(response, 3538)
 
     def test_invalid_input(self):
-        """input invalid value"""
+        """Input invalid value."""
         response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
                                     data={"weight": "weight", "exercise_duration": 0})
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -142,8 +152,10 @@ class CalculateAuthView(TestCase):
 
 
 class SetUpView(TestCase):
+    """Tests for set up view."""
+
     def setUp(self):
-        """ authenticated user can redirect to set up page"""
+        """Login and register."""
         self.user = User.objects.create(username='testuser')
         self.user.set_password('12345')
         self.user.save()
@@ -157,11 +169,11 @@ class SetUpView(TestCase):
         self.assertEqual(page.status_code, 200)
 
     def test_set_notification_time(self):
+        """Can post data in set up view successfully."""
         response = self.client.post(reverse("aquaholic:set_up", args=(self.user.id,)),
                                     data={"first_notification": "11:00",
                                           "last_notification": "16:00",
                                           "notify_interval": 1})
-        print(response)
         self.assertContains(response, "Saved! Please, visit schedule page to see the updates.", html=True)
 
 
@@ -169,7 +181,7 @@ class ScheduleView(TestCase):
     """Test cases for schedule view."""
 
     def test_set_schedule(self):
-        """schedule show time nad amount after generate schedule."""
+        """Schedule show time nad amount after generate schedule."""
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save()
@@ -184,6 +196,7 @@ class ScheduleView(TestCase):
 
 class HistoryViewTest(TestCase):
     """Test cases for history page."""
+
     def test_history_page(self):
         """History view work correctly.
 
@@ -261,6 +274,8 @@ class InputViewTest(TestCase):
 
 
 class AlertViewTest(TestCase):
+    """Test alert view."""
+
     def test_unauthenticated_user_cannot_go_to_login_required_page(self):
         """Unauthenticated user will be redirected to alert page if they are not logged in."""
         client = Client()
@@ -269,10 +284,14 @@ class AlertViewTest(TestCase):
 
 
 class Notification(TestCase):
+    """Tests for methods in notification.py."""
+
     def test_token_is_None(self):
+        """Send message with token == None return None."""
         self.assertIsNone(send_notification("Hi", None))
 
     def test_check_invalid_token_status(self):
+        """Check status will not return 100 for invalid token."""
         invalid_token = "askjhdjkas"
         none_token = None
         self.assertNotEqual(check_token_status(invalid_token), 200)
@@ -280,7 +299,10 @@ class Notification(TestCase):
 
 
 class UpdateNotificationView(TestCase):
+    """Tests for update notification view."""
+
     def test_cron_view_return_blank_page(self):
+        """Can go to cron view successfully."""
         client = Client()
         response = client.get(reverse('aquaholic:cron'))
         self.assertEqual(response.status_code, 200)

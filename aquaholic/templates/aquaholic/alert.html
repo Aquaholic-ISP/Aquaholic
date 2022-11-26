@@ -10,18 +10,28 @@
 
 
 <div class="content">
-    <h2>Oops, seems like you must log in first.</h2>
-    <div class="calmain">
+    {% if user.is_authenticated %}
+        <h2> You are already logged in.</h2>
         <div class="join">
             <form action="/" method="get">
                 {% csrf_token %}
                 <button type="submit">Home</button>
             </form>
-            <form action="{% provider_login_url 'line' %}" method="post">
-                {% csrf_token %}
-                <button type="submit">Log in</button>
-            </form>
         </div>
-    </div>
+    {% else %}
+        <h2>Oops, seems like you must log in first.</h2>
+        <div class="calmain">
+            <div class="join">
+                <form action="/" method="get">
+                    {% csrf_token %}
+                    <button type="submit">Home</button>
+                </form>
+                <form action="{% provider_login_url 'line' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Log in</button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
 </div>
 </html>

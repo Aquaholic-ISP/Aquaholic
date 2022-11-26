@@ -431,7 +431,10 @@ class InputView(LoginRequiredMixin, generic.DetailView):
                 Intake.objects.create(user_info_id=user_info.id,
                                       date=aware_date,
                                       total_amount=amount)
-            message = "Saved !"
+            if float(amount) == 0:
+                message = "Please, input a number more than 0."
+            else:
+                message = "Saved !"
             return render(request, self.template_name,
                           {'message': message})
         except ValueError:

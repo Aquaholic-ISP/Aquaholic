@@ -394,7 +394,7 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
         user_schedule = Schedule.objects.filter(user_info_id=user_info.id)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-        if status == "turn off":
+        if status == "turn_off":
             user_info.notification_turned_on = False
             user_info.save()
             for row in user_schedule:

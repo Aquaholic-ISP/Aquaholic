@@ -8,7 +8,7 @@ from aquaholic.views import *
 from django.contrib.auth.models import User
 from django.utils import timezone
 from aquaholic.notification import get_access_token, send_notification, check_token_status
-
+import time
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
     """Create user info object with the providing information."""
@@ -198,7 +198,7 @@ class SetUpView(TestCase):
         page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 302)  # redirect to registration page
         self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
-                    data={"weight": 50, "exercise_duration": 0})
+                         data={"weight": 50, "exercise_duration": 0})
         page = self.client.get(reverse('aquaholic:set_up', args=(self.user.id,)))
         self.assertEqual(page.status_code, 200)
 
@@ -213,19 +213,37 @@ class SetUpView(TestCase):
 
 class ScheduleView(TestCase):
     """Test cases for schedule view."""
-
-    def test_set_schedule(self):
-        """Schedule show time nad amount after generate schedule."""
-        user = User.objects.create(username='testuser')
-        user.set_password('12345')
-        user.save()
-        client = Client()
-        client.login(username='testuser', password='12345')
-        page = client.get(reverse('aquaholic:home'))
+    def setUp(self):
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='12345')
+        page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 302)  # redirect to registration page
-        client.post(reverse("aquaholic:registration", args=(user.id,)), data={"weight": 50, "exercise_duration": 0})
-        page = client.get(reverse('aquaholic:schedule', args=(user.id,)))
+        self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
+        page = self.client.get(reverse('aquaholic:schedule', args=(self.user.id,)))
         self.assertEqual(page.status_code, 200)
+
+    def test_get_schedule(self):
+        """Can go to schedule page successfully."""
+        page = self.client.get(reverse('aquaholic:schedule', args=(self.user.id,)))
+        self.assertEqual(page.status_code, 200)
+
+    def test_turn_off_notification(self):
+        """Set user_info.notification_turned_on == False when clicks turn off."""
+        page = self.client.post(reverse('aquaholic:schedule', args=(self.user.id,)), data={'status': "turn_off"})
+        self.assertEqual(page.status_code, 200)
+        self.user_info1 = UserInfo.objects.get(user_id=self.user.id)
+        self.assertFalse(self.user_info1.notification_turned_on)
+
+    def test_turn_on_notification(self):
+        """Set user_info.notification_turned_on == True when clicks turn on."""
+        page = self.client.post(reverse('aquaholic:schedule', args=(self.user.id,)), data={'status': "turn_on"})
+        self.assertEqual(page.status_code, 200)
+        self.user_info1 = UserInfo.objects.get(user_id=self.user.id)
+        self.assertTrue(self.user_info1.notification_turned_on)
 
 
 class HistoryViewTest(TestCase):

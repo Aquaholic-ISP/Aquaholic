@@ -211,6 +211,7 @@ class SetUpRegistrationView(LoginRequiredMixin, generic.DetailView):
     template_name = 'aquaholic/set_up_regist.html'
 
     def get(self, request, *args, **kwargs):
+        """Go to set up registration page for new user."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
         status = check_token_status(user_info.notify_token)
         return render(request, self.template_name,
@@ -237,8 +238,8 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                                                     "has_token": status == 200})
 
     def post(self, request, *args, **kwargs):
-        """
-        Handle tasks after user clicked save.
+        """Handle tasks after user clicked save.
+
         Update the database and redirect user to line
         notify authorization or schedule page in case that
         the user already has notify token. User will stay on
@@ -324,14 +325,20 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
 
 
 class LineNotifyVerificationView(LoginRequiredMixin, generic.DetailView):
+    """A class for handling line notify verification."""
+
     def get(self, request, *args, **kwargs):
+        """Redirect to Line notify authorization."""
         url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
               f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
         return HttpResponseRedirect(url)
 
 
 class LineNotifyConnect(LoginRequiredMixin, generic.DetailView):
+    """A class that represents line connect view that helps user connect to line notify."""
+
     def get(self, request, *args, **kwargs):
+        """Go to line connect page."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
         status = check_token_status(user_info.notify_token)
         return render(request, "aquaholic/line_connect.html",
@@ -491,14 +498,14 @@ class HistoryView(LoginRequiredMixin, generic.DetailView):
 
 
 def update_notification(request):
-    """
+    """Cron job for sending notification via line.
+
     Send notification to the user and update their status.
     Cron-job.org will call this view every 5 minutes to check
     if it's the time to send notification. After the last notification
     in a user's schedule is sent, the time in the schedule will be
     added by 24 hours.
     """
-
     all_to_send = Schedule.objects.filter(notification_time__lte=timezone.now(),
                                           notification_status=False)
     for one_to_send in all_to_send:

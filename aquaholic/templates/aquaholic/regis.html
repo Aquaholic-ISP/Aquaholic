@@ -57,9 +57,6 @@
         <div class="result">
             {% if result %}
                 <p id="amount-result">The amount of water that you should drink is <b>{{result}}</b> ml.</p>
-<!--    <a href="{% url 'aquaholic:set_up' user.id %}">-->
-<!--  <button>Next</button>-->
-<!--</a>-->
             <a href="{% url 'aquaholic:set_up' user.id %}">
     <button type="button" style="margin-bottom=400;">Next</button>
 </a>

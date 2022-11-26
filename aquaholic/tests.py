@@ -174,7 +174,7 @@ class SetUpView(TestCase):
                                     data={"first_notification": "11:00",
                                           "last_notification": "16:00",
                                           "notify_interval": 1})
-        self.assertContains(response, "Saved! Please, visit schedule page to see the updates.", html=True)
+        self.assertContains(response, "Saved! Please, visit schedule page to see the update.", html=True)
 
 
 class ScheduleView(TestCase):

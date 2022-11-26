@@ -385,10 +385,14 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
         if status == "turn off":
+            user_info.notification_turned_on = False
+            user_info.save()
             for row in user_schedule:
                 row.notification_status = True
                 row.save()
         else:
+            user_info.notification_turned_on = True
+            user_info.save()
             for row in user_schedule:
                 row.notification_status = row.notification_time < timezone.now()
                 row.save()
@@ -524,8 +528,13 @@ def update_notification(request):
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)
-        for schedule in user_schedule:
-            schedule.notification_time += timezone.timedelta(hours=24)
-            schedule.notification_status = False
-            schedule.save()
+        if not user_info.notification_turned_on:
+            for schedule in user_schedule:
+                schedule.notification_time += timezone.timedelta(hours=24)
+                schedule.notification_status = False
+                schedule.save()
+        else:
+            for schedule in user_schedule:
+                schedule.notification_time += timezone.timedelta(hours=24)
+                schedule.save()
     return HttpResponse()

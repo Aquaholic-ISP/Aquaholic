@@ -306,14 +306,24 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             first_notification_time += datetime.timedelta(hours=24)
         notification_time = first_notification_time
         interval = user_info.time_interval
-        for i in range(0, total_hours + 1, interval):
-            Schedule.objects.create(user_info_id=user_info.id,
-                                    notification_time=make_aware(notification_time),
-                                    expected_amount=expected_amount,
-                                    notification_status=(notification_time < datetime.datetime.now()),
-                                    is_last=(i == total_hours)
-                                    )
-            notification_time += datetime.timedelta(hours=interval)
+        if user_info.notification_turned_on:
+            for i in range(0, total_hours + 1, interval):
+                Schedule.objects.create(user_info_id=user_info.id,
+                                        notification_time=make_aware(notification_time),
+                                        expected_amount=expected_amount,
+                                        notification_status=(notification_time < datetime.datetime.now()),
+                                        is_last=(i == total_hours)
+                                        )
+                notification_time += datetime.timedelta(hours=interval)
+        else:
+            for i in range(0, total_hours + 1, interval):
+                Schedule.objects.create(user_info_id=user_info.id,
+                                        notification_time=make_aware(notification_time),
+                                        expected_amount=expected_amount,
+                                        notification_status=True,
+                                        is_last=(i == total_hours)
+                                        )
+                notification_time += datetime.timedelta(hours=interval)
 
     @staticmethod
     def delete_schedule(user_info):

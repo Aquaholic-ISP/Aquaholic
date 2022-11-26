@@ -110,21 +110,3 @@ input[type=number]::-webkit-inner-spin-button {
     position: relative;
     overflow: hidden;
 }
-.result button{
-    margin-top: 183px;
-  margin-bottom: 100px;
-  margin-right: -140px;
-  margin-left: 80px;
-    width: 250px;
-    height:50px;
-    padding: 20px auto;
-    text-align: center;
-    font-size: 18px;
-    border-radius: 25px;
-    font-weight: bold;
-    border: 2px solid #0E1646;
-    background: white;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}

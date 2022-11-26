@@ -235,8 +235,8 @@ class ScheduleView(TestCase):
         """Set user_info.notification_turned_on == False when clicks turn off."""
         page = self.client.post(reverse('aquaholic:schedule', args=(self.user.id,)), data={'status': "turn_off"})
         self.assertEqual(page.status_code, 200)
-        self.user_info1 = UserInfo.objects.get(user_id=self.user.id)
-        self.assertFalse(self.user_info1.notification_turned_on)
+        user_info1 = UserInfo.objects.get(user_id=self.user.id)
+        self.assertFalse(user_info1.notification_turned_on)
         response = self.client.post(reverse("aquaholic:set_up", args=(self.user.id,)),
                                     data={"first_notification": "11:00",
                                           "last_notification": "16:00",
@@ -244,15 +244,15 @@ class ScheduleView(TestCase):
         self.assertContains(response, "Saved! Please, visit schedule page to see the update.", html=True)
         page = self.client.post(reverse('aquaholic:schedule', args=(self.user.id,)), data={'status': "turn_off"})
         self.assertEqual(page.status_code, 200)
-        self.user_info1 = UserInfo.objects.get(user_id=self.user.id)
-        self.assertFalse(self.user_info1.notification_turned_on)
+        user_info1 = UserInfo.objects.get(user_id=self.user.id)
+        self.assertFalse(user_info1.notification_turned_on)
 
     def test_turn_on_notification(self):
         """Set user_info.notification_turned_on == True when clicks turn on."""
         page = self.client.post(reverse('aquaholic:schedule', args=(self.user.id,)), data={'status': "turn_on"})
         self.assertEqual(page.status_code, 200)
-        self.user_info1 = UserInfo.objects.get(user_id=self.user.id)
-        self.assertTrue(self.user_info1.notification_turned_on)
+        user_info1 = UserInfo.objects.get(user_id=self.user.id)
+        self.assertTrue(user_info1.notification_turned_on)
 
 
 class HistoryViewTest(TestCase):

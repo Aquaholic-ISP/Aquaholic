@@ -345,6 +345,7 @@ class LineNotifyVerificationViewTest(TestCase):
     """Tests for line notify verification view."""
 
     def test_redirect_after_visit(self):
+        """When enter url for line notify, it will redirect to line authorization url."""
         client = Client()
         response = client.get(reverse('aquaholic:line_notify'))
         self.assertEqual(response.status_code, 302)

@@ -41,6 +41,9 @@
 
 <div class="content">
     <h1>Your notification schedule</h1>
+    {% if not has_token %}
+        You must connect to Line Notify first to receive notification. <a href="{% url 'aquaholic:line_connect' user.id %}"> Connect to Line Notify </a>
+    {% endif %}
     <div class="scrollindiv">
 
             <div class="schedule">

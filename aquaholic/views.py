@@ -123,11 +123,17 @@ class RegistrationView(LoginRequiredMixin, generic.DetailView):
     template_name = 'aquaholic/regis.html'
 
     def get(self, request, *args, **kwargs):
-        """Registration page for new authenticated user."""
-        return render(request, self.template_name)
+        """Calculate page for authenticated user."""
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.weight == 0:
+            return render(request, self.template_name)
+        return render(request, self.template_name,
+                      {'result': user_info.water_amount_per_day,
+                       'weight': user_info.weight,
+                       'exercise_duration': user_info.exercise_duration})
 
     def post(self, request, *args, **kwargs):
-        """Water amount per day calculate from user weight and exercise duration for new authenticated user."""
+        """Water amount per day calculate from user weight and exercise duration for authenticated user."""
         try:
             user_info = UserInfo.objects.get(user_id=request.user.id)
             user_info.weight = float(request.POST["weight"])
@@ -137,14 +143,18 @@ class RegistrationView(LoginRequiredMixin, generic.DetailView):
             user_info.save()
             if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html',
-                              {'result': user_info.water_amount_per_day})
+                              {'result': user_info.water_amount_per_day,
+                               'weight': user_info.weight,
+                               'exercise_duration': user_info.exercise_duration})
             # update schedule
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
                 one_schedule.expected_amount = user_info.water_amount_per_hour
                 one_schedule.save()
             return render(request, self.template_name,
-                          {'result': user_info.water_amount_per_day})
+                          {'result': user_info.water_amount_per_day,
+                           'weight': user_info.weight,
+                           'exercise_duration': user_info.exercise_duration})
         except ValueError:
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
@@ -250,13 +260,24 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
             self.create_schedule(user_info)  # create new schedule
+            status = check_token_status(user_info.notify_token)
             message = "Saved! Please, visit schedule page to see the updates."
             return render(request, self.template_name,
-                          {'message': message})
+                          {'message': message,
+                           'first_notification': user_info.first_notification_time.strftime("%H:%M"),
+                           'last_notification': user_info.last_notification_time.strftime("%H:%M"),
+                           'notification_hour': interval,
+                           "has_token": status == 200})
         except ValueError:
             message = "Please, enter time in both fields."
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            status = check_token_status(user_info.notify_token)
             return render(request, self.template_name,
-                          {'message': message})
+                          {'message': message,
+                           "first_notification": user_info.first_notification_time.strftime("%H:%M"),
+                           "last_notification": user_info.last_notification_time.strftime("%H:%M"),
+                           "notification_hour": user_info.time_interval,
+                           "has_token": status == 200})
 
     @staticmethod
     def update_user_info(first_notify_time, last_notify_time, interval, user_info):
@@ -342,8 +363,10 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
+        status = check_token_status(user_info.notify_token)
         return render(request, self.template_name,
-                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id), })
+                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id),
+                       'has_token': status == 200})
 
     def post(self, request, *args, **kwargs):
         """Notification of schedule."""
@@ -360,8 +383,10 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
             for row in user_schedule:
                 row.notification_status = row.notification_time < timezone.now()
                 row.save()
+        status = check_token_status(user_info.notify_token)
         return render(request, self.template_name,
-                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
+                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id),
+                       'has_token': status == 200})
 
 
 class InputView(LoginRequiredMixin, generic.DetailView):

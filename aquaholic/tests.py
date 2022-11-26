@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from aquaholic.notification import get_access_token, send_notification, check_token_status
 from unittest.mock import patch
-import pytz
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):

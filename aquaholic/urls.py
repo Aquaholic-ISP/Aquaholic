@@ -1,5 +1,7 @@
 from django.urls import path
 from django.views.generic import RedirectView
+from decouple import config
+from django.views.generic import TemplateView
 
 from . import views
 
@@ -21,4 +23,6 @@ urlpatterns = [
     path('aquaholic/profile', views.ProfileView.as_view(), name="profile"),
     path('aquaholic/cron', views.update_notification, name='cron'),
     path('aquaholic/alert', views.login_alert, name='alert'),
+    path('aquaholic/line_notify', views.LineNotifyVerificationView.as_view(), name="line_notify"),
+    path('aquaholic/<int:pk>/line_connect', views.LineNotifyConnect.as_view(), name="line_connect")
 ]

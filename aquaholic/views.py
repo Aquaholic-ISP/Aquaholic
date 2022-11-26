@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Schedule, Intake, UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
-from .notification import get_access_token, send_notification
+from .notification import get_access_token, send_notification, check_token_status
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -203,10 +203,13 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         first = user_info.first_notification_time.strftime("%H:%M")
         last = user_info.last_notification_time.strftime("%H:%M")
         noti_hour = int(user_info.time_interval)
+        status = check_token_status(user_info.notify_token)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-        return render(request, self.template_name,
-                      {'first_notification': first, 'last_notification': last, 'notification_hour': noti_hour})
+        return render(request, self.template_name, {'first_notification': first,
+                                                    'last_notification': last,
+                                                    'notification_hour': noti_hour,
+                                                    "has_token": status == 200})
 
     def post(self, request, *args, **kwargs):
         """
@@ -216,6 +219,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         the user already has notify token. User will stay on
         set up page if the value is invalid.
         """
+        user_info = UserInfo.objects.get(user_id=request.user.id)
         try:
             first = request.POST["first_notification"]
             last = request.POST["last_notification"]
@@ -226,19 +230,14 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                 message = "Please, enter different time or time difference is more than 1 hour."
                 return render(request, self.template_name,
                               {'message': message})
-            user_info = UserInfo.objects.get(user_id=request.user.id)
             if user_info.water_amount_per_day == 0:
                 return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
             self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
             self.create_schedule(user_info)  # create new schedule
-            if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
-                return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
-            else:
-                # redirect to line notify website for generate token
-                url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
-                      f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
-                return HttpResponseRedirect(url)
+            message = "Saved! Please, visit schedule page to see the updates."
+            return render(request, self.template_name,
+                          {'message': message})
         except ValueError:
             message = "Please, enter time in both fields."
             return render(request, self.template_name,
@@ -289,6 +288,21 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                 one_schedule.delete()
 
 
+class LineNotifyVerificationView(LoginRequiredMixin, generic.DetailView):
+    def get(self, request, *args, **kwargs):
+        url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
+              f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
+        return HttpResponseRedirect(url)
+
+
+class LineNotifyConnect(LoginRequiredMixin, generic.DetailView):
+    def get(self, request, *args, **kwargs):
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        status = check_token_status(user_info.notify_token)
+        return render(request, "aquaholic/line_connect.html",
+                      {"has_token": status == 200})
+
+
 class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
     """A class that handles the callback after user authorize notification."""
 
@@ -300,7 +314,7 @@ class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         user_info.notify_token = token
         user_info.save()
-        return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
+        return HttpResponseRedirect(reverse('aquaholic:line_connect', args=(request.user.id,)))
 
 
 class ScheduleView(LoginRequiredMixin, generic.DetailView):
@@ -445,7 +459,7 @@ def update_notification(request):
     in a user's schedule is sent, the time in the schedule will be
     added by 24 hours.
     """
-    all_to_send = Schedule.objects.filter(notification_time__lte=datetime.datetime.now(),
+    all_to_send = Schedule.objects.filter(notification_time__lte=make_aware(datetime.datetime.now()),
                                           notification_status=False)
     for one_to_send in all_to_send:
         send_notification(f"Don't forget to drink {one_to_send.expected_amount} ml of water",
@@ -454,7 +468,7 @@ def update_notification(request):
         one_to_send.save()
 
     last_to_send = Schedule.objects.filter(notification_status=True, is_last=True,
-                                           notification_time__lte=datetime.datetime.now())
+                                           notification_time__lte=make_aware(datetime.datetime.now()))
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)

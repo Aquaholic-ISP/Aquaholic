@@ -32,3 +32,13 @@ def send_notification(message, token):
 
     r = requests.post(url, headers=headers, data={'message': message})
     return r.json()['status']
+
+
+def check_token_status(token):
+    url = "https://notify-api.line.me/api/status"
+    if not token:
+        return 0
+    headers = {'content-type': 'application/x-www-form-urlencoded',
+               'Authorization': 'Bearer ' + token}
+    r = requests.get(url, headers=headers)
+    return r.json()['status']

@@ -1,7 +1,6 @@
 {% load static %}
 {% load socialaccount %}
 {% load i18n %}
-
 <html>
 <head>
     <title>Set your new schedule</title>
@@ -39,28 +38,24 @@
 
 <div class="content">
     <h1>Set your notification schedule</h1>
+    <p style="font-size: 20px; ">Connect to Line Notify for receiving notifications which will remind you to drink water throughout the day</p>
     <div class="setup">
-        <form action="{% url 'aquaholic:set_up' user.id %}" method="POST">
-            {% csrf_token %}
-            <br>
-            <label id="first" style="font-size: 25px;">Enter your first notification time</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="time" name="first_notification" value="{{ first_notification }}">
-            <br>
-            <label id="last" style="font-size: 25px;">Enter your last notification time</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="time" name="last_notification" value="{{ last_notification }}">
-            <br>
-            <label id="frequency" style="font-size: 25px; ">Notify every</label>
-            <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_interval" min="1" value="{{ notification_hour }}">
-            <label style="font-size: 25px;">hours</label>
-
-            <br>
-            {% if message %}
-                <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
-            {% endif %}
-            <br>
-            <button  type="submit" style="margin-top: 40px;">save</button>
-        </form>
+        <a id="line-notify"  href="{% url 'aquaholic:line_notify' %}">Connect to your Line Notify</a>
+        <button id="help" type="button" onclick="alert('After clicking - Connect to your Line Notify - , you will be asked to login to your line account and asked which chat or group you would like to receive notifications from our app.')">?</button>
         <br>
+        {% if has_token %}
+           <p style="font-size: 20px; "> ✅ Line notify is connected. Notification is enabled.</p>
+           <br>
+           <p style="font-size: 16px; "> You can turn off notification anytime in the schedule page or disconnect from line notify anytime at <a style="color: white" href="https://notify-bot.line.me/my/">My page - Line Notify</a></p>
+           <br>
+           <a id="line-connect" href="{% url 'aquaholic:set_up' user.id %}"> Notification Settings </a>
+        {% else %}
+           <p style="font-size: 20px; "> ❌ Line notify is not connected. Notification is not yet enabled.</p>
+           <br>
+           <p style="font-size: 16px; "> Please, connect to your line notify first to receive notification from our app</a></p>
+
+        {% endif %}
     </div>
-</div>    
+</div>
+
 </html>

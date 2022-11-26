@@ -142,27 +142,27 @@ class CalculateAuthView(TestCase):
 
 
 class SetUpView(TestCase):
-    def test_setup_page(self):
+    def setUp(self):
         """ authenticated user can redirect to set up page"""
-        user = User.objects.create(username='testuser')
-        user.set_password('12345')
-        user.save()
-        client = Client()
-        client.login(username='testuser', password='12345')
-        page = client.get(reverse('aquaholic:home'))
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='12345')
+        page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 302)  # redirect to registration page
-        client.post(reverse("aquaholic:registration", args=(user.id,)), data={"weight": 50, "exercise_duration": 0})
-        page = client.get(reverse('aquaholic:set_up', args=(user.id,)))
+        self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                    data={"weight": 50, "exercise_duration": 0})
+        page = self.client.get(reverse('aquaholic:set_up', args=(self.user.id,)))
         self.assertEqual(page.status_code, 200)
 
-    def test_get_notification_time(self):
-        """User can set notification time in set up page."""
-        first_notify_time = datetime.time.strftime(datetime.time(10, 0, 0), "%H:%M")
-        last_notify_time = datetime.time.strftime(datetime.time(22, 0, 0), "%H:%M")
-        self.client.login()
-        user = create_userinfo(80, 0, first_notify_time, last_notify_time)
-        self.assertEqual(user.first_notification_time, "10:00")
-        self.assertEqual(user.last_notification_time, "22:00")
+    def test_set_notification_time(self):
+        response = self.client.post(reverse("aquaholic:set_up", args=(self.user.id,)),
+                                    data={"first_notification": "11:00",
+                                          "last_notification": "16:00",
+                                          "notify_interval": 1})
+        print(response)
+        self.assertContains(response, "Saved! Please, visit schedule page to see the updates.", html=True)
 
 
 class ScheduleView(TestCase):

@@ -326,6 +326,10 @@ class Notification(TestCase):
         self.assertNotEqual(check_token_status(invalid_token), 200)
         self.assertNotEqual(check_token_status(none_token), 200)
 
+    def test_get_access_token_with_invalid_code(self):
+        """Return None when input invalid code."""
+        self.assertEqual(get_access_token("asjadk"), None)
+
 
 class UpdateNotificationView(TestCase):
     """Tests for update notification view."""

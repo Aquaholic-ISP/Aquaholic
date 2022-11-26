@@ -206,49 +206,6 @@ class SetUpRegistrationView(LoginRequiredMixin, generic.DetailView):
         return render(request, self.template_name,
                       {"has_token": status == 200})
 
-    @staticmethod
-    def update_user_info(first_notify_time, last_notify_time, interval, user_info):
-        """Save new user information to the database."""
-        user_info.first_notification_time = first_notify_time
-        user_info.last_notification_time = last_notify_time
-        user_info.time_interval = interval
-        # calculate and save total hours and water amount per hour to database
-        user_info.total_hours = get_total_hours(user_info.first_notification_time,
-                                                user_info.last_notification_time)
-        user_info.set_water_amount_per_hour()
-        user_info.save()
-
-    @staticmethod
-    def create_schedule(user_info):
-        """Create new schedule provided the new information given."""
-        # get total hours, first notification time and expected amount (water amount to drink per hour)
-        total_hours = int(user_info.total_hours)
-        expected_amount = user_info.water_amount_per_hour
-        first_notification_time = datetime.datetime.combine(datetime.date.today(),
-                                                            user_info.first_notification_time)
-        last_notification_time = first_notification_time + datetime.timedelta(hours=total_hours)
-        # last notification time less than now, the schedule will notify tomorrow
-        if last_notification_time < datetime.datetime.now():
-            first_notification_time += datetime.timedelta(hours=24)
-        notification_time = first_notification_time
-        interval = user_info.time_interval
-        for i in range(0, total_hours + 1, interval):
-            Schedule.objects.create(user_info_id=user_info.id,
-                                    notification_time=make_aware(notification_time),
-                                    expected_amount=int(expected_amount),
-                                    notification_status=(notification_time < datetime.datetime.now()),
-                                    is_last=(i == total_hours)
-                                    )
-            notification_time += datetime.timedelta(hours=interval)
-
-    @staticmethod
-    def delete_schedule(user_info):
-        """Delete all the existing schedule for this user."""
-        if Schedule.objects.filter(user_info_id=user_info.id).exists():
-            found_schedule = Schedule.objects.filter(user_info_id=user_info.id)
-            for one_schedule in found_schedule:
-                one_schedule.delete()
-
 
 class SetUpView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the set up page view."""

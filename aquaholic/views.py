@@ -261,7 +261,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             self.delete_schedule(user_info)  # remove all old schedules if any
             self.create_schedule(user_info)  # create new schedule
             status = check_token_status(user_info.notify_token)
-            message = "Saved! Please, visit schedule page to see the updates."
+            message = "Saved! Please, visit schedule page to see the update."
             return render(request, self.template_name,
                           {'message': message,
                            'first_notification': user_info.first_notification_time.strftime("%H:%M"),

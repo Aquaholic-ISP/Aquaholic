@@ -340,6 +340,8 @@ class LineNotifyConnect(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         """Go to line connect page."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.water_amount_per_day == 0:
+            return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
         status = check_token_status(user_info.notify_token)
         return render(request, "aquaholic/line_connect.html",
                       {"has_token": status == 200})

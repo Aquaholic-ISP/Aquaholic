@@ -137,6 +137,11 @@ class CalculateAuthView(TestCase):
         self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
                          data={"weight": 50, "exercise_duration": 0})
 
+    def test_get_calculate_auth(self):
+        """Go to calculate page for authenticated user."""
+        response = self.client.get(reverse("aquaholic:calculate_auth", args=(self.user.id,)))
+        self.assertEqual(response.status_code, 200)
+
     def test_calculation(self):
         """Calculation is done correctly."""
         response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
@@ -349,3 +354,19 @@ class LineNotifyVerificationViewTest(TestCase):
         client = Client()
         response = client.get(reverse('aquaholic:line_notify'))
         self.assertEqual(response.status_code, 302)
+
+
+class LineNotifyConnectViewTest(TestCase):
+    """Tests for line notify connect view."""
+
+    def test_get_line_connect(self):
+        """Can visit to line connect view."""
+        user1 = User.objects.create(username='testuser1')
+        user1.set_password('12345')
+        user1.save()
+        client = Client()
+        client.login(username='testuser1', password='12345')
+        client.get(reverse("aquaholic:home"))
+        client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
+        response = client.get(reverse('aquaholic:line_connect', args=(user1.id,)))
+        self.assertEqual(response.status_code, 200)

@@ -528,7 +528,7 @@ def update_notification(request):
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)
-        if not user_info.notification_turned_on:
+        if user_info.notification_turned_on:
             for schedule in user_schedule:
                 schedule.notification_time += timezone.timedelta(hours=24)
                 schedule.notification_status = False

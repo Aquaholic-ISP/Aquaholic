@@ -209,6 +209,8 @@ class SetUpView(TestCase):
                                           "last_notification": "16:00",
                                           "notify_interval": 1})
         self.assertContains(response, "Saved! Please, visit schedule page to see the update.", html=True)
+        response = self.client.get(reverse('aquaholic:cron'))
+        self.assertEqual(response.status_code, 200)
 
 
 class ScheduleView(TestCase):

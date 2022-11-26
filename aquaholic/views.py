@@ -201,51 +201,10 @@ class SetUpRegistrationView(LoginRequiredMixin, generic.DetailView):
     template_name = 'aquaholic/set_up_regist.html'
 
     def get(self, request, *args, **kwargs):
-        """Set up schedule page."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
-        first = user_info.first_notification_time.strftime("%H:%M")
-        last = user_info.last_notification_time.strftime("%H:%M")
-        noti_hour = int(user_info.time_interval)
-        if user_info.water_amount_per_day == 0:
-            return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
+        status = check_token_status(user_info.notify_token)
         return render(request, self.template_name,
-                      {'first_notification': first, 'last_notification': last, 'notification_hour': noti_hour})
-
-    def post(self, request, *args, **kwargs):
-        """
-        Handle tasks after user clicked save.
-        Update the database and redirect user to line
-        notify authorization or schedule page in case that
-        the user already has notify token. User will stay on
-        set up page if the value is invalid.
-        """
-        try:
-            first = request.POST["first_notification"]
-            last = request.POST["last_notification"]
-            interval = int(request.POST["notify_interval"])
-            first_notify_time = datetime.datetime.strptime(first, "%H:%M").time()
-            last_notify_time = datetime.datetime.strptime(last, "%H:%M").time()
-            if first == last or get_total_hours(first_notify_time, last_notify_time) == 0:
-                message = "Please, enter different time or time difference is more than 1 hour."
-                return render(request, self.template_name,
-                              {'message': message})
-            user_info = UserInfo.objects.get(user_id=request.user.id)
-            if user_info.water_amount_per_day == 0:
-                return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-            self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
-            self.delete_schedule(user_info)  # remove all old schedules if any
-            self.create_schedule(user_info)  # create new schedule
-            if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
-                return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
-            else:
-                # redirect to line notify website for generate token
-                url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
-                      f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
-                return HttpResponseRedirect(url)
-        except ValueError:
-            message = "Please, enter time in both fields."
-            return render(request, self.template_name,
-                          {'message': message})
+                      {"has_token": status == 200})
 
     @staticmethod
     def update_user_info(first_notify_time, last_notify_time, interval, user_info):

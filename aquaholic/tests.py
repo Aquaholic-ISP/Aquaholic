@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from aquaholic.views import *
 from django.contrib.auth.models import User
 from django.utils import timezone
-from aquaholic.notification import get_access_token, send_notification
+from aquaholic.notification import get_access_token, send_notification, check_token_status
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
@@ -167,22 +167,6 @@ class SetUpView(TestCase):
 
 class ScheduleView(TestCase):
     """Test cases for schedule view."""
-    # def test_new_user_schedule_page_not_found(self):
-    #     """Authenticated user can redirect to schedule page. But no time and amount in schedule page
-    #     if users are not create schedule."""
-    #     user = User.objects.create(username='testuser')
-    #     user.set_password('12345')
-    #     user.save()
-    #     client = Client()
-    #     client.login(username='testuser', password='12345')
-    #     userinfo = UserInfo.objects.create(weight=50, exercise_duration=30, first_notification_time=datetime.time(11, 0, 0),
-    #                                        last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
-    #     userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
-    #                                            userinfo.last_notification_time)
-    #     userinfo.set_water_amount_per_hour()
-    #     userinfo.save()
-    #     page = client.get(reverse('aquaholic:schedule', args=(user.id,), ))
-    #     self.assertEqual(page.status_code, 200)
 
     def test_set_schedule(self):
         """schedule show time nad amount after generate schedule."""
@@ -196,23 +180,6 @@ class ScheduleView(TestCase):
         client.post(reverse("aquaholic:registration", args=(user.id,)), data={"weight": 50, "exercise_duration": 0})
         page = client.get(reverse('aquaholic:schedule', args=(user.id,)))
         self.assertEqual(page.status_code, 200)
-        # userinfo = UserInfo.objects.create(weight=50, exercise_duration=30,
-        # first_notification_time=datetime.time(11, 0, 0),
-        #                                    last_notification_time=datetime.time(22, 0, 0), user_id=user.id)
-        # userinfo.total_hours = get_total_hours(userinfo.first_notification_time,
-        #                                        userinfo.last_notification_time)
-        # userinfo.set_water_amount_per_hour()
-        # userinfo.save()
-        # first_notify_time = userinfo.first_notification_time
-        # expected_amount = userinfo.water_amount_per_hour
-        # first_notification_time = datetime.datetime.combine(datetime.date.today(), first_notify_time)
-        # Schedule.objects.create(user_info_id=userinfo.id,
-        #                             notification_time=first_notification_time,
-        #                             expected_amount=expected_amount,
-        #                             notification_status=False
-        #                             )
-        # page = client.get(reverse('aquaholic:schedule', args=(user.id,),))
-        # self.assertEqual(page.status_code, 200)
 
 
 class HistoryViewTest(TestCase):
@@ -304,6 +271,12 @@ class AlertViewTest(TestCase):
 class Notification(TestCase):
     def test_token_is_None(self):
         self.assertIsNone(send_notification("Hi", None))
+
+    def test_check_invalid_token_status(self):
+        invalid_token = "askjhdjkas"
+        none_token = None
+        self.assertNotEqual(check_token_status(invalid_token), 200)
+        self.assertNotEqual(check_token_status(none_token), 200)
 
 
 class UpdateNotificationView(TestCase):

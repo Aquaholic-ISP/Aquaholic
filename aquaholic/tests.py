@@ -26,7 +26,7 @@ class UserInfoModelTests(TestCase):
         user = UserInfo(weight=50, exercise_duration=60)
         user.set_water_amount_per_day()
         amount = 2339.7265
-        self.assertAlmostEqual(amount, user.water_amount_per_day, places=4)
+        self.assertAlmostEqual(int(amount), user.water_amount_per_day, places=4)
 
     def test_get_total_hour(self):
         """calculate the total hour from user input notification time."""
@@ -44,7 +44,7 @@ class UserInfoModelTests(TestCase):
         user.set_water_amount_per_day()
         user.total_hours = get_total_hours(user.first_notification_time, user.last_notification_time)
         user.set_water_amount_per_hour()
-        self.assertAlmostEqual(per_hour, user.water_amount_per_hour, 2)
+        self.assertAlmostEqual(int(per_hour), user.water_amount_per_hour, 2)
 
 
 class HomePageView(TestCase):
@@ -73,6 +73,10 @@ class CalculateView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Please, enter numbers in both fields.", html=True)
 
+    def test_calculation(self):
+        response = self.client.post('/aquaholic/calculate', data={"weight": 65, "exercise_duration": 120})
+        self.assertContains(response, 3538)
+
 
 class TemplateUsed(TestCase):
     def test_template_used(self):
@@ -100,6 +104,8 @@ class TemplateUsed(TestCase):
                                                                         "notify_interval": 1})
         page = client.get(reverse('aquaholic:schedule', args=(user.id,)))
         self.assertTemplateUsed(page, 'aquaholic/schedule.html')
+        page = client.get(reverse('aquaholic:alert'))
+        self.assertTemplateUsed(page, 'aquaholic/alert.html')
 
 
 class LoginWithLine(TestCase):
@@ -109,6 +115,30 @@ class LoginWithLine(TestCase):
         cal_url = reverse('aquaholic:home')
         response = self.client.get(cal_url)
         self.assertEqual(response.status_code, 200)
+
+
+class CalculateAuthView(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client.login(username='testuser', password='12345')
+        page1 = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page1.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
+
+    def test_calculation(self):
+        response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
+                                    data={"weight": 65, "exercise_duration": 120})
+        self.assertContains(response, 3538)
+
+    def test_invalid_input(self):
+        """input invalid value"""
+        response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
+                                    data={"weight": "weight", "exercise_duration": 0})
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Please, enter numbers in both fields.", html=True)
 
 
 class SetUpView(TestCase):

@@ -2,14 +2,15 @@
     margin: 0;
     padding: 0;
     text-align: center;
-    /*background-color: #FFFFFF;*/
-    background: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
+    background-color: transparent;
+    background-repeat: no-repeat;
     color: #0E1646;
     font-family: "Poppins", sans-serif;
 }
 
-.head h1{
+h1{
     font-size: 60px;
+    background-color: transparent;
 }
 
 .search label{
@@ -36,6 +37,14 @@
     position: relative;
     overflow: hidden;
 }
+
+.chart {
+    background-color: transparent;
+    height: 80%;
+    width: 80%;
+    margin-left: 10%;
+    margin-top: 1%;
+} 
 
 canvas {
     background: #FFFFFF;

@@ -171,11 +171,11 @@ class RegistrationViewTest(TestCase):
 
     def test_invalid_input(self):
         """Input invalid value."""
-        response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
+        response = self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
                                     data={"weight": "weight", "exercise_duration": 0})
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Please, enter numbers in both fields.", html=True)
-        response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
+        response = self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
                                     data={"weight": 0, "exercise_duration": 0})
         self.assertEqual(response.status_code, HTTPStatus.OK)
 

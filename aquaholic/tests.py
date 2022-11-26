@@ -151,6 +151,35 @@ class CalculateAuthView(TestCase):
         self.assertContains(response, "Please, enter numbers in both fields.", html=True)
 
 
+class RegistrationViewTest(TestCase):
+    """Test cases for registration view."""
+
+    def setUp(self) -> None:
+        """Login and go register first."""
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client.login(username='testuser', password='12345')
+        page1 = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page1.status_code, 302)  # redirect to registration page
+
+    def test_calculation(self):
+        """Calculation is done correctly."""
+        response = self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                                    data={"weight": 65, "exercise_duration": 120})
+        self.assertContains(response, 3538)
+
+    def test_invalid_input(self):
+        """Input invalid value."""
+        response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
+                                    data={"weight": "weight", "exercise_duration": 0})
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Please, enter numbers in both fields.", html=True)
+        response = self.client.post(reverse("aquaholic:calculate_auth", args=(self.user.id,)),
+                                    data={"weight": 0, "exercise_duration": 0})
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+
 class SetUpView(TestCase):
     """Tests for set up view."""
 
@@ -306,3 +335,12 @@ class UpdateNotificationView(TestCase):
         client = Client()
         response = client.get(reverse('aquaholic:cron'))
         self.assertEqual(response.status_code, 200)
+
+
+class LineNotifyVerificationViewTest(TestCase):
+    """Tests for line notify verification view."""
+
+    def test_redirect_after_visit(self):
+        client = Client()
+        response = client.get(reverse('aquaholic:line_notify'))
+        self.assertEqual(response.status_code, 302)

@@ -341,7 +341,10 @@ class AlertViewTest(TestCase):
     def test_unauthenticated_user_cannot_go_to_login_required_page(self):
         """Unauthenticated user will be redirected to alert page if they are not logged in."""
         client = Client()
-        response = client.get(reverse('aquaholic:profile'))
+        user1 = User.objects.create(username='testuser1')
+        user1.set_password('12345')
+        user1.save()
+        response = client.get(reverse('aquaholic:profile', args=(user1.id,)))
         self.assertEqual(response.status_code, 302)
 
 

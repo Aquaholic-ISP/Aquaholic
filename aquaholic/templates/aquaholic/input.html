@@ -92,7 +92,7 @@
             </div>
 
             <div class="save">
-                <button type="submit">Save</button>
+                <button type="submit" onclick="this.disabled=true;this.value='Submitting...'; this.form.submit();">Save</button>
             </div>
 
             {% if message %}

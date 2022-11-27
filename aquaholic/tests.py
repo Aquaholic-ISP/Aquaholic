@@ -311,3 +311,25 @@ class UpdateNotificationView(TestCase):
         client = Client()
         response = client.get(reverse('aquaholic:cron'))
         self.assertEqual(response.status_code, 200)
+
+
+class ProfileViewTest(TestCase):
+    """Test cases for profile view."""
+
+    def test_profile(self):
+        """Authenticated user can view their profile."""
+        user = User.objects.create(username='testuser1')
+        user.set_password('12345')
+        user.save()
+        client = Client()
+        client.login(username='testuser', password='12345')
+        client.post(reverse("aquaholic:registration", args=(user.id,)), data={"weight": 60, "exercise_duration": 70})
+        response = client.get(reverse('aquaholic:profile'))
+        self.assertEqual(response.status_code, 302)
+        profile_url = reverse('aquaholic:profile')
+        form_data = {"first_name": "-",
+                     "weight": "60.0",
+                     "exercise_duration": "70.0",
+                     "user_id": f"{user.id}"}
+        response = client.get(profile_url, form_data)
+        self.assertEqual(response.status_code, 302)

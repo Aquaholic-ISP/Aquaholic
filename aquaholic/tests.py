@@ -444,9 +444,9 @@ class ProfileViewTest(TestCase):
         client = Client()
         client.login(username='testuser', password='12345')
         client.post(reverse("aquaholic:registration", args=(user.id,)), data={"weight": 60, "exercise_duration": 70})
-        response = client.get(reverse('aquaholic:profile'))
+        response = client.get(reverse('aquaholic:profile', args=(user.id,)))
         self.assertEqual(response.status_code, 302)
-        profile_url = reverse('aquaholic:profile')
+        profile_url = reverse('aquaholic:profile', args=(user.id,))
         form_data = {"first_name": "-",
                      "weight": "60.0",
                      "exercise_duration": "70.0",

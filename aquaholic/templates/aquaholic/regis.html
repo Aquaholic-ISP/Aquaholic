@@ -51,9 +51,9 @@
             {% endif %}
             <button type="submit" style="margin-top: 40px;">Calculate and Save</button>
             {% if result %}
-            <a href="{% url 'aquaholic:set_up' user.id %}">
-    <button type="button" style="margin-bottom=400;">Next</button>
-</a>
+              <a href="{% url 'aquaholic:line_connect' user.id %}">
+              <button type="button" style="margin-bottom=400;">Next</button>
+              </a>
             {% endif %}
 
         </form>

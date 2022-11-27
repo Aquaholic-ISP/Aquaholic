@@ -298,21 +298,22 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         # get total hours, first notification time and expected amount (water amount to drink per hour)
         total_hours = int(user_info.total_hours)
         expected_amount = user_info.water_amount_per_hour
+        interval = user_info.time_interval
+        last_hour = total_hours - total_hours % interval
         first_notification_time = datetime.datetime.combine(datetime.date.today(),
                                                             user_info.first_notification_time)
-        last_notification_time = first_notification_time + datetime.timedelta(hours=total_hours)
+        last_notification_time = first_notification_time + datetime.timedelta(hours=last_hour)
         # last notification time less than now, the schedule will notify tomorrow
         if last_notification_time < datetime.datetime.now():
             first_notification_time += datetime.timedelta(hours=24)
         notification_time = first_notification_time
-        interval = user_info.time_interval
         if user_info.notification_turned_on:
             for i in range(0, total_hours + 1, interval):
                 Schedule.objects.create(user_info_id=user_info.id,
                                         notification_time=make_aware(notification_time),
                                         expected_amount=expected_amount,
                                         notification_status=(notification_time < datetime.datetime.now()),
-                                        is_last=(i == total_hours)
+                                        is_last=(i == last_hour)
                                         )
                 notification_time += datetime.timedelta(hours=interval)
         else:
@@ -321,7 +322,7 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                                         notification_time=make_aware(notification_time),
                                         expected_amount=expected_amount,
                                         notification_status=True,
-                                        is_last=(i == total_hours)
+                                        is_last=(i == last_hour)
                                         )
                 notification_time += datetime.timedelta(hours=interval)
 

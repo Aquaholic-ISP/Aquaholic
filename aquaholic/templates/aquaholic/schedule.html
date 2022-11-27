@@ -47,7 +47,6 @@
     <div class="scrollindiv">
 
             <div class="schedule">
-                <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
                 <table border="1" cellpadding=10>
                 <th style="text-align:center; width: 250px;">Time</th>
                 <th style="text-align:center; width: 250px;">Amount (ml)</th>
@@ -74,9 +73,7 @@
                     {% endif %}
                     </tr>
                 {% endfor %}
-
                 </table><br>
-                </form>
 
         </div>
 
@@ -85,8 +82,8 @@
 
     <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
         {% csrf_token %}
-        <button name="status" value="turn off"> Turn off notification </button>
-        <button name="status" value="turn on"> Turn on notification </button>
+        <button type="submit" name="status" value="turn_off"> Turn off notification </button>
+        <button type="submit" name="status" value="turn_on"> Turn on notification </button>
     </form>
 
 </div>

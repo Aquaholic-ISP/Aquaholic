@@ -1,6 +1,6 @@
 """Unittests for aquaholic app."""
 import datetime
-from aquaholic.models import UserInfo, Intake
+from aquaholic.models import UserInfo, Intake, Schedule
 from django.urls import reverse
 from http import HTTPStatus
 from django.test import TestCase, Client
@@ -8,6 +8,7 @@ from aquaholic.views import *
 from django.contrib.auth.models import User
 from django.utils import timezone
 from aquaholic.notification import get_access_token, send_notification, check_token_status
+from unittest.mock import patch
 
 
 def create_userinfo(weight, exercise_time, first_notification_time, last_notification_time):
@@ -198,7 +199,7 @@ class SetUpView(TestCase):
         page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 302)  # redirect to registration page
         self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
-                    data={"weight": 50, "exercise_duration": 0})
+                         data={"weight": 50, "exercise_duration": 0})
         page = self.client.get(reverse('aquaholic:set_up', args=(self.user.id,)))
         self.assertEqual(page.status_code, 200)
 
@@ -213,19 +214,46 @@ class SetUpView(TestCase):
 
 class ScheduleView(TestCase):
     """Test cases for schedule view."""
-
-    def test_set_schedule(self):
-        """Schedule show time nad amount after generate schedule."""
-        user = User.objects.create(username='testuser')
-        user.set_password('12345')
-        user.save()
-        client = Client()
-        client.login(username='testuser', password='12345')
-        page = client.get(reverse('aquaholic:home'))
+    def setUp(self):
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='12345')
+        page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 302)  # redirect to registration page
-        client.post(reverse("aquaholic:registration", args=(user.id,)), data={"weight": 50, "exercise_duration": 0})
-        page = client.get(reverse('aquaholic:schedule', args=(user.id,)))
+        self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
+        page = self.client.get(reverse('aquaholic:schedule', args=(self.user.id,)))
         self.assertEqual(page.status_code, 200)
+
+    def test_get_schedule(self):
+        """Can go to schedule page successfully."""
+        page = self.client.get(reverse('aquaholic:schedule', args=(self.user.id,)))
+        self.assertEqual(page.status_code, 200)
+
+    def test_turn_off_notification(self):
+        """Set user_info.notification_turned_on == False when clicks turn off."""
+        page = self.client.post(reverse('aquaholic:schedule', args=(self.user.id,)), data={'status': "turn_off"})
+        self.assertEqual(page.status_code, 200)
+        user_info1 = UserInfo.objects.get(user_id=self.user.id)
+        self.assertFalse(user_info1.notification_turned_on)
+        response = self.client.post(reverse("aquaholic:set_up", args=(self.user.id,)),
+                                    data={"first_notification": "11:00",
+                                          "last_notification": "16:00",
+                                          "notify_interval": 1})
+        self.assertContains(response, "Saved! Please, visit schedule page to see the update.", html=True)
+        page = self.client.post(reverse('aquaholic:schedule', args=(self.user.id,)), data={'status': "turn_off"})
+        self.assertEqual(page.status_code, 200)
+        user_info1 = UserInfo.objects.get(user_id=self.user.id)
+        self.assertFalse(user_info1.notification_turned_on)
+
+    def test_turn_on_notification(self):
+        """Set user_info.notification_turned_on == True when clicks turn on."""
+        page = self.client.post(reverse('aquaholic:schedule', args=(self.user.id,)), data={'status': "turn_on"})
+        self.assertEqual(page.status_code, 200)
+        user_info1 = UserInfo.objects.get(user_id=self.user.id)
+        self.assertTrue(user_info1.notification_turned_on)
 
 
 class HistoryViewTest(TestCase):
@@ -339,11 +367,41 @@ class Notification(TestCase):
 class UpdateNotificationView(TestCase):
     """Tests for update notification view."""
 
-    def test_cron_view_return_blank_page(self):
-        """Can go to cron view successfully."""
+    def test_get_update_notification_view(self):
+        """Can go to update notification view successfully."""
         client = Client()
         response = client.get(reverse('aquaholic:cron'))
         self.assertEqual(response.status_code, 200)
+
+    def test_schedule_updates_correctly(self):
+        """When the last schedule is sent, all schedule will be added by 24 hours."""
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='12345')
+        page = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
+        response = self.client.post(reverse("aquaholic:set_up", args=(self.user.id,)),
+                                    data={"first_notification": "19:00",
+                                          "last_notification": "21:00",
+                                          "notify_interval": 1})
+        self.assertContains(response, "Saved! Please, visit schedule page to see the update.", html=True)
+        response = self.client.get(reverse('aquaholic:cron'))
+        self.assertEqual(response.status_code, 200)
+        user_info = UserInfo.objects.get(user_id=self.user.id)
+        last_schedule = Schedule.objects.filter(user_info_id=user_info.id, is_last=True).first().notification_time
+        today = datetime.datetime.now().strftime("%Y %B %d")
+        self.assertEqual(today, last_schedule.strftime("%Y %B %d"))
+        with patch.object(timezone, 'now', return_value=last_schedule+timezone.timedelta(minutes=1)):
+            response = self.client.get(reverse('aquaholic:cron'))
+            self.assertEqual(response.status_code, 200)
+            new_last_schedule = Schedule.objects.filter(user_info_id=user_info.id,
+                                                        is_last=True).first().notification_time
+            tomorrow = (timezone.now()+timezone.timedelta(days=1)).strftime("%Y %B %d")
+            self.assertEqual(tomorrow, new_last_schedule.strftime("%Y %B %d"))
 
 
 class LineNotifyVerificationViewTest(TestCase):

@@ -306,14 +306,24 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             first_notification_time += datetime.timedelta(hours=24)
         notification_time = first_notification_time
         interval = user_info.time_interval
-        for i in range(0, total_hours + 1, interval):
-            Schedule.objects.create(user_info_id=user_info.id,
-                                    notification_time=make_aware(notification_time),
-                                    expected_amount=expected_amount,
-                                    notification_status=(notification_time < datetime.datetime.now()),
-                                    is_last=(i == total_hours)
-                                    )
-            notification_time += datetime.timedelta(hours=interval)
+        if user_info.notification_turned_on:
+            for i in range(0, total_hours + 1, interval):
+                Schedule.objects.create(user_info_id=user_info.id,
+                                        notification_time=make_aware(notification_time),
+                                        expected_amount=expected_amount,
+                                        notification_status=(notification_time < datetime.datetime.now()),
+                                        is_last=(i == total_hours)
+                                        )
+                notification_time += datetime.timedelta(hours=interval)
+        else:
+            for i in range(0, total_hours + 1, interval):
+                Schedule.objects.create(user_info_id=user_info.id,
+                                        notification_time=make_aware(notification_time),
+                                        expected_amount=expected_amount,
+                                        notification_status=True,
+                                        is_last=(i == total_hours)
+                                        )
+                notification_time += datetime.timedelta(hours=interval)
 
     @staticmethod
     def delete_schedule(user_info):
@@ -384,11 +394,15 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
         user_schedule = Schedule.objects.filter(user_info_id=user_info.id)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-        if status == "turn off":
+        if status == "turn_off":
+            user_info.notification_turned_on = False
+            user_info.save()
             for row in user_schedule:
                 row.notification_status = True
                 row.save()
         else:
+            user_info.notification_turned_on = True
+            user_info.save()
             for row in user_schedule:
                 row.notification_status = row.notification_time < timezone.now()
                 row.save()
@@ -524,8 +538,13 @@ def update_notification(request):
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)
-        for schedule in user_schedule:
-            schedule.notification_time += timezone.timedelta(hours=24)
-            schedule.notification_status = False
-            schedule.save()
+        if user_info.notification_turned_on:
+            for schedule in user_schedule:
+                schedule.notification_time += timezone.timedelta(hours=24)
+                schedule.notification_status = False
+                schedule.save()
+        else:
+            for schedule in user_schedule:
+                schedule.notification_time += timezone.timedelta(hours=24)
+                schedule.save()
     return HttpResponse()

@@ -23,7 +23,7 @@
             {% csrf_token %}
             <button type="submit" style="border:none">Calculate</button>
         </form></li>
-        <li><a href="{% url 'aquaholic:set_up' user.id %}">Set Schedule</a></li>
+        <li><a href="{% url 'aquaholic:line_connect' user.id %}">Set Schedule</a></li>
         <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>
         <li><a href="{% url 'aquaholic:input' user.id %}">Input</a></li>
         <li><a href="{% url 'aquaholic:history' user.id %}">History</a></li>
@@ -41,23 +41,26 @@
         <form action="{% url 'aquaholic:registration' user.id %}" method="POST">
             {% csrf_token%}
             <label id="weightl" >Enter your weight (kg)</label>
-            <input id="weightin" type="number" name="weight" min="1" step="0.01">
+            <input id="weightin" type="number" name="weight" min="1" step="0.01"  value={{weight}}>
             <br>
             <label style="font-size: 30px;">Enter your exercise time (min)</label>
-            <input style="margin-left: 65px; font-size: 18px;" type="number" name="exercise_duration" min="0" step="0.01">
+            <input style="margin-left: 65px; font-size: 18px;" type="number" name="exercise_duration" min="0" step="0.01" value={{exercise_duration}}>
             <br>
             {% if message %}
                 <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
             {% endif %}
             <button type="submit" style="margin-top: 40px;">Calculate and Save</button>
-
+            {% if result %}
+              <a href="{% url 'aquaholic:line_connect' user.id %}">
+              <button type="button" style="margin-bottom=400;">Next</button>
+              </a>
+            {% endif %}
 
         </form>
         </div>
         <div class="result">
             {% if result %}
-                <p id="amount-result">The amount of water that you should drink is <b>{{result}}</b> ml.</p>
-            <a href="{% url 'aquaholic:set_up' user.id %}" style="margin-top: 40px;">Next</a>
+                <p id="amount-result">The amount of water that you should drink is <b>{{result}}</b> ml.</p>    
             {% endif %}
 
         </div>

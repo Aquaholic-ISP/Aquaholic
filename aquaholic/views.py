@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Schedule, Intake, UserInfo, KILOGRAM_TO_POUND, OUNCES_TO_MILLILITER
-from .notification import get_access_token, send_notification
+from .notification import get_access_token, send_notification, check_token_status
 
 
 def get_total_hours(first_notification_time, last_notification_time):
@@ -123,11 +123,17 @@ class RegistrationView(LoginRequiredMixin, generic.DetailView):
     template_name = 'aquaholic/regis.html'
 
     def get(self, request, *args, **kwargs):
-        """Registration page for new authenticated user."""
-        return render(request, self.template_name)
+        """Calculate page for authenticated user."""
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.weight == 0:
+            return render(request, self.template_name)
+        return render(request, self.template_name,
+                      {'result': user_info.water_amount_per_day,
+                       'weight': user_info.weight,
+                       'exercise_duration': user_info.exercise_duration})
 
     def post(self, request, *args, **kwargs):
-        """Water amount per day calculate from user weight and exercise duration for new authenticated user."""
+        """Water amount per day calculate from user weight and exercise duration for authenticated user."""
         try:
             user_info = UserInfo.objects.get(user_id=request.user.id)
             user_info.weight = float(request.POST["weight"])
@@ -137,14 +143,18 @@ class RegistrationView(LoginRequiredMixin, generic.DetailView):
             user_info.save()
             if user_info.water_amount_per_day == 0:
                 return render(request, 'aquaholic/regis.html',
-                              {'result': user_info.water_amount_per_day})
+                              {'result': user_info.water_amount_per_day,
+                               'weight': user_info.weight,
+                               'exercise_duration': user_info.exercise_duration})
             # update schedule
             all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in all_schedules:
                 one_schedule.expected_amount = user_info.water_amount_per_hour
                 one_schedule.save()
             return render(request, self.template_name,
-                          {'result': user_info.water_amount_per_day})
+                          {'result': user_info.water_amount_per_day,
+                           'weight': user_info.weight,
+                           'exercise_duration': user_info.exercise_duration})
         except ValueError:
             message = "Please, enter numbers in both fields."
             return render(request, self.template_name,
@@ -195,6 +205,19 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
                           {'message': message})
 
 
+class SetUpRegistrationView(LoginRequiredMixin, generic.DetailView):
+    """A class that represents the set up page view."""
+
+    template_name = 'aquaholic/set_up_regist.html'
+
+    def get(self, request, *args, **kwargs):
+        """Go to set up registration page for new user."""
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        status = check_token_status(user_info.notify_token)
+        return render(request, self.template_name,
+                      {"has_token": status == 200})
+
+
 class SetUpView(LoginRequiredMixin, generic.DetailView):
     """A class that represents the set up page view."""
 
@@ -206,19 +229,23 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
         first = user_info.first_notification_time.strftime("%H:%M")
         last = user_info.last_notification_time.strftime("%H:%M")
         noti_hour = int(user_info.time_interval)
+        status = check_token_status(user_info.notify_token)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-        return render(request, self.template_name,
-                      {'first_notification': first, 'last_notification': last, 'notification_hour': noti_hour})
+        return render(request, self.template_name, {'first_notification': first,
+                                                    'last_notification': last,
+                                                    'notification_hour': noti_hour,
+                                                    "has_token": status == 200})
 
     def post(self, request, *args, **kwargs):
-        """
-        Handle tasks after user clicked save.
+        """Handle tasks after user clicked save.
+
         Update the database and redirect user to line
         notify authorization or schedule page in case that
         the user already has notify token. User will stay on
         set up page if the value is invalid.
         """
+        user_info = UserInfo.objects.get(user_id=request.user.id)
         try:
             first = request.POST["first_notification"]
             last = request.POST["last_notification"]
@@ -229,24 +256,29 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                 message = "Please, enter different time or time difference is more than 1 hour."
                 return render(request, self.template_name,
                               {'message': message})
-            user_info = UserInfo.objects.get(user_id=request.user.id)
             if user_info.water_amount_per_day == 0:
                 return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
             self.update_user_info(first_notify_time, last_notify_time, interval, user_info)
             self.delete_schedule(user_info)  # remove all old schedules if any
             self.create_schedule(user_info)  # create new schedule
-            if UserInfo.objects.get(user_id=request.user.id).notify_token is not None:
-                return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
-            else:
-                # redirect to line notify website for generate token
-                url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
-                      f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
-                return HttpResponseRedirect(url)
+            status = check_token_status(user_info.notify_token)
+            message = "Saved! Please, visit schedule page to see the update."
+            return render(request, self.template_name,
+                          {'message': message,
+                           'first_notification': user_info.first_notification_time.strftime("%H:%M"),
+                           'last_notification': user_info.last_notification_time.strftime("%H:%M"),
+                           'notification_hour': interval,
+                           "has_token": status == 200})
         except ValueError:
             message = "Please, enter time in both fields."
+            user_info = UserInfo.objects.get(user_id=request.user.id)
+            status = check_token_status(user_info.notify_token)
             return render(request, self.template_name,
-                          {'message': message})
-
+                          {'message': message,
+                           "first_notification": user_info.first_notification_time.strftime("%H:%M"),
+                           "last_notification": user_info.last_notification_time.strftime("%H:%M"),
+                           "notification_hour": user_info.time_interval,
+                           "has_token": status == 200})
 
     @staticmethod
     def update_user_info(first_notify_time, last_notify_time, interval, user_info):
@@ -274,14 +306,24 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             first_notification_time += datetime.timedelta(hours=24)
         notification_time = first_notification_time
         interval = user_info.time_interval
-        for i in range(0, total_hours + 1, interval):
-            Schedule.objects.create(user_info_id=user_info.id,
-                                    notification_time=make_aware(notification_time),
-                                    expected_amount=expected_amount,
-                                    notification_status=(notification_time < datetime.datetime.now()),
-                                    is_last=(i == total_hours)
-                                    )
-            notification_time += datetime.timedelta(hours=interval)
+        if user_info.notification_turned_on:
+            for i in range(0, total_hours + 1, interval):
+                Schedule.objects.create(user_info_id=user_info.id,
+                                        notification_time=make_aware(notification_time),
+                                        expected_amount=expected_amount,
+                                        notification_status=(notification_time < datetime.datetime.now()),
+                                        is_last=(i == total_hours)
+                                        )
+                notification_time += datetime.timedelta(hours=interval)
+        else:
+            for i in range(0, total_hours + 1, interval):
+                Schedule.objects.create(user_info_id=user_info.id,
+                                        notification_time=make_aware(notification_time),
+                                        expected_amount=expected_amount,
+                                        notification_status=True,
+                                        is_last=(i == total_hours)
+                                        )
+                notification_time += datetime.timedelta(hours=interval)
 
     @staticmethod
     def delete_schedule(user_info):
@@ -290,6 +332,29 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             found_schedule = Schedule.objects.filter(user_info_id=user_info.id)
             for one_schedule in found_schedule:
                 one_schedule.delete()
+
+
+class LineNotifyVerificationView(LoginRequiredMixin, generic.DetailView):
+    """A class for handling line notify verification."""
+
+    def get(self, request, *args, **kwargs):
+        """Redirect to Line notify authorization."""
+        url = f"https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={config('CLIENT_ID_NOTIFY')}" \
+              f"&redirect_uri={config('REDIRECT_URI_NOTIFY')}&scope=notify&state=testing123 "
+        return HttpResponseRedirect(url)
+
+
+class LineNotifyConnect(LoginRequiredMixin, generic.DetailView):
+    """A class that represents line connect view that helps user connect to line notify."""
+
+    def get(self, request, *args, **kwargs):
+        """Go to line connect page."""
+        user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.water_amount_per_day == 0:
+            return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
+        status = check_token_status(user_info.notify_token)
+        return render(request, "aquaholic/line_connect.html",
+                      {"has_token": status == 200})
 
 
 class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
@@ -303,7 +368,7 @@ class NotificationCallbackView(LoginRequiredMixin, generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         user_info.notify_token = token
         user_info.save()
-        return HttpResponseRedirect(reverse('aquaholic:schedule', args=(request.user.id,)))
+        return HttpResponseRedirect(reverse('aquaholic:line_connect', args=(request.user.id,)))
 
 
 class ScheduleView(LoginRequiredMixin, generic.DetailView):
@@ -317,8 +382,10 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
         user_info = UserInfo.objects.get(user_id=request.user.id)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
+        status = check_token_status(user_info.notify_token)
         return render(request, self.template_name,
-                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id),})
+                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id),
+                       'has_token': status == 200})
 
     def post(self, request, *args, **kwargs):
         """Notification of schedule."""
@@ -327,16 +394,22 @@ class ScheduleView(LoginRequiredMixin, generic.DetailView):
         user_schedule = Schedule.objects.filter(user_info_id=user_info.id)
         if user_info.water_amount_per_day == 0:
             return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
-        if status == "turn off":
+        if status == "turn_off":
+            user_info.notification_turned_on = False
+            user_info.save()
             for row in user_schedule:
                 row.notification_status = True
                 row.save()
         else:
+            user_info.notification_turned_on = True
+            user_info.save()
             for row in user_schedule:
                 row.notification_status = row.notification_time < timezone.now()
                 row.save()
+        status = check_token_status(user_info.notify_token)
         return render(request, self.template_name,
-                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id)})
+                      {'schedule': Schedule.objects.filter(user_info_id=user_info.id),
+                       'has_token': status == 200})
 
 
 class InputView(LoginRequiredMixin, generic.DetailView):
@@ -372,7 +445,10 @@ class InputView(LoginRequiredMixin, generic.DetailView):
                 Intake.objects.create(user_info_id=user_info.id,
                                       date=aware_date,
                                       total_amount=amount)
-            message = "Saved !"
+            if float(amount) == 0:
+                message = "Please, input a number more than 0."
+            else:
+                message = "Saved !"
             return render(request, self.template_name,
                           {'message': message})
         except ValueError:
@@ -391,7 +467,7 @@ class HistoryView(LoginRequiredMixin, generic.DetailView):
         """Get the data needed for history page and send those data as a context to history.html."""
         num_days_in_month = calendar.monthrange(selected_year, selected_month)[1]
         reached_goal_amount = dict()
-        not_reached_goal_amount= dict()
+        not_reached_goal_amount = dict()
         for day in range(1, num_days_in_month + 1):
             reached_goal_amount[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = 0
             not_reached_goal_amount[datetime.date(selected_year, selected_month, day).strftime("%d %b %Y")] = 0
@@ -441,7 +517,8 @@ class HistoryView(LoginRequiredMixin, generic.DetailView):
 
 
 def update_notification(request):
-    """
+    """Cron job for sending notification via line.
+
     Send notification to the user and update their status.
     Cron-job.org will call this view every 5 minutes to check
     if it's the time to send notification. After the last notification
@@ -461,9 +538,13 @@ def update_notification(request):
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)
-        for schedule in user_schedule:
-            schedule.notification_time += timezone.timedelta(hours=24)
-            schedule.notification_status = False
-            schedule.save()
+        if user_info.notification_turned_on:
+            for schedule in user_schedule:
+                schedule.notification_time += timezone.timedelta(hours=24)
+                schedule.notification_status = False
+                schedule.save()
+        else:
+            for schedule in user_schedule:
+                schedule.notification_time += timezone.timedelta(hours=24)
+                schedule.save()
     return HttpResponse()
-

@@ -7,11 +7,16 @@
 }
 
 h1{
-    font-size: 90px;
+    font-size: 50px;
     margin-top: 10%;
     text-shadow:
     -12px 12px 20px rgba(0,0,0,0.5);
 
+}
+
+.setup p{
+    display: inline-block;
+    color: white;
 }
 
 .setup button{
@@ -25,7 +30,6 @@ h1{
     border: 2px solid #0E1646;
     background: white;
     cursor: pointer;
-    /*position: relative;*/
     overflow: hidden;
 }
 
@@ -39,7 +43,6 @@ h1{
 
 #frequency {
     width: 15%;
-    margin-left: 12%;
 }
 
 .setup input{
@@ -51,7 +54,55 @@ h1{
 }
 
 .setup label {
-        display: inline-block;
-        width: 460px;
-        background: transparent;
+    display: inline-block;
+    width: 250px;
+    background: transparent;
+}
+.setup a {
+    display: inline-block;
+}
+
+#help {
+  height: 40px;
+  width: 40px;
+  font-size: 28px;
+  line-height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left: 3%;
+  color: #FFFFFF;
+  background-color: #06C755;
+  border: 2px solid #0E1646;
+}
+
+#line-notify {
+  background-color: #06C755;
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  margin: 4px 2px;
+  margin-top: 3%;
+  border-radius: 15px;
+  border: 2px solid #0E1646;
+  font-weight: bold;
+}
+
+#line-connect {
+    width: 300px;
+    height:35px;
+    text-align: center;
+    text-decoration: none;
+    margin-top: 3%;
+    font-size: 20px;
+    top: 50%;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #0E1646;
+    background: white;
+    cursor: pointer;
+    overflow: hidden;
 }

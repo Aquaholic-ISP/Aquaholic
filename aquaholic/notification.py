@@ -1,8 +1,10 @@
+"""A module that keep methods related to line notification."""
 import requests
 from decouple import config
 
 
 def get_access_token(code):
+    """Generate access token from the given code."""
     api_url = "https://notify-bot.line.me/oauth/token"
     content_type = "application/x-www-form-urlencoded"
 
@@ -24,6 +26,7 @@ def get_access_token(code):
 
 
 def send_notification(message, token):
+    """Send notification from message anf token provided."""
     url = 'https://notify-api.line.me/api/notify'
     if not token:
         return None
@@ -31,4 +34,15 @@ def send_notification(message, token):
                'Authorization': 'Bearer ' + token}
 
     r = requests.post(url, headers=headers, data={'message': message})
+    return r.json()['status']
+
+
+def check_token_status(token):
+    """Check the token status (200 == valid)."""
+    url = "https://notify-api.line.me/api/status"
+    if not token:
+        return 0
+    headers = {'content-type': 'application/x-www-form-urlencoded',
+               'Authorization': 'Bearer ' + token}
+    r = requests.get(url, headers=headers)
     return r.json()['status']

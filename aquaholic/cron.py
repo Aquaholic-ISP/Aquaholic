@@ -2,10 +2,10 @@ import datetime
 
 from .models import Schedule
 from .notification import send_notification
-
+from django.utils.timezone import make_aware
 
 def update_notification():
-    all_to_send = Schedule.objects.filter(notification_time__lte=datetime.datetime.now(),
+    all_to_send = Schedule.objects.filter(notification_time__lte=make_aware(datetime.datetime.now()),
                                           notification_status=False)
     for one_to_send in all_to_send:
         send_notification(f"Don't forget to drink {one_to_send.expected_amount} ml of water", one_to_send.user_info.notify_token)
@@ -13,7 +13,7 @@ def update_notification():
         one_to_send.save()
 
     last_to_send = Schedule.objects.filter(notification_status=True, is_last=True,
-                                           notification_time__lte=datetime.datetime.now())
+                                           notification_time__lte=make_aware(datetime.datetime.now()))
     for last_schedule in last_to_send:
         user_info = last_schedule.user_info
         user_schedule = Schedule.objects.filter(user_info=user_info)

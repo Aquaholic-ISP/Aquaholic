@@ -453,4 +453,3 @@ class ProfileViewTest(TestCase):
                      "user_id": f"{user.id}"}
         response = client.get(profile_url, form_data)
         self.assertEqual(response.status_code, 302)
-

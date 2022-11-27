@@ -53,7 +53,7 @@
             <h1 style="font-size: 80px;">Welcome Back, {{ user.first_name }}</h1>
             <div class="profile">
                 <ul>
-                    <li><a href="profile">Visit your profile</a></li>
+                    <li><a href="{% url 'aquaholic:profile' user.id %}">Visit your profile</a></li>
                 </ul>
             </div>
             

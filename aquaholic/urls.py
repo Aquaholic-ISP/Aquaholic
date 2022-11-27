@@ -17,11 +17,11 @@ urlpatterns = [
 
     path('aquaholic/', views.HomePageView.as_view(), name='home'),
     path("", RedirectView.as_view(url="/aquaholic/")),
-    path('aquaholic/calculate', views.CalculateView.as_view(), name='calculate'),
+    path('aquaholic/calculate/<int:pk>/', views.CalculateView.as_view(), name='calculate'),
     path('aquaholic/<int:pk>/input', views.InputView.as_view(), name='input'),
     path('aquaholic/<int:pk>/history', views.HistoryView.as_view(), name='history'),
     path('aquaholic/about_us', views.AboutUsView.as_view(), name='about_us'),
-    path('aquaholic/profile', views.ProfileView.as_view(), name="profile"),
+    path('aquaholic/<int:pk>/profile', views.ProfileView.as_view(), name="profile"),
     path('aquaholic/cron', views.update_notification, name='cron'),
     path('aquaholic/alert', views.login_alert, name='alert'),
     path('aquaholic/line_notify', views.LineNotifyVerificationView.as_view(), name="line_notify"),

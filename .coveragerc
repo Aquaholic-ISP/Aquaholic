@@ -5,7 +5,6 @@ omit =
     aquaholic/__inti__.py
     aquaholic/admin.py
     manage.py
-    aquaholic/tests.py
     aquaholic/apps.py
     data/*
     aquaholic/static/*

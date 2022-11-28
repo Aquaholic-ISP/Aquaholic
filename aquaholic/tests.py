@@ -214,7 +214,9 @@ class SetUpView(TestCase):
 
 class ScheduleView(TestCase):
     """Test cases for schedule view."""
+
     def setUp(self):
+        """Login, register, and go to schedule page."""
         self.user = User.objects.create(username='testuser')
         self.user.set_password('12345')
         self.user.save()
@@ -377,7 +379,12 @@ class UpdateNotificationView(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_schedule_updates_correctly(self):
-        """When the last schedule is sent, all schedule will be added by 24 hours."""
+        """Schedule is updated correctly when visiting cron url.
+
+        When the time passes the scheduled time, notification status is changed to True.
+        When the last schedule is sent, all schedule will be added by 24 hours
+        and notification status is changed to False again.
+        """
         self.user = User.objects.create(username='testuser')
         self.user.set_password('12345')
         self.user.save()
@@ -392,19 +399,27 @@ class UpdateNotificationView(TestCase):
                                           "last_notification": "21:00",
                                           "notify_interval": 1})
         self.assertContains(response, "Saved! Please, visit schedule page to see the update.", html=True)
-        response = self.client.get(reverse('aquaholic:cron'))
-        self.assertEqual(response.status_code, 200)
         user_info = UserInfo.objects.get(user_id=self.user.id)
-        last_schedule = Schedule.objects.filter(user_info_id=user_info.id, is_last=True).first().notification_time
-        today = datetime.datetime.now().strftime("%Y %B %d")
-        self.assertEqual(today, last_schedule.strftime("%Y %B %d"))
-        with patch.object(timezone, 'now', return_value=last_schedule+timezone.timedelta(minutes=1)):
+        last_schedule = Schedule.objects.filter(user_info_id=user_info.id, is_last=True).first()
+        first_schedule = Schedule.objects.filter(user_info_id=user_info.id).first()
+        first_schedule_time = first_schedule.notification_time
+        last_schedule_time = last_schedule.notification_time
+        self.assertFalse(first_schedule.notification_status)
+        self.assertFalse(last_schedule.notification_status)
+        with patch.object(timezone, 'now', return_value=first_schedule_time + timezone.timedelta(minutes=10)):
+            response = self.client.get(reverse('aquaholic:cron'))
+            self.assertEqual(response.status_code, 200)
+            new_first_schedule = Schedule.objects.filter(user_info_id=user_info.id).first()
+            self.assertTrue(new_first_schedule.notification_status)
+        with patch.object(timezone, 'now', return_value=last_schedule_time + timezone.timedelta(minutes=10)):
             response = self.client.get(reverse('aquaholic:cron'))
             self.assertEqual(response.status_code, 200)
             new_last_schedule = Schedule.objects.filter(user_info_id=user_info.id,
-                                                        is_last=True).first().notification_time
-            tomorrow = (timezone.now()+timezone.timedelta(days=1)).strftime("%Y %B %d")
-            self.assertEqual(tomorrow, new_last_schedule.strftime("%Y %B %d"))
+                                                        is_last=True).first()
+            new_last_schedule_time = new_last_schedule.notification_time
+            tomorrow = (timezone.now() + timezone.timedelta(days=1)).strftime("%Y %B %d")
+            self.assertEqual(tomorrow, new_last_schedule_time.strftime("%Y %B %d"))
+            self.assertFalse(new_last_schedule.notification_status)
 
 
 class LineNotifyVerificationViewTest(TestCase):

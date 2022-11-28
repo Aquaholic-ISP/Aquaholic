@@ -30,8 +30,8 @@ python -m venv env
 pip install -r requirements.txt
 ```
 6. Create .env file following what's written in sample.env
-- For LINE Login, you can get CLIENT_ID, and CLIENT_SECRET from [LINE Developers Console](https://developers.line.biz/console/)
-following step 3 in [LINE Developers Documentation](https://developers.line.biz/en/docs/line-login/getting-started/#step-3-check-the-channel-settings-and-enter-the-callback-url).
+- For LINE Login, you can get CLIENT_ID, and CLIENT_SECRET from [LINE Developers Console](https://developers.line.biz/console/).
+Noted that, the development callback url you should use is ```http://127.0.0.1:8000/accounts/line/login/callback/```.
 ```
 # Fill information for line login service
 CLIENT_ID = line-login-client-id
@@ -39,9 +39,8 @@ CLIENT_SECRET = line-login-client-secret
 ```
 - For LINE Notify, you can get CLIENT_ID_NOTIFY, and CLIENT_SECRET_NOTIFY from registering a service with
 [LINE Notify](https://notify-bot.line.me/my/services/).
-- For the REDIRECT_URI_NOTIFY, we suggest that you should use your_base_url + /noti/callback/ and
-please make sure that it is the same as what you registered in 
-[Managed Registered Services - LINE Notify](https://notify-bot.line.me/my/services/).
+- For the REDIRECT_URI_NOTIFY, we suggest that you should use ```http://127.0.0.1:8000/noti/callback/``` in local development 
+and please make sure that it is the same as what you have registered.
 
 
 ```

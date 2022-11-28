@@ -89,8 +89,7 @@ class HomePageViewTests(TestCase):
         page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 200)
         input_url = reverse('aquaholic:input', args=(user.id,))
-        form_data = {"amount": 2000,
-                     "date": "2022-11-25"}
+        form_data = {"amount": 2000, "date": timezone.now()}
         self.client.post(input_url, form_data)
         page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 200)

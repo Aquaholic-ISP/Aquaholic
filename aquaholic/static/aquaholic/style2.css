@@ -74,12 +74,11 @@ input[type=number]::-webkit-inner-spin-button {
 
 
 .result #amount-result {
-    width: 200%;
+    width: 100%;
     position: absolute;
     line-height: 300%; 
     font-size: 30px;
     margin-top: 16%;
-    margin-left: -52%;
     font-size: 25px;
 }
 

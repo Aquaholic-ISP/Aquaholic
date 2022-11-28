@@ -250,6 +250,8 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
             first = request.POST["first_notification"]
             last = request.POST["last_notification"]
             interval = int(request.POST["notify_interval"])
+            first_notify_time = datetime.datetime.strptime(first, "%H:%M").time()
+            last_notify_time = datetime.datetime.strptime(last, "%H:%M").time()
         except ValueError:
             message = "Please, enter time in both fields."
             user_info = UserInfo.objects.get(user_id=request.user.id)
@@ -260,8 +262,6 @@ class SetUpView(LoginRequiredMixin, generic.DetailView):
                            "last_notification": user_info.last_notification_time.strftime("%H:%M"),
                            "notification_hour": user_info.time_interval,
                            "has_token": status == 200})
-        first_notify_time = datetime.datetime.strptime(first, "%H:%M").time()
-        last_notify_time = datetime.datetime.strptime(last, "%H:%M").time()
         if first == last or get_total_hours(first_notify_time, last_notify_time) == 0:
             message = "Please, enter different time or time difference is more than 1 hour."
             return render(request, self.template_name,

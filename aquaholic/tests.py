@@ -269,6 +269,14 @@ class SetUpViewTests(TestCase):
                                           "notify_interval": 1})
         self.assertContains(response, "Please, enter different time or time difference is more than 1 hour.", html=True)
 
+    def test_set_invalid_notification_time(self):
+        """Set an invalid notification time."""
+        response = self.client.post(reverse("aquaholic:set_up", args=(self.user.id,)),
+                                    data={"first_notification": "1111",
+                                          "last_notification": "11:00",
+                                          "notify_interval": 1})
+        self.assertContains(response, "Please, enter time in both fields.", html=True)
+
 
 class ScheduleViewTests(TestCase):
     """Test cases for schedule view."""

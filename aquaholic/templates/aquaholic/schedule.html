@@ -18,12 +18,12 @@
     <ul>
         {% if user.is_authenticated %}
         <li><a href="/">Home</a></li>
-        <li><a href="/aquaholic/profile">Profile</a></li>
+        <li><a href="{% url 'aquaholic:profile' user.id %}">Profile</a></li>
         <li><form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
             {% csrf_token %}
             <button type="submit" style="border:none">Calculate</button>
         </form></li>
-        <li><a href="{% url 'aquaholic:set_up' user.id %}">Set Schedule</a></li>
+        <li><a href="{% url 'aquaholic:line_connect' user.id %}">Set Schedule</a></li>
         <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>
         <li><a href="{% url 'aquaholic:input' user.id %}">Input</a></li>
         <li><a href="{% url 'aquaholic:history' user.id %}">History</a></li>
@@ -41,10 +41,12 @@
 
 <div class="content">
     <h1>Your notification schedule</h1>
+    {% if not has_token %}
+        You must connect to Line Notify first to receive notification. <a href="{% url 'aquaholic:line_connect' user.id %}"> Connect to Line Notify </a>
+    {% endif %}
     <div class="scrollindiv">
 
             <div class="schedule">
-                <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
                 <table border="1" cellpadding=10>
                 <th style="text-align:center; width: 250px;">Time</th>
                 <th style="text-align:center; width: 250px;">Amount (ml)</th>
@@ -71,9 +73,7 @@
                     {% endif %}
                     </tr>
                 {% endfor %}
-
                 </table><br>
-                </form>
 
         </div>
 
@@ -82,8 +82,8 @@
 
     <form action="{% url 'aquaholic:schedule' user.id %}" method="POST">
         {% csrf_token %}
-        <button name="status" value="turn off"> Turn off notification </button>
-        <button name="status" value="turn on"> Turn on notification </button>
+        <button type="submit" name="status" value="turn_off"> Turn off notification </button>
+        <button type="submit" name="status" value="turn_on"> Turn on notification </button>
     </form>
 
 </div>

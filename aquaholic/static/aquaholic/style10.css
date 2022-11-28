@@ -1,11 +1,18 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
 
+html {
+   min-height: 100%;
+   background: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
+   background-repeat: no-repeat;
+   background-size: cover;
+   background-position: center center;
+   background-attachment: fixed;
+}
 
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
     color: #0E1646;
     font-family: "Poppins", sans-serif;
 }
@@ -140,9 +147,9 @@ input[type="checkbox"]{
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 0;
+    background: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
     text-align: center;
     width: 100%;
-    background: linear-gradient(-60deg, #ffcc99 0%, #4d79ff 100%);
     color: #0E1646;
     height: 100%;
 }

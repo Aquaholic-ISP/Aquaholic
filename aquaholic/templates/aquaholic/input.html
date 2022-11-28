@@ -16,12 +16,12 @@
     <ul>
         {% if user.is_authenticated %}
         <li><a href="/">Home</a></li>
-        <li><a href="/aquaholic/profile">Profile</a></li>
+        <li><a href="{% url 'aquaholic:profile' user.id %}">Profile</a></li>
         <li><form action="{% url 'aquaholic:calculate_auth' user.id %}" method="get">
             {% csrf_token %}
             <button type="submit" style="border:none">Calculate</button>
         </form></li>
-        <li><a href="{% url 'aquaholic:set_up' user.id %}">Set Schedule</a></li>
+        <li><a href="{% url 'aquaholic:line_connect' user.id %}">Set Schedule</a></li>
         <li><a href="{% url 'aquaholic:schedule' user.id %}">Schedule</a></li>
         <li><a href="{% url 'aquaholic:input' user.id %}">Input</a></li>
         <li><a href="{% url 'aquaholic:history' user.id %}">History</a></li>
@@ -54,18 +54,23 @@
             {% csrf_token %}
 
             <div class="date">
-                <label>Date: </label> 
-                <input id="date" type="date" name="date"/> 
+                <label>Date: </label>
+
+                <input id="date" type="date" name="date" max='date'/>
 
                 <script>
                     Date.prototype.getCurrentDate = (function() {
                         var local = new Date(this);
                         local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+                        date.max = new Date().toISOString().split("T")[0];
                         return local.toJSON().slice(0,10);
                     });
+
                     document.getElementById('date').value = new Date().getCurrentDate();
                 </script>
+
             </div>
+
 
             <div class="amount">
                 <label>Enter the amount: </label>
@@ -87,7 +92,7 @@
             </div>
 
             <div class="save">
-                <button type="submit">Save</button>
+                <button type="submit" onclick="this.disabled=true;this.value='Submitting...'; this.form.submit();">Save</button>
             </div>
 
             {% if message %}

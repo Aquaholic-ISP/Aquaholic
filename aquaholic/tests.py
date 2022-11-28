@@ -435,17 +435,21 @@ class InputViewTests(TestCase):
 
     def test_input_very_negative_value(self):
         """When the negative value inputted is less than 0, amount == 0."""
-        # current date
-        date = timezone.make_aware(datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0))
+        # don't have intake date yet
         input_url = reverse('aquaholic:input', args=(self.user1.id,))
         form_data = {"amount": "-19999",
-                     "date": date.strftime('%Y-%m-%d')}
+                     "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
         self.assertContains(response, "Saved !", html=True)
         user_info = UserInfo.objects.get(user_id=self.user1.id)
-        intake = Intake.objects.get(user_info_id=user_info.id, date=date)
+        db_time = timezone.make_aware(datetime.datetime(2022, 11, 25) + datetime.timedelta(hours=10))
+        intake = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(0, intake.total_amount)
-        # old date
+        # have intake date
+        input_url = reverse('aquaholic:input', args=(self.user1.id,))
+        form_data = {"amount": "500",
+                     "date": "2022-11-25"}
+        self.client.post(input_url, form_data)
         input_url = reverse('aquaholic:input', args=(self.user1.id,))
         form_data = {"amount": "-19999",
                      "date": "2022-11-25"}

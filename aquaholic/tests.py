@@ -46,7 +46,7 @@ class UserInfoModelTests(TestCase):
         self.assertAlmostEqual(int(per_hour), user.water_amount_per_hour, 2)
 
 
-class HomePageView(TestCase):
+class HomePageViewTests(TestCase):
     """Tests homepage view."""
 
     def test_home_page(self):
@@ -90,7 +90,7 @@ class HomePageView(TestCase):
         self.assertEqual(page.status_code, 200)
 
 
-class CalculateView(TestCase):
+class CalculateViewTests(TestCase):
     """Test the calculate page for unauthenticated user."""
 
     def test_calculate_page(self):
@@ -110,7 +110,7 @@ class CalculateView(TestCase):
         self.assertContains(response, 3538)
 
 
-class TemplateUsed(TestCase):
+class TemplateUsedTests(TestCase):
     """Test the template used in each page is correct."""
 
     def test_template_used(self):
@@ -141,7 +141,7 @@ class TemplateUsed(TestCase):
         self.assertTemplateUsed(page, 'aquaholic/alert.html')
 
 
-class LoginWithLine(TestCase):
+class LoginWithLineTests(TestCase):
     """Tests for line login."""
 
     def test_authenticated_using_line(self):
@@ -152,7 +152,7 @@ class LoginWithLine(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class CalculateAuthView(TestCase):
+class CalculateAuthViewTests(TestCase):
     """Test cases for calculate auth view."""
 
     def setUp(self) -> None:
@@ -185,7 +185,7 @@ class CalculateAuthView(TestCase):
         self.assertContains(response, "Please, enter numbers in both fields.", html=True)
 
 
-class RegistrationViewTest(TestCase):
+class RegistrationViewTests(TestCase):
     """Test cases for registration view."""
 
     def setUp(self) -> None:
@@ -214,7 +214,7 @@ class RegistrationViewTest(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
 
-class SetUpView(TestCase):
+class SetUpViewTests(TestCase):
     """Tests for set up view."""
 
     def setUp(self):
@@ -240,7 +240,7 @@ class SetUpView(TestCase):
         self.assertContains(response, "Saved! Please, visit schedule page to see the update.", html=True)
 
 
-class ScheduleView(TestCase):
+class ScheduleViewTests(TestCase):
     """Test cases for schedule view."""
 
     def setUp(self):
@@ -286,7 +286,7 @@ class ScheduleView(TestCase):
         self.assertTrue(user_info1.notification_turned_on)
 
 
-class HistoryViewTest(TestCase):
+class HistoryViewTests(TestCase):
     """Test cases for history page."""
 
     def test_history_page(self):
@@ -316,7 +316,7 @@ class HistoryViewTest(TestCase):
         self.assertTemplateUsed(response, 'aquaholic/history.html')
 
 
-class InputViewTest(TestCase):
+class InputViewTests(TestCase):
     """Test cases for input view."""
 
     def test_input(self):
@@ -365,7 +365,7 @@ class InputViewTest(TestCase):
         self.assertEqual(700, intake1.total_amount)
 
 
-class AlertViewTest(TestCase):
+class AlertViewTests(TestCase):
     """Test alert view."""
 
     def test_unauthenticated_user_cannot_go_to_login_required_page(self):
@@ -378,7 +378,7 @@ class AlertViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
 
-class Notification(TestCase):
+class NotificationTests(TestCase):
     """Tests for methods in notification.py."""
 
     def test_token_is_None(self):
@@ -397,7 +397,7 @@ class Notification(TestCase):
         self.assertEqual(get_access_token("asjadk"), None)
 
 
-class UpdateNotificationView(TestCase):
+class UpdateNotificationViewTests(TestCase):
     """Tests for update notification view."""
 
     def test_get_update_notification_view(self):
@@ -450,7 +450,7 @@ class UpdateNotificationView(TestCase):
             self.assertFalse(new_last_schedule.notification_status)
 
 
-class LineNotifyVerificationViewTest(TestCase):
+class LineNotifyVerificationViewTests(TestCase):
     """Tests for line notify verification view."""
 
     def test_redirect_after_visit(self):
@@ -460,7 +460,7 @@ class LineNotifyVerificationViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
 
-class LineNotifyConnectViewTest(TestCase):
+class LineNotifyConnectViewTests(TestCase):
     """Tests for line notify connect view."""
 
     def test_get_line_connect(self):
@@ -476,7 +476,7 @@ class LineNotifyConnectViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class ProfileViewTest(TestCase):
+class ProfileViewTests(TestCase):
     """Test cases for profile view."""
 
     def test_profile(self):
@@ -496,3 +496,13 @@ class ProfileViewTest(TestCase):
                      "user_id": f"{user.id}"}
         response = client.get(profile_url, form_data)
         self.assertEqual(response.status_code, 302)
+
+
+class AboutUsViewTests(TestCase):
+    """Test about us view."""
+
+    def test_go_to_about_us_page(self):
+        """Any users can visit about us page."""
+        client = Client()
+        response = client.get(reverse("aquaholic:about_us"))
+        self.assertEqual(response.status_code, 200)

@@ -496,3 +496,13 @@ class ProfileViewTests(TestCase):
                      "user_id": f"{user.id}"}
         response = client.get(profile_url, form_data)
         self.assertEqual(response.status_code, 302)
+
+
+class AboutUsViewTests(TestCase):
+    """Test about us view."""
+
+    def test_go_to_about_us_page(self):
+        """Any users can visit about us page."""
+        client = Client()
+        response = client.get(reverse("aquaholic:about_us"))
+        self.assertEqual(response.status_code, 200)

@@ -432,7 +432,6 @@ class UpdateNotificationViewTests(TestCase):
         first_schedule = Schedule.objects.filter(user_info_id=user_info.id).first()
         first_schedule_time = first_schedule.notification_time
         last_schedule_time = last_schedule.notification_time
-        self.assertFalse(first_schedule.notification_status)
         self.assertFalse(last_schedule.notification_status)
         with patch.object(timezone, 'now', return_value=first_schedule_time + timezone.timedelta(minutes=10)):
             response = self.client.get(reverse('aquaholic:cron'))

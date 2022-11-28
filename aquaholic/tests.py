@@ -377,9 +377,14 @@ class AlertViewTests(TestCase):
 class NotificationTests(TestCase):
     """Tests for methods in notification.py."""
 
-    def test_token_is_none(self):
-        """Send message with token == None return None."""
+    def test_token_is_invalid(self):
+        """Cannot send notification with invalid token.
+
+        Send message with token == None return None.
+        Send message with token == invalid token return 401.
+        """
         self.assertIsNone(send_notification("Hi", None))
+        self.assertEqual(401, send_notification("Hi", "kfdljsfkdlfj"))
 
     def test_check_invalid_token_status(self):
         """Check status will not return 100 for invalid token."""

@@ -9,7 +9,6 @@ def get_access_token(code):
     content_type = "application/x-www-form-urlencoded"
 
     grant_type = "authorization_code"
-    code = code
     redirect_uri = config('REDIRECT_URI_NOTIFY', default="line_callback_url")
     client_id = config('CLIENT_ID_NOTIFY', default="line_notify_client_id")
     client_secret = config('CLIENT_SECRET_NOTIFY', default="line_notify_client_id")
@@ -21,8 +20,8 @@ def get_access_token(code):
         "client_id": client_id,
         "client_secret": client_secret
     }
-    r = requests.post(api_url, headers=headers, data=data)
-    return r.json()['access_token']
+    response = requests.post(api_url, headers=headers, data=data)
+    return response.json()['access_token']
 
 
 def send_notification(message, token):
@@ -33,8 +32,8 @@ def send_notification(message, token):
     headers = {'content-type': 'application/x-www-form-urlencoded',
                'Authorization': 'Bearer ' + token}
 
-    r = requests.post(url, headers=headers, data={'message': message})
-    return r.json()['status']
+    response = requests.post(url, headers=headers, data={'message': message})
+    return response.json()['status']
 
 
 def check_token_status(token):
@@ -44,5 +43,5 @@ def check_token_status(token):
         return 0
     headers = {'content-type': 'application/x-www-form-urlencoded',
                'Authorization': 'Bearer ' + token}
-    r = requests.get(url, headers=headers)
-    return r.json()['status']
+    response = requests.get(url, headers=headers)
+    return response.json()['status']

@@ -16,8 +16,10 @@ class UserInfo(models.Model):
     weight = models.FloatField(default=0)
     exercise_duration = models.FloatField(default=0)
     water_amount_per_day = models.IntegerField(default=0)
-    first_notification_time = models.TimeField('first notification time', default=datetime.time(8, 0, 0))
-    last_notification_time = models.TimeField('last notification time', default=datetime.time(22, 0, 0))
+    first_notification_time = models.TimeField('first notification time',
+                                               default=datetime.time(8, 0, 0))
+    last_notification_time = models.TimeField('last notification time',
+                                              default=datetime.time(22, 0, 0))
     total_hours = models.FloatField(null=True)
     water_amount_per_hour = models.IntegerField(null=True)
     notify_token = models.CharField(max_length=200, null=True)
@@ -26,7 +28,8 @@ class UserInfo(models.Model):
 
     def set_water_amount_per_day(self):
         """Calculate amount of water per day."""
-        self.water_amount_per_day = int(((self.weight * KILOGRAM_TO_POUND * 0.5) + (self.exercise_duration / 30) * 12) * OUNCES_TO_MILLILITER)
+        self.water_amount_per_day = int(((self.weight * KILOGRAM_TO_POUND * 0.5) +
+                                         (self.exercise_duration / 30) * 12) * OUNCES_TO_MILLILITER)
 
     def set_water_amount_per_hour(self):
         """Calculate amount of water per hour."""

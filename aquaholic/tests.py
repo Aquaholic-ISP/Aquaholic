@@ -61,6 +61,34 @@ class HomePageView(TestCase):
         cal_url = reverse('aquaholic:home')
         self.assertEqual(response.url, cal_url)
 
+    def test_visit_home_page_with_zero_intake(self):
+        """Visitor can visit home page with zero intake."""
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client.login(username='testuser', password='12345')
+        page = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
+        page = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page.status_code, 200)
+
+    def test_visit_home_page_with_intakes(self):
+        """Visitor can visit home page with intakes."""
+        self.user = User.objects.create(username='testuser')
+        self.user.set_password('12345')
+        self.user.save()
+        self.client.login(username='testuser', password='12345')
+        page = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
+        user_info = UserInfo.objects.get(user_id=self.user.id)
+        Intake.objects.create(user_info_id=user_info.id, total_amount=400)
+        page = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page.status_code, 200)
+
 
 class CalculateView(TestCase):
     """Test the calculate page for unauthenticated user."""

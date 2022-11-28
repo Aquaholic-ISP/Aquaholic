@@ -356,6 +356,8 @@ class InputViewTests(TestCase):
 
         # user input the amount of water and save
         input_url = reverse('aquaholic:input', args=(user1.id,))
+        response = self.client.get(input_url)
+        self.assertEqual(response.status_code, 200)
         form_data = {"amount": "200",
                      "date": "2022-11-05"}
         response = self.client.post(input_url, form_data)

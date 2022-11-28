@@ -38,19 +38,19 @@
 
 <div class="content">
     <h1>Set your notification schedule</h1>
-    <p style="font-size: 20px; ">Connect to Line Notify for receiving notifications which will remind you to drink water throughout the day</p>
+    <p style="font-size: 20px; ">Connect to LINE Notify for receiving notifications which will remind you to drink water throughout the day</p>
     <div class="setup">
-        <a id="line-notify"  href="{% url 'aquaholic:line_notify' %}">Connect to your Line Notify</a>
-        <button id="help" type="button" onclick="alert('After clicking - Connect to your Line Notify - , you will be asked to login to your line account and asked which chat or group you would like to receive notifications from our app.')">?</button>
+        <a id="line-notify"  href="{% url 'aquaholic:line_notify' %}">Connect to your LINE Notify</a>
+        <button id="help" type="button" onclick="alert('After clicking - Connect to your LINE Notify - , you will be asked to login to your LINE account and asked which chat or group you would like to receive notifications from our app.')">?</button>
         <br>
         {% if has_token %}
-           <p style="font-size: 20px; "> ✅ Line notify is connected. Notification is enabled.</p>
+           <p style="font-size: 20px; "> ✅ LINE Notify is connected. Notification is enabled.</p>
            <br>
-           <p style="font-size: 16px; "> You can turn off notification anytime in the schedule page or disconnect from line notify anytime at <a style="color: white" href="https://notify-bot.line.me/my/">My page - Line Notify</a></p>
+           <p style="font-size: 16px; "> You can turn off notification anytime in the schedule page or disconnect from LINE Notify anytime at <a style="color: white" href="https://notify-bot.line.me/my/">My page - LINE Notify</a></p>
         {% else %}
-           <p style="font-size: 20px; "> ❌ Line notify is not connected. Notification is not yet enabled.</p>
+           <p style="font-size: 20px; "> ❌ LINE Notify is not connected. Notification is not yet enabled.</p>
            <br>
-           <p style="font-size: 16px; "> Please, connect to your line notify first to receive notification from our app</a></p>
+           <p style="font-size: 16px; "> Please, connect to your LINE Notify first to receive notifications from our app</a></p>
 
         {% endif %}
         <br>

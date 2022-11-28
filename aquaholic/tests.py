@@ -89,10 +89,15 @@ class HomePageViewTests(TestCase):
         page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 200)
         input_url = reverse('aquaholic:input', args=(user.id,))
-        form_data = {"amount": 2000, "date": timezone.now()}
+        date = timezone.make_aware(datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0))
+
+        form_data = {"amount": 2000, "date": date.strftime('%Y-%m-%d')}
         self.client.post(input_url, form_data)
         page = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page.status_code, 200)
+        user_info = UserInfo.objects.get(user_id=user.id)
+        date = timezone.make_aware(datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0))
+        user_intake = Intake.objects.get(user_info_id=user_info.id, date=date)
 
 
 class CalculateViewTests(TestCase):

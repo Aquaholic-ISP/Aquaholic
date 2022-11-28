@@ -482,16 +482,12 @@ class ProfileViewTests(TestCase):
         user.save()
         self.client.login(username='testuser1', password='12345')
         self.client.get(reverse("aquaholic:home"))
+        response = self.client.get(reverse('aquaholic:profile', args=(user.id,)))
+        # redirect to registration page
+        self.assertEqual(response.status_code, 302)
         self.client.post(reverse("aquaholic:registration", args=(user.id,)), data={"weight": 60, "exercise_duration": 70})
         response = self.client.get(reverse('aquaholic:profile', args=(user.id,)))
         self.assertEqual(response.status_code, 200)
-        # profile_url = reverse('aquaholic:profile', args=(user.id,))
-        # form_data = {"first_name": "-",
-        #              "weight": "60.0",
-        #              "exercise_duration": "70.0",
-        #              "user_id": f"{user.id}"}
-        # response = self.client.get(profile_url, form_data)
-        # self.assertEqual(response.status_code, 200)
 
 
 class AboutUsViewTests(TestCase):

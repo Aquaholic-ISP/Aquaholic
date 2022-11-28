@@ -336,7 +336,7 @@ class HistoryViewTests(TestCase):
 class InputViewTests(TestCase):
     """Test cases for input view."""
 
-    def test_input(self):
+    def test_input_page(self):
         """Intakes are stored in the database correctly.
 
         When user input an amount of water and save,
@@ -401,6 +401,25 @@ class InputViewTests(TestCase):
                      "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
         self.assertContains(response, "Please, input a number more than 0.", html=True)
+
+    def test_not_input_in_both_fields(self):
+        """
+        User save input without amount of water and date.
+        """
+        # user logins and to home page where user info is created
+        user1 = User.objects.create(username='testuser1')
+        user1.set_password('12345')
+        user1.save()
+        self.client.login(username='testuser1', password='12345')
+        response = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(response.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
+        # user input the amount of water and save
+        input_url = reverse('aquaholic:input', args=(user1.id,))
+        form_data = {"amount": "0",
+                     "date": "0"}
+        response = self.client.post(input_url, form_data)
+        self.assertContains(response, "Please, input in the field.", html=True)
 
 
 class AlertViewTests(TestCase):
@@ -516,7 +535,7 @@ class LineNotifyConnectViewTests(TestCase):
 class ProfileViewTests(TestCase):
     """Test cases for profile view."""
 
-    def test_profile(self):
+    def test_profile_page(self):
         """Authenticated user can view their profile."""
         user = User.objects.create(username='testuser1')
         user.set_password('12345')

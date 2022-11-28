@@ -1,0 +1,8 @@
+[run]
+branch = True
+omit = 
+    mysite/*
+    aquaholic/__inti__.py
+    aquaholic/admin.py
+    manage.py
+    aquaholic/tests.py

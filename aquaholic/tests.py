@@ -349,7 +349,8 @@ class InputViewTests(TestCase):
         user1.set_password('12345')
         user1.save()
         self.client.login(username='testuser1', password='12345')
-        response = self.client.get(reverse('aquaholic:home'))
+        self.client.get(reverse('aquaholic:home'))
+        response = self.client.get(reverse('aquaholic:input', args=(user1.id,)))
         self.assertEqual(response.status_code, 302)  # redirect to registration page
         self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
 

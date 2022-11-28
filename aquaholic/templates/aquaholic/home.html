@@ -4,7 +4,6 @@
 
 <html>
 <head>
-    <!-- <link rel="stylesheet" href="{% static 'aquaholic/style.css' %}"> -->
     <link rel="stylesheet" href="{% static 'aquaholic/style10.css' %}">
     <title>Home page of Aquaholic</title>
 </head>
@@ -68,7 +67,7 @@
 
             <form action="{% url 'aquaholic:line_connect' user.id %}" method="get">
                 {% csrf_token %}
-                <button type="submit" style="width: 220px;">Set Notification schedule</button>
+                <button type="submit" style="width: 220px;">Set notification schedule</button>
             </form>
 
             <form action="{% url 'aquaholic:schedule' user.id %}" method="get">

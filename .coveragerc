@@ -6,3 +6,8 @@ omit =
     aquaholic/admin.py
     manage.py
     aquaholic/tests.py
+    aquaholic/apps.py
+    data/*
+    aquaholic/static/*
+    aquaholic/templates/*
+    aquaholic/migrations/*

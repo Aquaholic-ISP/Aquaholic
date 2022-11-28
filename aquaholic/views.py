@@ -189,11 +189,6 @@ class CalculateAuthView(LoginRequiredMixin, generic.DetailView):
         user_info.set_water_amount_per_day()
         user_info.set_water_amount_per_hour()
         user_info.save()
-        if user_info.water_amount_per_day == 0:
-            return render(request, 'aquaholic/regis.html',
-                          {'result': user_info.water_amount_per_day,
-                           'weight': user_info.weight,
-                           'exercise_duration': user_info.exercise_duration})
         # update schedule
         all_schedules = Schedule.objects.filter(user_info_id=user_info.id)
         for one_schedule in all_schedules:
@@ -450,11 +445,14 @@ class InputView(LoginRequiredMixin, generic.DetailView):
                 intake.total_amount += amount
             intake.save()
         else:
-            Intake.objects.create(user_info_id=user_info.id,
-                                  date=aware_date,
-                                  total_amount=amount)
+            intake = Intake.objects.create(user_info_id=user_info.id,
+                                           date=aware_date,
+                                           total_amount=amount)
+            if amount <= 0:
+                intake.total_amount = 0
+            intake.save()
         if amount == 0:
-            message = "Please, input a number more than 0."
+            message = "Please, input a number not equal to 0."
         else:
             message = "Saved !"
         return render(request, self.template_name,

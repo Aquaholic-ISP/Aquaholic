@@ -233,6 +233,17 @@ class RegistrationViewTests(TestCase):
                                     data={"weight": 0, "exercise_duration": 0})
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
+    def test_redirect_to_register(self):
+        """Redirect to registration page when go to other pages if not yet."""
+        response = self.client.post(reverse("aquaholic:input", args=(self.user.id,)),
+                                    data={"amount": "500", "date": "2022-11-05"})
+        self.assertEqual(response.status_code, 302)
+        response = self.client.post(reverse("aquaholic:set_up", args=(self.user.id,)),
+                                    data={"first_notification": "11:00",
+                                          "last_notification": "16:00",
+                                          "notify_interval": 1})
+        self.assertEqual(response.status_code, 302)
+
 
 class SetUpViewTests(TestCase):
     """Tests for set up view."""
@@ -355,6 +366,18 @@ class HistoryViewTests(TestCase):
 class InputViewTests(TestCase):
     """Test cases for input view."""
 
+    def setUp(self) -> None:
+        # user logins and to home page where user info is created
+        self.user1 = User.objects.create(username='testuser1')
+        self.user1.set_password('12345')
+        self.user1.save()
+        self.client.login(username='testuser1', password='12345')
+        self.client.get(reverse('aquaholic:home'))
+        response = self.client.get(reverse('aquaholic:input', args=(self.user1.id,)))
+        self.assertEqual(response.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(self.user1.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
+
     def test_input_page(self):
         """Intakes are stored in the database correctly.
 
@@ -363,18 +386,8 @@ class InputViewTests(TestCase):
         the selected day topped up from the already
         existing amount in the database of that day.
         """
-        # user logins and to home page where user info is created
-        user1 = User.objects.create(username='testuser1')
-        user1.set_password('12345')
-        user1.save()
-        self.client.login(username='testuser1', password='12345')
-        self.client.get(reverse('aquaholic:home'))
-        response = self.client.get(reverse('aquaholic:input', args=(user1.id,)))
-        self.assertEqual(response.status_code, 302)  # redirect to registration page
-        self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
-
         # user input the amount of water and save
-        input_url = reverse('aquaholic:input', args=(user1.id,))
+        input_url = reverse('aquaholic:input', args=(self.user1.id,))
         response = self.client.get(input_url)
         self.assertEqual(response.status_code, 200)
         form_data = {"amount": "200",
@@ -383,7 +396,7 @@ class InputViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # get userInfo object from database
-        user_info = UserInfo.objects.get(user_id=user1.id)
+        user_info = UserInfo.objects.get(user_id=self.user1.id)
 
         # datetime in database = actual time + 10 hours
         db_time = timezone.make_aware(datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10))
@@ -391,7 +404,7 @@ class InputViewTests(TestCase):
         self.assertEqual(200, intake1.total_amount)
 
         # user save the amount of water and save again
-        input_url = reverse('aquaholic:input', args=(user1.id,))
+        input_url = reverse('aquaholic:input', args=(self.user1.id,))
         form_data = {"amount": "500",
                      "date": "2022-11-05"}
         response = self.client.post(input_url, form_data)
@@ -404,38 +417,44 @@ class InputViewTests(TestCase):
 
     def test_input_invalid(self):
         """User amount of water input must be greater than 0."""
-        # user logins and to home page where user info is created
-        user1 = User.objects.create(username='testuser1')
-        user1.set_password('12345')
-        user1.save()
-        self.client.login(username='testuser1', password='12345')
-        response = self.client.get(reverse('aquaholic:home'))
-        self.assertEqual(response.status_code, 302)  # redirect to registration page
-        self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
         # user input the amount of water and save
-        input_url = reverse('aquaholic:input', args=(user1.id,))
+        input_url = reverse('aquaholic:input', args=(self.user1.id,))
         form_data = {"amount": "0",
                      "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
-        self.assertContains(response, "Please, input a number more than 0.", html=True)
+        self.assertContains(response, "Please, input a number not equal to 0.", html=True)
 
     def test_not_input_in_both_fields(self):
         """User save input without amount of water and date."""
-        # user logins and to home page where user info is created
-        user1 = User.objects.create(username='testuser1')
-        user1.set_password('12345')
-        user1.save()
-        self.client.login(username='testuser1', password='12345')
-        response = self.client.get(reverse('aquaholic:home'))
-        self.assertEqual(response.status_code, 302)  # redirect to registration page
-        self.client.post(reverse("aquaholic:registration", args=(user1.id,)),
-                         data={"weight": 50, "exercise_duration": 0})
         # user input the amount of water and save
-        input_url = reverse('aquaholic:input', args=(user1.id,))
+        input_url = reverse('aquaholic:input', args=(self.user1.id,))
         form_data = {"amount": "0",
                      "date": "0"}
         response = self.client.post(input_url, form_data)
         self.assertContains(response, "Please, input numbers in both fields.", html=True)
+
+    def test_input_very_negative_value(self):
+        """When the negative value inputted is less than 0, amount == 0."""
+        # current date
+        date = timezone.make_aware(datetime.datetime.today().replace(hour=10, minute=0, second=0, microsecond=0))
+        input_url = reverse('aquaholic:input', args=(self.user1.id,))
+        form_data = {"amount": "-19999",
+                     "date": date.strftime('%Y-%m-%d')}
+        response = self.client.post(input_url, form_data)
+        self.assertContains(response, "Saved !", html=True)
+        user_info = UserInfo.objects.get(user_id=self.user1.id)
+        intake = Intake.objects.get(user_info_id=user_info.id, date=date)
+        self.assertEqual(0, intake.total_amount)
+        # old date
+        input_url = reverse('aquaholic:input', args=(self.user1.id,))
+        form_data = {"amount": "-19999",
+                     "date": "2022-11-25"}
+        response = self.client.post(input_url, form_data)
+        self.assertContains(response, "Saved !", html=True)
+        user_info = UserInfo.objects.get(user_id=self.user1.id)
+        db_time = timezone.make_aware(datetime.datetime(2022, 11, 25) + datetime.timedelta(hours=10))
+        intake = Intake.objects.get(user_info_id=user_info.id, date=db_time)
+        self.assertEqual(0, intake.total_amount)
 
 
 class AlertViewTests(TestCase):

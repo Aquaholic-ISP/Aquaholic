@@ -380,6 +380,25 @@ class InputViewTests(TestCase):
         intake1 = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(700, intake1.total_amount)
 
+    def test_input_invalid(self):
+        """
+        user amount of water input must be greater than 0.
+        """
+        # user logins and to home page where user info is created
+        user1 = User.objects.create(username='testuser1')
+        user1.set_password('12345')
+        user1.save()
+        self.client.login(username='testuser1', password='12345')
+        response = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(response.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
+        # user input the amount of water and save
+        input_url = reverse('aquaholic:input', args=(user1.id,))
+        form_data = {"amount": "0",
+                     "date": "2022-11-25"}
+        response = self.client.post(input_url, form_data)
+        self.assertContains(response, "Please, input a number more than 0.", html=True)
+
 
 class AlertViewTests(TestCase):
     """Test alert view."""

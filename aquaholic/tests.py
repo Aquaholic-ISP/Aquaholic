@@ -239,6 +239,9 @@ class SetUpViewTests(TestCase):
         self.assertEqual(page.status_code, 302)  # redirect to registration page
         self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
                          data={"weight": 50, "exercise_duration": 0})
+
+    def test_go_to_set_up_page(self):
+        """Can go to set notification page successfully."""
         page = self.client.get(reverse('aquaholic:set_up', args=(self.user.id,)))
         self.assertEqual(page.status_code, 200)
 
@@ -416,7 +419,7 @@ class InputViewTests(TestCase):
         form_data = {"amount": "0",
                      "date": "0"}
         response = self.client.post(input_url, form_data)
-        self.assertContains(response, "Please, input in the field.", html=True)
+        self.assertContains(response, "Please, input numbers in both fields.", html=True)
 
 
 class AlertViewTests(TestCase):
@@ -510,6 +513,13 @@ class LineNotifyVerificationViewTests(TestCase):
 
     def test_redirect_after_visit(self):
         """When enter url for line notify, it will redirect to line authorization url."""
+        user1 = User.objects.create(username='testuser1')
+        user1.set_password('12345')
+        user1.save()
+        self.client.login(username='testuser1', password='12345')
+        self.client.get(reverse("aquaholic:home"))
+        self.client.post(reverse("aquaholic:registration", args=(user1.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
         response = self.client.get(reverse('aquaholic:line_notify'))
         self.assertEqual(response.status_code, 302)
 
@@ -524,7 +534,8 @@ class LineNotifyConnectViewTests(TestCase):
         user1.save()
         self.client.login(username='testuser1', password='12345')
         self.client.get(reverse("aquaholic:home"))
-        self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
+        self.client.post(reverse("aquaholic:registration", args=(user1.id,)),
+                         data={"weight": 50, "exercise_duration": 0})
         response = self.client.get(reverse('aquaholic:line_connect', args=(user1.id,)))
         self.assertEqual(response.status_code, 200)
 

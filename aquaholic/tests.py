@@ -508,22 +508,6 @@ class UpdateNotificationViewTests(TestCase):
             self.assertFalse(new_last_schedule.notification_status)
 
 
-class LineNotifyVerificationViewTests(TestCase):
-    """Tests for line notify verification view."""
-
-    def test_redirect_after_visit(self):
-        """When enter url for line notify, it will redirect to line authorization url."""
-        user1 = User.objects.create(username='testuser1')
-        user1.set_password('12345')
-        user1.save()
-        self.client.login(username='testuser1', password='12345')
-        self.client.get(reverse("aquaholic:home"))
-        self.client.post(reverse("aquaholic:registration", args=(user1.id,)),
-                         data={"weight": 50, "exercise_duration": 0})
-        response = self.client.get(reverse('aquaholic:line_notify'))
-        self.assertEqual(response.status_code, 302)
-
-
 class LineNotifyConnectViewTests(TestCase):
     """Tests for line notify connect view."""
 

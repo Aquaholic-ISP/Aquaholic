@@ -198,6 +198,17 @@ class RegistrationViewTests(TestCase):
         page1 = self.client.get(reverse('aquaholic:home'))
         self.assertEqual(page1.status_code, 302)  # redirect to registration page
 
+    def test_go_to_registration_page(self):
+        """Go to registration page."""
+        user = User.objects.create(username='testuser1')
+        user.set_password('12345')
+        user.save()
+        self.client.login(username='testuser1', password='12345')
+        page1 = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(page1.status_code, 302)
+        page2 = self.client.get(reverse('aquaholic:registration', args=(user.id,)))
+        self.assertTemplateUsed(page2, "aquaholic/regis.html")
+
     def test_calculation(self):
         """Calculation is done correctly."""
         response = self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),

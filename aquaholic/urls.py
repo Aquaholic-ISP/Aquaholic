@@ -1,7 +1,7 @@
+"""List of all urls for aquaholic app."""
 from django.urls import path
 from django.views.generic import RedirectView
-from decouple import config
-from django.views.generic import TemplateView
+
 
 from . import views
 

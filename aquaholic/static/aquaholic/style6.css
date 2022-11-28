@@ -16,7 +16,9 @@
 }
 
 .head h1{
-    font-size: 60px;
+    font-size: 50px;
+    text-shadow:
+    -12px 12px 20px rgba(0,0,0,0.5);
 }
 
 .wrapbutton {

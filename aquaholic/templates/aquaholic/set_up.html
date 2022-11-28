@@ -40,7 +40,7 @@
 <div class="content">
     <h1>Set your notification schedule</h1>
     {% if not has_token %}
-        You must connect to Line Notify first to receive notification. <a href="{% url 'aquaholic:line_connect' user.id %}"> Connect to Line Notify </a>
+        You must connect to LINE Notify first to receive notifications. <a href="{% url 'aquaholic:line_connect' user.id %}"> Connect to LINE Notify </a>
     {% endif %}
     <div class="setup">
         <form action="{% url 'aquaholic:set_up' user.id %}" method="POST">
@@ -54,14 +54,14 @@
             <br>
             <label id="frequency" style="font-size: 25px; ">Notify every</label>
             <input style="margin-left: 114px; font-size: 18px;" type="number" name="notify_interval" min="1" value="{{ notification_hour }}" max="24">
-            <label style="font-size: 25px;">hours</label>
+            <label style="font-size: 25px;">hour(s)</label>
 
             <br>
             {% if message %}
                 <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
             {% endif %}
             <br>
-            <button  type="submit" style="margin-top: 40px;">save</button>
+            <button  type="submit" style="margin-top: 40px;">Save</button>
         </form>
         <br>
     </div>

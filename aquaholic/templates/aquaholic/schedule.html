@@ -42,7 +42,7 @@
 <div class="content">
     <h1>Your notification schedule</h1>
     {% if not has_token %}
-        You must connect to Line Notify first to receive notification. <a href="{% url 'aquaholic:line_connect' user.id %}"> Connect to Line Notify </a>
+        You must connect to LINE Notify first to receive notifications. <a href="{% url 'aquaholic:line_connect' user.id %}"> Connect to LINE Notify </a>
     {% endif %}
     <div class="scrollindiv">
 
@@ -50,7 +50,7 @@
                 <table border="1" cellpadding=10>
                 <th style="text-align:center; width: 250px;">Time</th>
                 <th style="text-align:center; width: 250px;">Amount (ml)</th>
-                <th style="text-align:center; width: 250px;">status</th>
+                <th style="text-align:center; width: 250px;">Status</th>
                 {% for data in schedule %}
                     <tr>
                     {% if data.notification_status %}

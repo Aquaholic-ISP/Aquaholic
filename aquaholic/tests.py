@@ -222,6 +222,8 @@ class RegistrationViewTests(TestCase):
         response = self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
                                     data={"weight": 65, "exercise_duration": 120})
         self.assertContains(response, 3538)
+        response = self.client.get(reverse('aquaholic:registration', args=(self.user.id,)))
+        self.assertContains(response, 65.0)
 
     def test_invalid_input(self):
         """Input invalid value."""

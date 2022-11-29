@@ -425,6 +425,8 @@ class InputView(LoginRequiredMixin, generic.DetailView):
         """Input the amount of water from user and save to database."""
         try:
             amount = float(request.POST["amount"])
+            if amount <= 0:
+                amount = 0
             date = request.POST["date"]
             intake_date = datetime.datetime.strptime(date, '%Y-%m-%d') + datetime.timedelta(hours=10)
         except ValueError:
@@ -439,20 +441,14 @@ class InputView(LoginRequiredMixin, generic.DetailView):
         # User already have intake for the given day, add amount of water to existed amount
         if Intake.objects.filter(user_info_id=user_info.id, date=aware_date).exists():
             intake = Intake.objects.get(user_info_id=user_info.id, date=aware_date)
-            if intake.total_amount + amount <= 0:
-                intake.total_amount = 0
-            else:
-                intake.total_amount += amount
+            intake.total_amount += amount
             intake.save()
         else:
-            intake = Intake.objects.create(user_info_id=user_info.id,
-                                           date=aware_date,
-                                           total_amount=amount)
-            if amount <= 0:
-                intake.total_amount = 0
-            intake.save()
-        if amount == 0:
-            message = "Please, input a number not equal to 0."
+            Intake.objects.create(user_info_id=user_info.id,
+                                  date=aware_date,
+                                  total_amount=amount)
+        if amount <= 0:
+            message = "Sorry! Water amount must be positive number more than 0."
         else:
             message = "Saved !"
         return render(request, self.template_name,

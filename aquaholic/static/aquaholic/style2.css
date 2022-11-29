@@ -28,6 +28,7 @@ h2{
     position: absolute;
     margin-top: 3%;
     margin-left: 25%;
+    height: 13%;
 }
 
 .calpart button{
@@ -115,7 +116,12 @@ input[type=number]::-webkit-inner-spin-button {
     overflow: hidden;
 }
 
+.message {
+    position: absolute;
+    margin-left: 30%;
+}
+
 .btn {
-    margin-top: 15%;
+    margin-top: 10%;
     height: 20vh;
 }

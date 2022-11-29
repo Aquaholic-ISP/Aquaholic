@@ -57,9 +57,11 @@
         <br>
         <a class="line-connect" id="line-connect2" href="{% url 'aquaholic:set_up' user.id %}"> Notification Settings </a>
         <br>
-        <ul>
-            <link><a href="/">Skip for now</a>
-        </ul>
+        {% if not has_token %}
+            <ul>
+                <link><a href="/">Skip for now</a>
+            </ul>
+        {% endif %}
     </div>
 </div>    
 </html>

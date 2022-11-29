@@ -48,8 +48,6 @@
            <p style="font-size: 20px; "> ✅ LINE Notify is connected. Notification is enabled.</p>
            <br>
            <p style="font-size: 16px; "> You can turn off notification anytime in the schedule page or disconnect from LINE Notify anytime at <a style="color: white" href="https://notify-bot.line.me/my/">My page - LINE Notify</a></p>
-           <br>
-           <a id="line-connect" href="{% url 'aquaholic:set_up' user.id %}"> Notification Settings </a>
         {% else %}
            <p style="font-size: 20px; "> ❌ LINE Notify is not connected. Notification is not yet enabled.</p>
            <br>
@@ -59,9 +57,11 @@
         <br>
         <a class="line-connect" id="line-connect2" href="{% url 'aquaholic:set_up' user.id %}"> Notification Settings </a>
         <br>
-        <ul>
-            <link><a href="/">Skip for now</a>
-        </ul>
+        {% if not has_token %}
+            <ul>
+                <link><a href="/">Skip for now</a>
+            </ul>
+        {% endif %}
     </div>
 </div>    
 </html>

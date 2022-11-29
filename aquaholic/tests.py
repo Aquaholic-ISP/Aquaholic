@@ -250,6 +250,14 @@ class SetUpViewTests(TestCase):
                                           "notify_interval": 1})
         self.assertContains(response, "Saved! Please, visit schedule page to see the update.", html=True)
 
+    def test_set_notification_time_is_not_allow(self):
+        """Total hour in notification setting must greater than 0."""
+        response = self.client.post(reverse("aquaholic:set_up", args=(self.user.id,)),
+                                    data={"first_notification": "11:00",
+                                          "last_notification": "11:00",
+                                          "notify_interval": 1})
+        self.assertContains(response, "Please, enter different time or time difference is more than 1 hour.", html=True)
+
 
 class ScheduleViewTests(TestCase):
     """Test cases for schedule view."""
@@ -328,7 +336,7 @@ class HistoryViewTests(TestCase):
 class InputViewTests(TestCase):
     """Test cases for input view."""
 
-    def test_input(self):
+    def test_input_page(self):
         """Intakes are stored in the database correctly.
 
         When user input an amount of water and save,
@@ -341,12 +349,15 @@ class InputViewTests(TestCase):
         user1.set_password('12345')
         user1.save()
         self.client.login(username='testuser1', password='12345')
-        response = self.client.get(reverse('aquaholic:home'))
+        self.client.get(reverse('aquaholic:home'))
+        response = self.client.get(reverse('aquaholic:input', args=(user1.id,)))
         self.assertEqual(response.status_code, 302)  # redirect to registration page
         self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
 
         # user input the amount of water and save
         input_url = reverse('aquaholic:input', args=(user1.id,))
+        response = self.client.get(input_url)
+        self.assertEqual(response.status_code, 200)
         form_data = {"amount": "200",
                      "date": "2022-11-05"}
         response = self.client.post(input_url, form_data)
@@ -371,6 +382,44 @@ class InputViewTests(TestCase):
         db_time = timezone.make_aware(datetime.datetime(2022, 11, 5) + datetime.timedelta(hours=10))
         intake1 = Intake.objects.get(user_info_id=user_info.id, date=db_time)
         self.assertEqual(700, intake1.total_amount)
+
+    def test_input_invalid(self):
+        """
+        user amount of water input must be greater than 0.
+        """
+        # user logins and to home page where user info is created
+        user1 = User.objects.create(username='testuser1')
+        user1.set_password('12345')
+        user1.save()
+        self.client.login(username='testuser1', password='12345')
+        response = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(response.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
+        # user input the amount of water and save
+        input_url = reverse('aquaholic:input', args=(user1.id,))
+        form_data = {"amount": "0",
+                     "date": "2022-11-25"}
+        response = self.client.post(input_url, form_data)
+        self.assertContains(response, "Please, input a number more than 0.", html=True)
+
+    def test_not_input_in_both_fields(self):
+        """
+        User save input without amount of water and date.
+        """
+        # user logins and to home page where user info is created
+        user1 = User.objects.create(username='testuser1')
+        user1.set_password('12345')
+        user1.save()
+        self.client.login(username='testuser1', password='12345')
+        response = self.client.get(reverse('aquaholic:home'))
+        self.assertEqual(response.status_code, 302)  # redirect to registration page
+        self.client.post(reverse("aquaholic:registration", args=(user1.id,)), data={"weight": 50, "exercise_duration": 0})
+        # user input the amount of water and save
+        input_url = reverse('aquaholic:input', args=(user1.id,))
+        form_data = {"amount": "0",
+                     "date": "0"}
+        response = self.client.post(input_url, form_data)
+        self.assertContains(response, "Please, input in the field.", html=True)
 
 
 class AlertViewTests(TestCase):
@@ -486,7 +535,7 @@ class LineNotifyConnectViewTests(TestCase):
 class ProfileViewTests(TestCase):
     """Test cases for profile view."""
 
-    def test_profile(self):
+    def test_profile_page(self):
         """Authenticated user can view their profile."""
         user = User.objects.create(username='testuser1')
         user.set_password('12345')

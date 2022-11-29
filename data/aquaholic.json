@@ -49,5 +49,22 @@
     "time_interval": 1,
     "notification_turned_on": true
   }
+},
+{
+  "model": "aquaholic.userinfo",
+  "pk": 9,
+  "fields": {
+    "user": 7,
+    "weight": 50.0,
+    "exercise_duration": 60.0,
+    "water_amount_per_day": 2339,
+    "first_notification_time": "08:00:00",
+    "last_notification_time": "22:00:00",
+    "total_hours": null,
+    "water_amount_per_hour": null,
+    "notify_token": null,
+    "time_interval": 1,
+    "notification_turned_on": true
+  }
 }
 ]

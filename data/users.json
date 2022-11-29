@@ -52,5 +52,23 @@
     "groups": [],
     "user_permissions": []
   }
+},
+{
+  "model": "auth.user",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$390000$d4R3bsU3yC1StaSMcnIXFO$7EPrIcCJDNoQE4oucAlQtqjO21iUhoNYZ8RAGBFCs8E=",
+    "last_login": "2022-11-29T18:10:31.349Z",
+    "is_superuser": false,
+    "username": "kulisara",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2022-11-29T18:10:31.132Z",
+    "groups": [],
+    "user_permissions": []
+  }
 }
 ]

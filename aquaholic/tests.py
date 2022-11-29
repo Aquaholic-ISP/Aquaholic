@@ -243,6 +243,8 @@ class RegistrationViewTests(TestCase):
                                           "last_notification": "16:00",
                                           "notify_interval": 1})
         self.assertEqual(response.status_code, 302)
+        response = self.client.get(reverse("aquaholic:new_set_up", args=(self.user.id,)))
+        self.assertEqual(response.status_code, 302)
 
 
 class SetUpViewTests(TestCase):
@@ -287,6 +289,26 @@ class SetUpViewTests(TestCase):
                                           "last_notification": "11:00",
                                           "notify_interval": 1})
         self.assertContains(response, "Please, enter time in both fields.", html=True)
+
+
+class SetUpRegistrationViewTest(TestCase):
+    """Test set up view for new user."""
+
+    def test_go_to_new_set_up_page(self):
+        """New users can visit new set up page."""
+        user = User.objects.create(username='testuser1')
+        user.set_password('12345')
+        user.save()
+        self.client.login(username='testuser1', password='12345')
+        self.client.get(reverse("aquaholic:home"))
+        response = self.client.get(reverse('aquaholic:profile', args=(user.id,)))
+        # redirect to registration page
+        self.assertEqual(response.status_code, 302)
+        self.client.post(reverse("aquaholic:registration", args=(user.id,)),
+                         data={"weight": 60, "exercise_duration": 70})
+        response = self.client.get(reverse('aquaholic:new_set_up', args=(user.id,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "aquaholic/set_up_regist.html")
 
 
 class ScheduleViewTests(TestCase):
@@ -422,7 +444,7 @@ class InputViewTests(TestCase):
         form_data = {"amount": "0",
                      "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
-        self.assertContains(response, "Please, input a number not equal to 0.", html=True)
+        self.assertContains(response, "Sorry! Water amount must be positive number more than 0.", html=True)
 
     def test_not_input_in_both_fields(self):
         """User save input without amount of water and date."""
@@ -440,7 +462,7 @@ class InputViewTests(TestCase):
         form_data = {"amount": "-19999",
                      "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
-        self.assertContains(response, "Saved !", html=True)
+        self.assertContains(response, "Sorry! Water amount must be positive number more than 0.", html=True)
         user_info = UserInfo.objects.get(user_id=self.user1.id)
         db_time = timezone.make_aware(datetime.datetime(2022, 11, 25) + datetime.timedelta(hours=10))
         intake = Intake.objects.get(user_info_id=user_info.id, date=db_time)
@@ -454,11 +476,11 @@ class InputViewTests(TestCase):
         form_data = {"amount": "-19999",
                      "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
-        self.assertContains(response, "Saved !", html=True)
+        self.assertContains(response, "Sorry! Water amount must be positive number more than 0.", html=True)
         user_info = UserInfo.objects.get(user_id=self.user1.id)
         db_time = timezone.make_aware(datetime.datetime(2022, 11, 25) + datetime.timedelta(hours=10))
         intake = Intake.objects.get(user_info_id=user_info.id, date=db_time)
-        self.assertEqual(0, intake.total_amount)
+        self.assertEqual(500, intake.total_amount)
 
 
 class AlertViewTests(TestCase):

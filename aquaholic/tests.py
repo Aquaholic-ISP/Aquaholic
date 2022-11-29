@@ -243,6 +243,8 @@ class RegistrationViewTests(TestCase):
                                           "last_notification": "16:00",
                                           "notify_interval": 1})
         self.assertEqual(response.status_code, 302)
+        response = self.client.get(reverse("aquaholic:new_set_up", args=(self.user.id,)))
+        self.assertEqual(response.status_code, 302)
 
 
 class SetUpViewTests(TestCase):

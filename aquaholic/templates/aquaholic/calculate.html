@@ -38,10 +38,17 @@
             <label id="timel" style="font-size: 30px;">Enter your exercise duration (min)</label>
             <input id="timein" style="margin-left: 65px; font-size: 18px;" type="number" name="exercise_duration" min="0" step="0.01">
             <br>
-            {% if message %}
-                <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
-            {% endif %}
-            <button type="submit" style="margin-top: 40px;">Calculate</button>
+
+            <div class="message">
+                {% if message %}
+                    <p style="color: #B80000; font-size: 18px; margin-bottom: 0; margin-top: 10px;">{{message}}</p>
+                {% endif %}
+            </div>
+
+            <div class="btn">
+                <button type="submit" style="margin-top: 40px;">Calculate</button>
+            </div>
+            
         </form>
         </div>
 

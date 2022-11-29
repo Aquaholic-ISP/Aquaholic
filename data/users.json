@@ -34,5 +34,23 @@
     "groups": [],
     "user_permissions": []
   }
+},
+{
+  "model": "auth.user",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$390000$T54Iy34Jpc5wk6cBwK8V6g$QMzeFkYsFMVvim7NGoE6cXJLrCDiDbTE1EB4LC67ZsY=",
+    "last_login": "2022-11-29T16:00:15.956Z",
+    "is_superuser": false,
+    "username": "newuser",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2022-11-29T16:00:15.856Z",
+    "groups": [],
+    "user_permissions": []
+  }
 }
 ]

@@ -222,6 +222,8 @@ class RegistrationViewTests(TestCase):
         response = self.client.post(reverse("aquaholic:registration", args=(self.user.id,)),
                                     data={"weight": 65, "exercise_duration": 120})
         self.assertContains(response, 3538)
+        response = self.client.get(reverse('aquaholic:registration', args=(self.user.id,)))
+        self.assertContains(response, 65.0)
 
     def test_invalid_input(self):
         """Input invalid value."""
@@ -444,7 +446,7 @@ class InputViewTests(TestCase):
         form_data = {"amount": "0",
                      "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
-        self.assertContains(response, "Sorry! Water amount must be positive number more than 0.", html=True)
+        self.assertContains(response, "Sorry! Water amount must be a positive number more than 0.", html=True)
 
     def test_not_input_in_both_fields(self):
         """User save input without amount of water and date."""
@@ -462,7 +464,7 @@ class InputViewTests(TestCase):
         form_data = {"amount": "-19999",
                      "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
-        self.assertContains(response, "Sorry! Water amount must be positive number more than 0.", html=True)
+        self.assertContains(response, "Sorry! Water amount must be a positive number more than 0.", html=True)
         user_info = UserInfo.objects.get(user_id=self.user1.id)
         db_time = timezone.make_aware(datetime.datetime(2022, 11, 25) + datetime.timedelta(hours=10))
         intake = Intake.objects.get(user_info_id=user_info.id, date=db_time)
@@ -476,7 +478,7 @@ class InputViewTests(TestCase):
         form_data = {"amount": "-19999",
                      "date": "2022-11-25"}
         response = self.client.post(input_url, form_data)
-        self.assertContains(response, "Sorry! Water amount must be positive number more than 0.", html=True)
+        self.assertContains(response, "Sorry! Water amount must be a positive number more than 0.", html=True)
         user_info = UserInfo.objects.get(user_id=self.user1.id)
         db_time = timezone.make_aware(datetime.datetime(2022, 11, 25) + datetime.timedelta(hours=10))
         intake = Intake.objects.get(user_info_id=user_info.id, date=db_time)

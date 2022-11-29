@@ -289,6 +289,26 @@ class SetUpViewTests(TestCase):
         self.assertContains(response, "Please, enter time in both fields.", html=True)
 
 
+class SetUpRegistrationViewTest(TestCase):
+    """Test set up view for new user."""
+
+    def test_go_to_new_set_up_page(self):
+        """New users can visit new set up page."""
+        user = User.objects.create(username='testuser1')
+        user.set_password('12345')
+        user.save()
+        self.client.login(username='testuser1', password='12345')
+        self.client.get(reverse("aquaholic:home"))
+        response = self.client.get(reverse('aquaholic:profile', args=(user.id,)))
+        # redirect to registration page
+        self.assertEqual(response.status_code, 302)
+        self.client.post(reverse("aquaholic:registration", args=(user.id,)),
+                         data={"weight": 60, "exercise_duration": 70})
+        response = self.client.get(reverse('aquaholic:new_set_up', args=(user.id,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "aquaholic/set_up_regist.html")
+
+
 class ScheduleViewTests(TestCase):
     """Test cases for schedule view."""
 

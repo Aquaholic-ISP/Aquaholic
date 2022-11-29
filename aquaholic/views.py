@@ -208,6 +208,8 @@ class SetUpRegistrationView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         """Go to set up registration page for new user."""
         user_info = UserInfo.objects.get(user_id=request.user.id)
+        if user_info.water_amount_per_day == 0:
+            return HttpResponseRedirect(reverse("aquaholic:registration", args=(request.user.id,)))
         status = check_token_status(user_info.notify_token)
         return render(request, self.template_name,
                       {"has_token": status == 200})

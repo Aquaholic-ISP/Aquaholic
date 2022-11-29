@@ -450,7 +450,7 @@ class InputView(LoginRequiredMixin, generic.DetailView):
                                   date=aware_date,
                                   total_amount=amount)
         if amount <= 0:
-            message = "Sorry! Water amount must be positive number more than 0."
+            message = "Sorry! Water amount must be a positive number more than 0."
         else:
             message = "Saved !"
         return render(request, self.template_name,
